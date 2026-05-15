@@ -1,0 +1,217 @@
+"""
+betlog.py -- MLB bet tracker
+
+Usage:
+  python betlog.py add --date 2026-05-15 --matchup "PHI @ PIT" --signal "OVER lean" --bet "over 8.5" --line -115 --stake 25
+  python betlog.py result 1 W
+  python betlog.py result 1 L
+  python betlog.py result 1 P          # push
+  python betlog.py list                # all open bets
+  python betlog.py list --all          # every bet
+  python betlog.py list --days 14
+  python betlog.py summary             # P&L by signal type
+"""
+
+import argparse
+import sqlite3
+from datetime import date, datetime
+from pathlib import Path
+
+DB_PATH = Path(__file__).parent / "betlog.db"
+
+
+# ── schema ─────────────────────────────────────────────────────────────────────
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS bets (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    date        TEXT NOT NULL,
+    matchup     TEXT NOT NULL,
+    signal      TEXT,
+    bet_on      TEXT NOT NULL,
+    line        INTEGER NOT NULL,
+    stake       REAL NOT NULL,
+    result      TEXT,                  -- W / L / P / NULL (pending)
+    profit      REAL,                  -- NULL until settled
+    notes       TEXT,
+    logged_at   TEXT DEFAULT (datetime('now'))
+);
+"""
+
+
+def connect() -> sqlite3.Connection:
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    conn.executescript(SCHEMA)
+    conn.commit()
+    return conn
+
+
+# ── payout math ────────────────────────────────────────────────────────────────
+
+def calc_profit(stake: float, line: int, result: str) -> float:
+    if result == "P":
+        return 0.0
+    if result == "L":
+        return -stake
+    # Win
+    if line < 0:
+        return round(stake * (100 / abs(line)), 2)
+    else:
+        return round(stake * (line / 100), 2)
+
+
+# ── commands ───────────────────────────────────────────────────────────────────
+
+def cmd_add(args):
+    conn = connect()
+    game_date = args.date or str(date.today())
+    conn.execute("""
+        INSERT INTO bets (date, matchup, signal, bet_on, line, stake, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (game_date, args.matchup, args.signal, args.bet, args.line, args.stake, args.notes))
+    conn.commit()
+    row = conn.execute("SELECT last_insert_rowid() as id").fetchone()
+    print(f"Logged bet #{row['id']}  |  {game_date}  {args.matchup}  |  {args.bet} @ {args.line:+d}  |  ${args.stake:.0f} stake")
+    conn.close()
+
+
+def cmd_result(args):
+    conn = connect()
+    row = conn.execute("SELECT * FROM bets WHERE id = ?", (args.id,)).fetchone()
+    if not row:
+        print(f"Bet #{args.id} not found")
+        conn.close()
+        return
+    if row["result"]:
+        print(f"Bet #{args.id} already settled: {row['result']}")
+        conn.close()
+        return
+
+    result = args.result.upper()
+    if result not in ("W", "L", "P"):
+        print("Result must be W, L, or P")
+        conn.close()
+        return
+
+    profit = calc_profit(row["stake"], row["line"], result)
+    conn.execute("UPDATE bets SET result = ?, profit = ? WHERE id = ?", (result, profit, args.id))
+    conn.commit()
+    sign = "+" if profit >= 0 else ""
+    print(f"Bet #{args.id} settled: {result}  |  {sign}${profit:.2f}  |  {row['matchup']}  {row['bet_on']}")
+    conn.close()
+
+
+def cmd_list(args):
+    conn = connect()
+    clauses = []
+    params  = []
+
+    if not args.all:
+        if args.days:
+            clauses.append("date >= date('now', ?)")
+            params.append(f"-{args.days} days")
+        else:
+            clauses.append("result IS NULL")
+
+    where = ("WHERE " + " AND ".join(clauses)) if clauses else ""
+    rows = conn.execute(f"""
+        SELECT * FROM bets {where} ORDER BY date DESC, id DESC
+    """, params).fetchall()
+    conn.close()
+
+    if not rows:
+        print("No bets found.")
+        return
+
+    label = "OPEN BETS" if (not args.all and not args.days) else "BETS"
+    print(f"\n{label}\n")
+    print(f"{'#':>3} {'Date':<12} {'Matchup':<30} {'Bet':<20} {'Line':>5} {'Stake':>6} {'Result':>6} {'Profit':>8}")
+    print("-" * 100)
+    for r in rows:
+        profit_str = f"+${r['profit']:.2f}" if r["profit"] and r["profit"] >= 0 else (f"-${abs(r['profit']):.2f}" if r["profit"] else "-")
+        result_str = r["result"] or "open"
+        print(f"{r['id']:>3} {r['date']:<12} {r['matchup']:<30} {r['bet_on']:<20} {r['line']:>+5} ${r['stake']:>5.0f} {result_str:>6} {profit_str:>8}")
+        if r["signal"]:
+            print(f"    signal: {r['signal']}")
+
+
+def cmd_summary(args):
+    conn = connect()
+    rows = conn.execute("""
+        SELECT * FROM bets WHERE result IS NOT NULL ORDER BY date
+    """).fetchall()
+    conn.close()
+
+    if not rows:
+        print("No settled bets yet.")
+        return
+
+    total_stake  = sum(r["stake"] for r in rows)
+    total_profit = sum(r["profit"] for r in rows)
+    wins   = sum(1 for r in rows if r["result"] == "W")
+    losses = sum(1 for r in rows if r["result"] == "L")
+    pushes = sum(1 for r in rows if r["result"] == "P")
+    win_pct = wins / (wins + losses) * 100 if (wins + losses) > 0 else 0
+    roi     = total_profit / total_stake * 100 if total_stake else 0
+
+    print(f"\nBET LOG SUMMARY  ({len(rows)} settled)\n")
+    print(f"  Record:      {wins}W - {losses}L - {pushes}P  ({win_pct:.0f}% win rate)")
+    print(f"  Total stake: ${total_stake:.2f}")
+    print(f"  Net P&L:     {'+'if total_profit>=0 else ''}{total_profit:.2f}")
+    print(f"  ROI:         {roi:+.1f}%")
+
+    # break down by signal type
+    by_signal: dict[str, dict] = {}
+    for r in rows:
+        sig = r["signal"] or "no signal"
+        key = sig.split("--")[0].strip().lower()
+        if key not in by_signal:
+            by_signal[key] = {"w": 0, "l": 0, "p": 0, "profit": 0.0}
+        by_signal[key][r["result"].lower()] += 1
+        by_signal[key]["profit"] += r["profit"]
+
+    if len(by_signal) > 1:
+        print(f"\n  By signal type:")
+        for sig, s in sorted(by_signal.items(), key=lambda x: -x[1]["profit"]):
+            total = s["w"] + s["l"]
+            wp = s["w"] / total * 100 if total else 0
+            sign = "+" if s["profit"] >= 0 else ""
+            print(f"    {sig:<35} {s['w']}W-{s['l']}L  {wp:.0f}%  {sign}${s['profit']:.2f}")
+
+
+# ── main ───────────────────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(description="MLB bet log")
+    sub = parser.add_subparsers(dest="cmd")
+
+    p_add = sub.add_parser("add", help="Log a new bet")
+    p_add.add_argument("--date",    default=None, help="Game date YYYY-MM-DD (default: today)")
+    p_add.add_argument("--matchup", required=True, help='e.g. "PHI @ PIT"')
+    p_add.add_argument("--signal",  default=None, help='Signal from matchup.py e.g. "OVER lean"')
+    p_add.add_argument("--bet",     required=True, help='What you bet e.g. "over 8.5" or "Pirates ML"')
+    p_add.add_argument("--line",    required=True, type=int, help="American odds e.g. -115 or +130")
+    p_add.add_argument("--stake",   required=True, type=float, help="Dollars wagered")
+    p_add.add_argument("--notes",   default=None)
+
+    p_res = sub.add_parser("result", help="Settle a bet")
+    p_res.add_argument("id",     type=int, help="Bet ID")
+    p_res.add_argument("result", help="W, L, or P (push)")
+
+    p_lst = sub.add_parser("list", help="List bets")
+    p_lst.add_argument("--all",  action="store_true", help="Show all bets including settled")
+    p_lst.add_argument("--days", type=int, default=0, help="Last N days")
+
+    sub.add_parser("summary", help="P&L summary by signal type")
+
+    args = parser.parse_args()
+    if args.cmd == "add":       cmd_add(args)
+    elif args.cmd == "result":  cmd_result(args)
+    elif args.cmd == "list":    cmd_list(args)
+    elif args.cmd == "summary": cmd_summary(args)
+    else: parser.print_help()
+
+
+if __name__ == "__main__":
+    main()
