@@ -3,20 +3,21 @@ scout.py -- tier rankings for betting: ELITE (bet on) / FADE (bet against)
 
 Usage:
   python scout.py teams
-  python scout.py pitchers
-  python scout.py hitters
-  python scout.py all
+  python scout.py pitchers [--starters-only]
+  python scout.py hitters [--hot-only]
+  python scout.py all [--starters-only] [--hot-only]
 """
 
 import argparse
 from db import connect
 
-ELITE_PCT = 0.20
-FADE_PCT  = 0.20
+ELITE_PCT   = 0.20
+FADE_PCT    = 0.20
+STARTER_IP  = 30.0  # min IP to count as a starter
 
 
 def trend(season_rank: int, recent_rank: int, total: int) -> str:
-    delta = season_rank - recent_rank  # positive = improved recently
+    delta = season_rank - recent_rank
     threshold = max(3, int(total * 0.15))
     if delta >= threshold:
         return "UP"
@@ -33,14 +34,11 @@ def tier_label(rank: int, total: int) -> str:
     return "mid"
 
 
-def teams():
+def teams(hot_only: bool = False):
     conn = connect()
-
     season = conn.execute("""
         SELECT t.name,
                COUNT(*) as g,
-               SUM(t.rf) as rf,
-               SUM(t.ra) as ra,
                SUM(CASE WHEN t.rf > t.ra THEN 1 ELSE 0 END) as wins,
                ROUND(AVG(t.rf), 2) as rsg
         FROM (
@@ -53,8 +51,7 @@ def teams():
     """).fetchall()
 
     recent = conn.execute("""
-        SELECT t.name,
-               ROUND(AVG(t.rf), 2) as rsg_recent
+        SELECT t.name, ROUND(AVG(t.rf), 2) as rsg_recent
         FROM (
             SELECT home_team as name, home_score as rf FROM games
             WHERE home_score IS NOT NULL AND date >= date('now', '-14 days')
@@ -65,10 +62,10 @@ def teams():
         GROUP BY t.name
         ORDER BY rsg_recent DESC
     """).fetchall()
-
     conn.close()
 
     recent_rank = {r["name"]: i + 1 for i, r in enumerate(recent)}
+    recent_rsg  = {r["name"]: r["rsg_recent"] for r in recent}
     total = len(season)
 
     print(f"\nTEAM TIERS  (season RS/G + last-14d trend)  --  ELITE = bet on | FADE = bet against\n")
@@ -80,19 +77,22 @@ def teams():
         t = tier_label(rank, total)
         if t == "mid":
             continue
-        wl = f"{r['wins']}-{r['g'] - r['wins']}"
-        rr = recent_rank.get(r["name"], rank)
-        tr = trend(rank, rr, total)
-        recent_row = next((x for x in recent if x["name"] == r["name"]), None)
-        rsg14 = f"{recent_row['rsg_recent']:.2f}" if recent_row else "-"
+        rr   = recent_rank.get(r["name"], rank)
+        tr   = trend(rank, rr, total)
+        if hot_only and t == "ELITE" and tr == "DN":
+            continue
+        wl   = f"{r['wins']}-{r['g'] - r['wins']}"
+        rsg14 = f"{recent_rsg[r['name']]:.2f}" if r["name"] in recent_rsg else "-"
         print(f"{t:<6} {r['name']:<28} {wl:>5} {r['rsg']:>5} {rsg14:>8} {tr:>5}")
 
 
-def pitchers():
-    conn = connect()
+def pitchers(starters_only: bool = False, hot_only: bool = False):
+    min_ip = STARTER_IP if starters_only else 15.0
+    label  = "STARTERS" if starters_only else "PITCHERS"
 
-    season = conn.execute("""
-        SELECT p.name, p.team,
+    conn = connect()
+    season = conn.execute(f"""
+        SELECT p.player_id, p.name, p.team,
                ROUND(SUM(l.ip), 1) as ip,
                SUM(l.k) as k,
                SUM(l.er) as er,
@@ -102,7 +102,7 @@ def pitchers():
         JOIN players p ON p.player_id = l.player_id
         WHERE l.stat_type = 'pitching' AND l.ip IS NOT NULL
         GROUP BY l.player_id
-        HAVING SUM(l.ip) >= 15
+        HAVING SUM(l.ip) >= {min_ip}
         ORDER BY era ASC
     """).fetchall()
 
@@ -118,50 +118,37 @@ def pitchers():
         HAVING SUM(l.ip) >= 3
         ORDER BY era_recent ASC
     """).fetchall()
-
     conn.close()
 
-    # for ERA: lower is better, so rank 1 = lowest ERA = ELITE
-    recent_ids = [r["player_id"] for r in recent]
-    recent_era  = {r["player_id"]: r["era_recent"] for r in recent}
-
-    # rebuild recent rank dict by ERA order
-    sorted_recent = sorted(recent, key=lambda x: x["era_recent"] or 99)
-    recent_rank_map = {r["player_id"]: i + 1 for i, r in enumerate(sorted_recent)}
-
+    sorted_recent    = sorted(recent, key=lambda x: x["era_recent"] or 99)
+    recent_rank_map  = {r["player_id"]: i + 1 for i, r in enumerate(sorted_recent)}
+    recent_era_map   = {r["player_id"]: r["era_recent"] for r in recent}
     total = len(season)
-    # map player name to player_id via season rows -- need player_id in query
-    conn2 = connect()
-    pid_map = {r["name"]: conn2.execute(
-        "SELECT player_id FROM players WHERE name = ?", (r["name"],)
-    ).fetchone()["player_id"] for r in season}
-    conn2.close()
 
-    print(f"\nPITCHER TIERS  (season ERA + last-14d trend)  --  ELITE = low ERA | FADE = high ERA\n")
+    print(f"\n{label} TIERS  (season ERA + last-14d trend, min {min_ip} IP)  --  ELITE = low ERA | FADE = high ERA\n")
     print(f"{'Tier':<6} {'Name':<25} {'Team':<25} {'IP':>5} {'ERA':>5} {'ERA 14d':>7} {'K/9':>5} {'Trend':>5}")
-    print("-" * 85)
+    print("-" * 87)
 
     for i, r in enumerate(season):
         rank = i + 1
-        t = tier_label(rank, total)
+        t    = tier_label(rank, total)
         if t == "mid":
             continue
-        pid = pid_map.get(r["name"])
-        rr = recent_rank_map.get(pid, rank) if pid else rank
-        tr = trend(rank, rr, total)
-        era14 = f"{recent_era[pid]:.2f}" if pid and pid in recent_era else "-"
+        pid  = r["player_id"]
+        rr   = recent_rank_map.get(pid, rank)
+        tr   = trend(rank, rr, total)
+        if hot_only and t == "ELITE" and tr == "DN":
+            continue
+        era14 = f"{recent_era_map[pid]:.2f}" if pid in recent_era_map else "-"
         print(f"{t:<6} {r['name']:<25} {r['team']:<25} {r['ip']:>5} {r['era']:>5} {era14:>7} {r['k9']:>5} {tr:>5}")
 
 
-def hitters():
+def hitters(hot_only: bool = False):
     conn = connect()
-
     season = conn.execute("""
-        SELECT p.name, p.team,
-               SUM(l.ab) as ab,
-               SUM(l.hits) as hits,
-               SUM(l.hr) as hr,
-               SUM(l.rbi) as rbi,
+        SELECT p.player_id, p.name, p.team,
+               SUM(l.ab) as ab, SUM(l.hits) as hits,
+               SUM(l.hr) as hr, SUM(l.rbi) as rbi,
                ROUND(CAST(SUM(l.hits) AS REAL) / NULLIF(SUM(l.ab), 0), 3) as avg
         FROM player_game_logs l
         JOIN players p ON p.player_id = l.player_id
@@ -183,56 +170,65 @@ def hitters():
         HAVING SUM(l.ab) >= 15
         ORDER BY avg_recent DESC
     """).fetchall()
-
     conn.close()
 
-    sorted_recent = sorted(recent, key=lambda x: -(x["avg_recent"] or 0))
+    sorted_recent   = sorted(recent, key=lambda x: -(x["avg_recent"] or 0))
     recent_rank_map = {r["player_id"]: i + 1 for i, r in enumerate(sorted_recent)}
     recent_avg_map  = {r["player_id"]: r["avg_recent"] for r in recent}
-
-    conn2 = connect()
-    pid_map = {r["name"]: conn2.execute(
-        "SELECT player_id FROM players WHERE name = ?", (r["name"],)
-    ).fetchone()["player_id"] for r in season}
-    conn2.close()
-
     total = len(season)
 
-    print(f"\nHITTER TIERS  (season AVG + last-14d trend)  --  ELITE = bet on | FADE = bet against\n")
+    flag = "  (hot-only: ELITE with UP or stable trend)" if hot_only else ""
+    print(f"\nHITTER TIERS  (season AVG + last-14d trend){flag}  --  ELITE = bet on | FADE = bet against\n")
     print(f"{'Tier':<6} {'Name':<25} {'Team':<25} {'AB':>4} {'AVG':>5} {'AVG 14d':>7} {'HR':>4} {'RBI':>4} {'Trend':>5}")
     print("-" * 90)
 
     for i, r in enumerate(season):
         rank = i + 1
-        t = tier_label(rank, total)
+        t    = tier_label(rank, total)
         if t == "mid":
             continue
-        pid = pid_map.get(r["name"])
-        rr = recent_rank_map.get(pid, rank) if pid else rank
-        tr = trend(rank, rr, total)
-        avg14 = f"{recent_avg_map[pid]:.3f}" if pid and pid in recent_avg_map else "-"
+        pid  = r["player_id"]
+        rr   = recent_rank_map.get(pid, rank)
+        tr   = trend(rank, rr, total)
+        if hot_only and t == "ELITE" and tr == "DN":
+            continue
+        avg14 = f"{recent_avg_map[pid]:.3f}" if pid in recent_avg_map else "-"
         print(f"{t:<6} {r['name']:<25} {r['team']:<25} {r['ab']:>4} {r['avg']:>5} {avg14:>7} {r['hr']:>4} {r['rbi']:>4} {tr:>5}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Scout tiers -- ELITE vs FADE")
     sub = parser.add_subparsers(dest="cmd")
-    sub.add_parser("teams")
-    sub.add_parser("pitchers")
-    sub.add_parser("hitters")
-    sub.add_parser("all")
+
+    sub.add_parser("teams").add_argument("--hot-only", action="store_true",
+        help="ELITE only if trending UP or stable")
+
+    p_pit = sub.add_parser("pitchers")
+    p_pit.add_argument("--starters-only", action="store_true",
+        help=f"Only pitchers with {STARTER_IP}+ IP (filters out relievers)")
+    p_pit.add_argument("--hot-only", action="store_true",
+        help="ELITE only if trending UP or stable")
+
+    p_hit = sub.add_parser("hitters")
+    p_hit.add_argument("--hot-only", action="store_true",
+        help="ELITE only if trending UP or stable")
+
+    p_all = sub.add_parser("all")
+    p_all.add_argument("--starters-only", action="store_true")
+    p_all.add_argument("--hot-only", action="store_true")
+
     args = parser.parse_args()
 
     if args.cmd == "teams":
-        teams()
+        teams(hot_only=args.hot_only)
     elif args.cmd == "pitchers":
-        pitchers()
+        pitchers(starters_only=args.starters_only, hot_only=args.hot_only)
     elif args.cmd == "hitters":
-        hitters()
+        hitters(hot_only=args.hot_only)
     elif args.cmd == "all":
-        teams()
-        pitchers()
-        hitters()
+        teams(hot_only=args.hot_only)
+        pitchers(starters_only=args.starters_only, hot_only=args.hot_only)
+        hitters(hot_only=args.hot_only)
     else:
         parser.print_help()
 
