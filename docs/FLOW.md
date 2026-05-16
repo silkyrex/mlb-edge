@@ -4,6 +4,21 @@ What runs automatically vs what needs you.
 
 ---
 
+## New Machine Setup
+
+```bash
+git clone https://github.com/silkyrex/mlb-edge.git
+cd mlb-edge
+cp .env.example .env
+# Edit .env: set SPORTS_WEBHOOK_URL, MLB_EDGE_DIR, PYTHON_BIN
+pip install -r requirements.txt
+launchctl load ~/Library/LaunchAgents/com.mlb-edge.morning-brief.plist
+```
+
+The plist is in `~/Library/LaunchAgents/` -- copy it there from the repo if setting up fresh.
+
+---
+
 ## What Runs Without You
 
 | Time | What | Where |

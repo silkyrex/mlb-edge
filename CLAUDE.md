@@ -3,6 +3,7 @@
 MLB betting edge system. Phase 3 active: Underdog pick'em scraping + lean-based scoring.
 
 For the game day runbook, see `docs/FLOW.md`. For project overview, see `README.md`.
+For new machine setup, copy `.env.example` → `.env` and fill in `SPORTS_WEBHOOK_URL`, `MLB_EDGE_DIR`, `PYTHON_BIN`.
 
 ---
 
@@ -56,6 +57,9 @@ Key columns: `date`, `matchup`, `signal`, `bet_on`, `line`, `stake`, `result` (o
 | `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet run against picks.db) |
 | `schema/schema.sql` | Full DB schema. Always update before editing picks.db schema. |
 | `docs/FLOW.md` | Game day runbook -- step-by-step order of operations |
+| `.env` | Runtime config: `SPORTS_WEBHOOK_URL`, `MLB_EDGE_DIR`, `PYTHON_BIN`. Gitignored. |
+| `.env.example` | Template for new machine setup. Copy to `.env` and fill in. |
+| `run_morning_brief.sh` | launchd wrapper -- sources `.env`, runs `morning_brief.py --post` |
 
 ---
 
@@ -109,3 +113,4 @@ IL return rule: `IL-return-today` = first game back, unreliable, -10 to score. `
 - `cache_stats.py` and `cache_news.py` are idempotent -- safe to re-run same game+date.
 - `cache_news.py --roster` = night-before mode (uses team rosters). Plain mode = game-day (uses mlb_game_lines).
 - First-inning pitch count picks on FADE pitchers are volatile. Only take 1st Inn PC Higher when the opposing lineup has documented high walk rates or deep count tendencies. Season WHIP does not predict first-inning behavior.
+- `daily.sh` and `run_morning_brief.sh` resolve their own directory and source `.env` automatically. No hardcoded paths -- update `.env` if Python or repo location changes.
