@@ -25,8 +25,10 @@ Discord lean signal (12:00 PT daily)
 
 | DB | Location | Tables |
 |---|---|---|
-| `picks.db` | `~/sports/dfs/picks.db` | `games`, `players`, `player_game_logs`, `mlb_game_lines` |
+| `picks.db` | `~/sports/dfs/picks.db` | `mlb_game_lines`, `player_recent_stats`, `player_news` |
 | `betlog.db` | `./betlog.db` (repo-local) | `bets` |
+
+Note: `games`, `players`, `player_game_logs` are defined in schema.sql but not yet populated (fetch.py hasn't been run against picks.db). The Phase 3 pipeline runs entirely off `mlb_game_lines` + the two cache tables.
 
 **Do not merge these.** `picks.db` is the shared sports DB (also used by NBA DFS tools). `betlog.db` is MLB-only bet tracking.
 
@@ -47,6 +49,7 @@ Discord lean signal (12:00 PT daily)
 | `betlog.py` | MLB bet log -- add, result, list, summary |
 | `daily.sh` | Cron wrapper for nightly fetch; logs to /tmp/mlb-edge-daily.log |
 | `schema.sql` | Full DB schema (run via db.py init, not directly) |
+| `FLOW.md` | Game day runbook -- step-by-step from night-before through settlement |
 
 ## Claude Skills
 
@@ -81,7 +84,10 @@ python discord_push.py
 # Query historical player stats
 python query.py --player "Aaron Civale" --days 10
 
-# Pre-cache player stats and injury status (run after /underdog-mlb, before /underdog-mlb-analyze)
+# Night before: pre-cache injury status without needing Underdog scrape
+python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-16 --roster
+
+# Game day: pre-cache player stats + injury status (run after /underdog-mlb)
 python cache_stats.py --game "SF Giants @ Athletics"
 python cache_news.py --game "SF Giants @ Athletics"
 
@@ -113,10 +119,12 @@ python betlog.py summary
 
 ## Player Research Rule
 
-**Always research individual player form before finalizing a pick -- offense grade alone is not enough.**
-A FADE team can have hot individual players. Check last 10-15 game averages against the line.
+**Always check individual player form before finalizing a pick -- offense grade alone is not enough.**
+A FADE team can have hot individual players. Run `cache_stats.py` and check `last15_h_r_rbi` vs the line.
 Example (2026-05-15): Ramos graded FADE offense but averaging 2.07 H+R+RBI/game vs line of 1.5 -- wrong fade.
-Look for: xwOBA significantly below wOBA (regression due), IL return rusty, hamstring limiting DH-only players.
+Look for: `last15_h_r_rbi` well above line (hot, don't fade), `IL-return` status in player_news (rust), flat multiplier (no market signal).
+
+**IL return rule:** Any player with `IL-return-today` or `IL-return-Nd` (N ≤ 7) gets score -10. First game back is unreliable regardless of season stats.
 
 ## Rules
 
@@ -125,3 +133,6 @@ Look for: xwOBA significantly below wOBA (regression due), IL return rusty, hams
 - `daily.sh` runs at 11pm PT -- do not re-run same date if already ingested (fetch.py uses upsert so it's safe, just wasteful).
 - Discord webhook UA must be non-Python: `"User-Agent": "mlb-edge/1.0"` -- default Python UA gets 403.
 - All Underdog line scraping happens through Claude skills (Playwright), not Python scripts.
+- `cache_stats.py` and `cache_news.py` are idempotent -- re-running the same game+date is safe (INSERT OR REPLACE).
+- `cache_news.py --roster` uses the full active roster; `cache_news.py` (no flag) uses only players in mlb_game_lines. Use `--roster` the night before, plain mode on game day after scraping.
+- See `FLOW.md` for the full game day order of operations.
