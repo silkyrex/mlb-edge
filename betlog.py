@@ -31,6 +31,33 @@ _OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 _IMPROVE_SCRIPT = Path.home() / "projects" / "core" / "workloads" / "ob1-self-improve" / "improve.py"
 
 
+def _notion_sync(bet_id: int) -> None:
+    """Push a single bet to Notion in the background. Silently skips if no token."""
+    import subprocess, sys
+    _sync_script = Path(__file__).parent / "notion_sync.py"
+    if not _sync_script.exists():
+        return
+    token = os.environ.get("NOTION_TOKEN", "")
+    if not token:
+        # check .env
+        _env = Path(__file__).parent / ".env"
+        if _env.exists():
+            for line in _env.read_text().splitlines():
+                if line.startswith("NOTION_TOKEN="):
+                    token = line.split("=", 1)[1].strip()
+                    break
+    if not token:
+        return
+    env = os.environ.copy()
+    env["NOTION_TOKEN"] = token
+    subprocess.Popen(
+        [sys.executable, str(_sync_script), "--bet", str(bet_id)],
+        env=env,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
 def _trigger_self_improve() -> None:
     """Fire ob1-self-improve sports after every settled outcome. Runs in background."""
     if not (_SUPABASE_URL and _SUPABASE_KEY and _OPENROUTER_KEY):
@@ -150,6 +177,7 @@ def cmd_add(args):
         "type": "mlb_bet_placed", "matchup": args.matchup, "date": game_date,
         "bet_id": bet_id, "bet": args.bet, "signal": args.signal, "agent": "betlog",
     })
+    _notion_sync(bet_id)
 
 
 def cmd_result(args):
@@ -187,6 +215,7 @@ def cmd_result(args):
         "bet_id": args.id, "result": result, "profit": profit, "signal": row["signal"],
         "agent": "betlog",
     })
+    _notion_sync(args.id)
     _trigger_self_improve()
 
 
