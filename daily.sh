@@ -4,9 +4,19 @@
 # 2. Pre-cache tomorrow's injury/IL status for all games
 # 3. Check open bets against final box scores, post to Discord
 
+# Resolve script directory so this works from any working directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Load config from .env
+if [[ -f "$SCRIPT_DIR/.env" ]]; then
+    set -a
+    source "$SCRIPT_DIR/.env"
+    set +a
+fi
+
 LOG=/tmp/mlb-edge-daily.log
-PYTHON=/Users/rzhu/.venv/bin/python
-DIR=/Users/rzhu/projects/mlb-edge
+DIR="${MLB_EDGE_DIR:-$SCRIPT_DIR}"
+PYTHON="${PYTHON_BIN:-$(which python3)}"
 
 echo "=== MLB Edge Daily $(date) ===" >> "$LOG"
 
