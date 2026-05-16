@@ -6,11 +6,10 @@ Pulls official IL data from MLB Stats API. Flags:
   - Players who just returned from IL within last 7 days (rehab rust)
   - Players activated today (first game back)
 
-Run after /underdog-mlb, before /underdog-mlb-analyze.
-
 Usage:
-    python cache_news.py --game "SF Giants @ Athletics"
-    python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-15
+    python cache_news.py --game "SF Giants @ Athletics"             # requires /underdog-mlb first
+    python cache_news.py --game "SF Giants @ Athletics" --roster    # uses team rosters, no scrape needed
+    python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-16 --roster  # tomorrow's game
     python cache_news.py --game "SF Giants @ Athletics" --query
 """
 
@@ -149,21 +148,26 @@ def upsert_news(conn: sqlite3.Connection, player: str, team: str, news_date: str
     """, (news_date, player, team, status, note, source))
 
 
-def cache_game(game_name: str, game_date: str):
+def get_roster_players(team_ids: list[int]) -> list[dict]:
+    """Return list of {player, team} dicts from active rosters."""
+    players: list[dict] = []
+    for tid in team_ids:
+        r = requests.get(f"{BASE}/teams/{tid}/roster", params={"season": SEASON}, timeout=10)
+        if r.status_code != 200:
+            continue
+        team_name = ""
+        for entry in r.json().get("roster", []):
+            person = entry.get("person", {})
+            name = person.get("fullName", "")
+            if not team_name:
+                team_name = entry.get("team", {}).get("abbreviation", "")
+            players.append({"player": name, "team": team_name, "player_type": entry.get("position", {}).get("type", "")})
+    return players
+
+
+def cache_game(game_name: str, game_date: str, use_roster: bool = False):
     conn = get_conn()
     ensure_table(conn)
-
-    rows = conn.execute("""
-        SELECT DISTINCT player, team, player_type
-        FROM mlb_game_lines
-        WHERE game=? AND scraped_date=? AND player_type IN ('pitcher', 'batter')
-        ORDER BY player_type DESC, player
-    """, (game_name, game_date)).fetchall()
-
-    if not rows:
-        print(f"No lines found for '{game_name}' on {game_date}. Run /underdog-mlb first.")
-        conn.close()
-        return
 
     game_pk, team_ids = find_game_pk_and_teams(game_name, game_date)
     if not team_ids:
@@ -172,6 +176,24 @@ def cache_game(game_name: str, game_date: str):
         return
 
     print(f"Game PK: {game_pk} | Teams: {team_ids}")
+
+    if use_roster:
+        roster = get_roster_players(team_ids)
+        rows = roster
+        print(f"Using roster mode: {len(rows)} players from active rosters")
+    else:
+        rows = conn.execute("""
+            SELECT DISTINCT player, team, player_type
+            FROM mlb_game_lines
+            WHERE game=? AND scraped_date=? AND player_type IN ('pitcher', 'batter')
+            ORDER BY player_type DESC, player
+        """, (game_name, game_date)).fetchall()
+
+        if not rows:
+            print(f"No lines found for '{game_name}' on {game_date}.")
+            print("Tip: use --roster to cache from team rosters without needing /underdog-mlb.")
+            conn.close()
+            return
 
     # Fetch 60 days of transactions to catch long-term IL placements
     start = str(date_cls.fromisoformat(game_date) - timedelta(days=60))
@@ -258,12 +280,13 @@ def main():
     parser.add_argument("--game", required=True)
     parser.add_argument("--date", default=str(date_cls.today()))
     parser.add_argument("--query", action="store_true")
+    parser.add_argument("--roster", action="store_true", help="Use team rosters instead of mlb_game_lines (no scrape needed)")
     args = parser.parse_args()
 
     if args.query:
         query_cache(args.game, args.date)
     else:
-        cache_game(args.game, args.date)
+        cache_game(args.game, args.date, use_roster=args.roster)
 
 
 if __name__ == "__main__":
