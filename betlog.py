@@ -28,6 +28,25 @@ _SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 _OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 
 
+_IMPROVE_SCRIPT = Path.home() / "projects" / "core" / "workloads" / "ob1-self-improve" / "improve.py"
+
+
+def _trigger_self_improve() -> None:
+    """Fire ob1-self-improve sports after every settled outcome. Runs in background."""
+    if not (_SUPABASE_URL and _SUPABASE_KEY and _OPENROUTER_KEY):
+        return
+    if not _IMPROVE_SCRIPT.exists():
+        return
+    import subprocess, sys
+    env = os.environ.copy()
+    subprocess.Popen(
+        [sys.executable, str(_IMPROVE_SCRIPT), "sports"],
+        env=env,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
 def _ob1_push(content: str, metadata: dict) -> None:
     if not (_SUPABASE_URL and _SUPABASE_KEY and _OPENROUTER_KEY):
         return
@@ -168,6 +187,7 @@ def cmd_result(args):
         "bet_id": args.id, "result": result, "profit": profit, "signal": row["signal"],
         "agent": "betlog",
     })
+    _trigger_self_improve()
 
 
 def cmd_list(args):
