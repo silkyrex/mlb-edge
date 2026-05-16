@@ -34,7 +34,7 @@ Six tables in `picks.db` (`~/sports/dfs/picks.db`):
 
 Bet tracking is separate: `betlog.db` (repo-local), `bets` table only.
 
-See `schema.sql` for full column definitions.
+See [`schema/schema.sql`](schema/schema.sql) for full column definitions.
 
 ---
 

@@ -54,7 +54,7 @@ Key columns: `date`, `matchup`, `signal`, `bet_on`, `line`, `stake`, `result` (o
 | `betlog.py` | Bet log -- add, result, list, summary |
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- early lean read |
 | `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet run against picks.db) |
-| `schema.sql` | Full DB schema. Always update before editing picks.db schema. |
+| `schema/schema.sql` | Full DB schema. Always update before editing picks.db schema. |
 | `docs/FLOW.md` | Game day runbook -- step-by-step order of operations |
 
 ---
@@ -102,7 +102,7 @@ IL return rule: `IL-return-today` = first game back, unreliable, -10 to score. `
 
 ## Hard Rules
 
-- Never edit picks.db schema without updating schema.sql first.
+- Never edit picks.db schema without updating `schema/schema.sql` first.
 - betlog.db is append-only -- never delete or update settled rows.
 - All Underdog scraping goes through Claude skills (Playwright). No Python scraping.
 - Discord webhook must use `"User-Agent": "mlb-edge/1.0"` -- default Python UA gets 403.
