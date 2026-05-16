@@ -307,7 +307,35 @@ def build_brief(game_date: str) -> str:
         lines.append(f"\n_{len(pitchers_cached)} starters pre-cached in picks.db (ERA/FIP/WAR ready for /underdog-mlb-analyze)_")
 
     lines.append(f"\n_Lean signal arrives 12pm PT via Discord._")
-    return "\n".join(lines)
+    brief_text = "\n".join(lines)
+
+    # Capture starter grades to OB1
+    try:
+        ob1_url = os.getenv("OB1_MCP_URL", "http://134.199.137.81:8000/mcp?key=7iQ3-Wqv41JK60Hav2GdWHCOQZbfYrFYayj3l2TCzy0")
+        import urllib.request as _ur2
+        elite = [n for n, _ in pitchers_cached if any(
+            g in brief_text for g in [f"{n} [ELITE]"]
+        )]
+        grade_lines = [l.strip() for l in brief_text.splitlines() if "[ELITE]" in l or "[FADE]" in l or "[mid]" in l]
+        thought = (
+            f"MLB morning brief [{game_date}]: {len(games)} games, {len(pitchers_cached)} starters cached.\n"
+            + "\n".join(grade_lines[:20])
+            + "\nAgent: mlb-edge morning-brief"
+        )
+        payload = json.dumps({
+            "jsonrpc": "2.0", "method": "tools/call",
+            "params": {"name": "capture_thought", "arguments": {"content": thought}},
+            "id": 1,
+        }).encode()
+        req = _ur2.Request(ob1_url, data=payload, method="POST",
+                           headers={"Content-Type": "application/json",
+                                    "Accept": "application/json, text/event-stream",
+                                    "User-Agent": "mlb-edge/1.0"})
+        _ur2.urlopen(req, timeout=15)
+    except Exception:
+        pass
+
+    return brief_text
 
 
 def post_to_discord(message: str):
