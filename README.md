@@ -1,55 +1,84 @@
 # mlb-edge
 
-MLB sports betting data pipeline. Collects game results and player stats, builds a local database, and (eventually) runs analysis against betting lines.
+MLB betting edge system. Scrapes Underdog pick'em lines, cross-references MLB Stats API data, and scores picks against a daily lean signal (OVER/UNDER/AWAY/HOME + pitcher/offense grades).
 
-## Phases
+**Phase 3 is active.** Daily workflow: Discord lean → Underdog scrape → player stat + injury cache → ranked pick list → bet log.
 
-- **Phase 1 (done):** Ingest game + player data from MLB Stats API into SQLite
-- **Phase 2:** Historical backfill, data quality checks
-- **Phase 3 (active):** Line comparison -- Underdog pick'em lines scraped to `mlb_game_lines` via `/underdog-mlb` Claude skill; analyzed via `/underdog-mlb-analyze` with lean context + external research + scoring
+See `FLOW.md` for the step-by-step game day runbook.
 
-## Quickstart
+---
 
-```bash
-pip install -r requirements.txt
-python db.py            # initialize schema
-python fetch.py date 2026-05-15
-python fetch.py range 2026-05-01 2026-05-15
-python fetch.py date 2026-05-15 --team Yankees
-```
+## How It Works
+
+Two inputs meet at analysis time:
+
+1. **Lean signal** -- arrives daily at 12pm PT via Discord. Grades each pitcher (ELITE/mid/FADE) and each offense. Drives pick direction.
+2. **Underdog lines** -- scraped via Playwright for the target game. 23 stat tabs per game: pitcher K/ERA/WHIP props, batter H+R+RBI/Hits/Ks props, team totals.
+
+The analyzer reads both, applies lean logic, checks cached player stats and IL status, and ranks every pick 0-100.
+
+---
 
 ## Schema
 
-Four tables:
+Six tables in `picks.db` (`~/sports/dfs/picks.db`):
 
-- `games` -- one row per game (scores, teams, venue)
-- `players` -- player registry (name, position, team)
-- `player_game_logs` -- per-game hitting and pitching stats, keyed on `game_pk + player_id + stat_type`
-- `mlb_game_lines` -- Underdog pick'em lines (pitcher + batter + team), scraped daily per game
+| Table | What's in it |
+|---|---|
+| `mlb_game_lines` | Underdog pick'em lines -- one row per player/stat/date |
+| `player_recent_stats` | Pre-cached stats: last 5 starts (pitchers), last 15 games (batters) |
+| `player_news` | IL status and recent transactions from MLB Stats API |
+| `games` | Game results from MLB Stats API (Phase 1, not yet active) |
+| `players` | Player registry (Phase 1, not yet active) |
+| `player_game_logs` | Per-game hitting/pitching stats (Phase 1, not yet active) |
 
-See `schema.sql` for full definitions.
+Bet tracking is separate: `betlog.db` (repo-local), `bets` table only.
 
-## Phase 3 Workflow
+See `schema.sql` for full column definitions.
 
-```
-12:00 PT  Discord lean signal arrives (OVER/UNDER lean + pitcher/offense grades)
-          ↓
-          /playwright-underdog   (login to Underdog)
-          ↓
-          /underdog-mlb [game]   (scrape all 23 stat tabs → mlb_game_lines)
-          ↓
-          /underdog-mlb-analyze [game] [lean]  (score + rank + research → pick list)
-          ↓
-          /bet-score MLB [slip]  (gate top picks before placing)
-```
+---
 
-Query lines directly:
+## Key Scripts
+
+| Script | What it does |
+|---|---|
+| `cache_stats.py` | Pulls last 5/15 game averages from MLB Stats API → `player_recent_stats` |
+| `cache_news.py` | Pulls IL transactions from MLB Stats API → `player_news`. Use `--roster` flag the night before (no Underdog scrape needed). |
+| `lines_query.py` | Query `mlb_game_lines` by game, player, stat |
+| `betlog.py` | Bet log -- add, settle, list, summary |
+| `matchup.py` | Generates lean signal from team/pitcher tiers (early read before Discord) |
+| `fetch.py` | Ingest MLB Stats API → games + player logs (Phase 1) |
+
+---
+
+## Claude Skills
+
+| Skill | What it does |
+|---|---|
+| `/playwright-underdog` | Logs into Underdog via Playwright (prerequisite) |
+| `/underdog-mlb [game]` | Scrapes all 23 stat tabs for a game → `mlb_game_lines` |
+| `/underdog-mlb-analyze [game] [lean]` | Scores and ranks picks using DB cache + lean logic |
+
+---
+
+## Quick Queries
+
 ```bash
 python lines_query.py --list-games
 python lines_query.py --game "SF Giants @ Athletics" --type pitcher
-python lines_query.py --game "SF Giants @ Athletics" --stat "Strikeouts"
+python lines_query.py --game "SF Giants @ Athletics" --player "Civale"
+
+python cache_stats.py --game "SF Giants @ Athletics" --query
+python cache_news.py --game "SF Giants @ Athletics" --query
+
+python betlog.py list
+python betlog.py summary
 ```
+
+---
 
 ## Data Sources
 
-See `DATASOURCES.md` for MLB Stats API docs, Baseball Reference notes, and paid service options.
+- **MLB Stats API** -- free, no key. Schedule, boxscores, rosters, transactions. See `DATASOURCES.md`.
+- **Underdog Sports** -- pick'em lines scraped via Playwright skill. Requires login.
+- **Discord lean signal** -- daily at 12pm PT from the mlb-lean pipeline.
