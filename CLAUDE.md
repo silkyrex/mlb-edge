@@ -15,6 +15,7 @@ Discord lean signal (12:00 PT)
          └── /underdog-mlb [game] → picks.db [mlb_game_lines]
                 ├── cache_stats.py → picks.db [player_recent_stats]
                 ├── cache_news.py  → picks.db [player_news]
+                ├── cache_team.py  → picks.db [team_game_stats]
                 └── /underdog-mlb-analyze [game] [lean] → ranked picks → betlog.py add
 ```
 
@@ -32,17 +33,17 @@ Key columns: `scraped_date`, `game`, `player`, `team`, `player_type` (pitcher/ba
 Unique on `(scraped_date, game, player, stat)`.
 
 **player_recent_stats** -- Pre-cached per player per day.
-Pitcher columns: `season_era`, `season_k9`, `season_whip`, `recent_era`, `last5_ks`, `split_home_era`, `split_away_era`, `x_woba_against`, `x_avg_against`.
-Batter columns: `last15_h_r_rbi`, `last15_hits`, `last15_ks_batter`, `last15_hr`, `last15_tb`, `season_avg`, `season_ops`, `vs_lhp_avg`, `vs_lhp_ops`, `vs_rhp_avg`, `vs_rhp_ops`, `split_home_avg`, `split_home_ops`, `split_away_avg`, `split_away_ops`, `x_avg`, `x_slg`, `x_woba`.
+Pitcher columns: `season_era`, `season_k9`, `season_whip`, `recent_era`, `last5_ks` (JSON), `split_home_era`, `split_away_era`, `x_woba_against`, `x_avg_against`.
+Batter columns: `last15_h_r_rbi`, `last15_hits`, `last15_ks_batter`, `last15_hr`, `last15_tb`, `season_avg`, `season_ops`, `vs_lhp_avg/ops/ab`, `vs_rhp_avg/ops/ab`, `split_home_avg/ops/ab`, `split_away_avg/ops/ab`, `x_avg`, `x_slg`, `x_woba`.
 Unique on `(player, cache_date)`.
 
-**team_game_stats** -- Team-level stats per game per day.
-Columns: `side` (home/away), `bullpen_era`, `bullpen_whip`, `bullpen_k9`, `starter_era`, `team_avg`, `team_ops`, `team_k_pct`, `venue_name`, `venue_roof`, `venue_left/center/right`.
-Unique on `(cache_date, game, team_name)`.
-
 **player_news** -- IL status per player per day.
-Key columns: `status` (active / IL-10 / IL-15 / IL-60 / IL-return-today / IL-return-Nd), `note`, `source` (mlb-api / web).
+Key columns: `status` (active / IL-10 / IL-15 / IL-60 / IL-return-today / IL-return-Nd), `note`, `source`.
 Unique on `(news_date, player)`.
+
+**team_game_stats** -- Team-level stats per game per day.
+Columns: `side`, `bullpen_era`, `bullpen_whip`, `bullpen_k9`, `starter_era`, `team_avg`, `team_ops`, `team_k_pct`, `venue_name`, `venue_roof`, `venue_left/center/right`.
+Unique on `(cache_date, game, team_name)`.
 
 **betlog.db bets table** -- append-only. Never delete rows.
 Key columns: `date`, `matchup`, `signal`, `bet_on`, `line`, `stake`, `result` (open/W/L), `profit`.
@@ -53,28 +54,31 @@ Key columns: `date`, `matchup`, `signal`, `bet_on`, `line`, `stake`, `result` (o
 
 | File | Purpose |
 |---|---|
-| `cache_stats.py` | MLB Stats API → player_recent_stats (stats + splits + xStats). Idempotent. |
-| `cache_news.py` | MLB transactions API → player_news. `--roster` flag skips mlb_game_lines dependency. |
-| `cache_team.py` | Team bullpen ERA, offense K%, venue roof/dims → team_game_stats. Idempotent. |
+| `dive.py` | Full pre-game report: pitchers, batter lineup splits, regression flags, prop angles |
+| `cache_stats.py` | MLB Stats API → player_recent_stats (stats + L/R + home/away splits + xStats). Idempotent. |
+| `cache_news.py` | MLB transactions API → player_news. `--roster` skips mlb_game_lines dependency. |
+| `cache_team.py` | Bullpen ERA, offense K%, venue roof/dims → team_game_stats. Idempotent. |
+| `cache_tomorrow.py` | Wraps cache_news --roster for all of tomorrow's games. Called by daily.sh. |
+| `player.py` | `pitcher [name]` per-start log / `batter [name]` per-game + splits / `matchup [b] [p]` H2H |
+| `settle.py` | Live box score lookup for open bets. `--post-discord` for Discord notify. |
+| `morning_brief.py` | 9am PT launchd -- all games + starter grades + IL returns → Discord |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player |
 | `betlog.py` | Bet log -- add, result, list, summary |
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- early lean read |
-| `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet run against picks.db) |
+| `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet active against picks.db) |
 | `schema/schema.sql` | Full DB schema. Always update before editing picks.db schema. |
-| `docs/FLOW.md` | Game day runbook -- step-by-step order of operations |
-| `.env` | Runtime config: `SPORTS_WEBHOOK_URL`, `MLB_EDGE_DIR`, `PYTHON_BIN`. Gitignored. |
-| `.env.example` | Template for new machine setup. Copy to `.env` and fill in. |
-| `run_morning_brief.sh` | launchd wrapper -- sources `.env`, runs `morning_brief.py --post` |
+| `docs/FLOW.md` | Game day runbook |
+| `.env` | `SPORTS_WEBHOOK_URL`, `MLB_EDGE_DIR`, `PYTHON_BIN`. Gitignored. |
+| `.env.example` | New machine template. |
+| `run_morning_brief.sh` | launchd wrapper -- sources `.env`, runs morning_brief.py --post |
 
 ---
 
 ## Tier System
 
-Drives lean signal and pick scoring.
-
-- **ELITE** -- ERA ~2.50 and under (pitchers), top-tier offense
+- **ELITE** -- ERA ≤ ~3.00 (pitchers), top-tier offense
 - **mid** -- average
-- **FADE** -- ERA ~4.50+ (pitchers), weak offense
+- **FADE** -- ERA ≥ ~4.50 (pitchers), weak offense
 
 Signal rules (`matchup.py signal()`):
 - OVER: ELITE offense vs FADE pitcher
@@ -100,12 +104,9 @@ GREEN >= 65. YELLOW 50-64. SKIP below 50 or IL-flagged.
 
 ## Player Research Rule
 
-Check `last15_h_r_rbi` against the line before fading any batter, regardless of team grade.
-A FADE team can have hot individuals. If `last15_h_r_rbi` is well above the Underdog line, do not fade.
-
-Example (2026-05-15): Ramos graded FADE offense, averaging 2.07 H+R+RBI/g vs line of 1.5 -- wrong fade.
-
-IL return rule: `IL-return-today` = first game back, unreliable, -10 to score. `IL-return-Nd` N<=7 = still shaking rust, -10.
+Check `last15_h_r_rbi` against the line before fading any batter regardless of team grade.
+Check `x_avg` vs `season_avg` -- actual significantly above expected = regression risk; below expected = underperforming, be cautious fading.
+IL return rule: IL-return-today or IL-return-Nd (N ≤ 7) = -10 to score.
 
 ---
 
@@ -115,7 +116,7 @@ IL return rule: `IL-return-today` = first game back, unreliable, -10 to score. `
 - betlog.db is append-only -- never delete or update settled rows.
 - All Underdog scraping goes through Claude skills (Playwright). No Python scraping.
 - Discord webhook must use `"User-Agent": "mlb-edge/1.0"` -- default Python UA gets 403.
-- `cache_stats.py` and `cache_news.py` are idempotent -- safe to re-run same game+date.
-- `cache_news.py --roster` = night-before mode (uses team rosters). Plain mode = game-day (uses mlb_game_lines).
-- First-inning pitch count picks on FADE pitchers are volatile. Only take 1st Inn PC Higher when the opposing lineup has documented high walk rates or deep count tendencies. Season WHIP does not predict first-inning behavior.
-- `daily.sh` and `run_morning_brief.sh` resolve their own directory and source `.env` automatically. No hardcoded paths -- update `.env` if Python or repo location changes.
+- `cache_stats.py`, `cache_news.py`, `cache_team.py` are idempotent -- safe to re-run same game+date.
+- `cache_news.py --roster` = night-before mode. Plain mode = game-day (uses mlb_game_lines).
+- `daily.sh` and `run_morning_brief.sh` source `.env` automatically. Update `.env` if paths change.
+- First-inning pitch count on FADE pitchers is volatile. Only take 1st Inn PC Higher when opposing lineup has documented high walk rates. Season WHIP does not predict first-inning behavior.

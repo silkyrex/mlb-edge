@@ -1,52 +1,64 @@
 # Data Sources
 
-## Active: MLB Stats API
+## MLB Stats API (active)
+
+The official MLB data source. Free, no account needed.
 
 - Base URL: `https://statsapi.mlb.com/api/v1`
-- Free, no API key required
-- Rate-limit friendly for daily ingestion
-- Covers: schedules, boxscores, player stats, game logs, rosters
-- Docs: https://github.com/toddrob99/MLB-StatsAPI (community wrapper + endpoint reference)
+- Community docs: https://github.com/toddrob99/MLB-StatsAPI
 
-Key endpoints used:
-- `/schedule` -- game list by date
-- `/game/{game_pk}/boxscore` -- full player stats per game
+What we use it for:
+- Daily game schedules (who's playing, when, where)
+- Box scores (final stats for each player after a game ends)
+- Player stats: recent starts for pitchers, recent games for batters, splits (vs lefties/righties, home/away)
+- Expected stats (xAVG, xwOBA) -- how hard batters actually hit the ball, regardless of whether it fell for a hit
+- Injury transactions -- who got placed on the injured list, who came back, and when
+- Team rosters -- who's on the active roster right now
+- Bullpen vs starter ERA splits -- whether the starting rotation or relief pitchers are performing better
+- Ballpark info -- outdoor vs dome, field dimensions
 
-## To Explore: Baseball Reference
+---
 
-- Site: https://www.baseball-reference.com
-- Rich historical data, advanced stats (WAR, FIP, wOBA, etc.)
-- No official API -- requires scraping (brittle, slow)
-- Best use case: historical backfill, advanced metrics not in MLB API
+## Underdog Sports (active)
 
-## To Explore: Paid Services
+Where the bets live. Requires a login.
 
-- **The Odds API** (https://the-odds-api.com) -- betting lines, props, historical odds; free tier ~500 req/mo
-- **Sportradar** -- enterprise-grade, full MLB data + lines; expensive
-- **DraftKings / FanDuel APIs** -- unofficial, fragile; not recommended
+Site: https://app.underdogsports.com/pick-em
 
-When to add: after the DB has enough game history to run meaningful line comparisons.
+The system logs in using browser automation (Playwright) and scrapes all available bets for a specific game. About 170 bets per game across 23 categories:
 
-## Active: Underdog Sports Pick'em Lines
+**Pitcher bets:** Strikeouts, Pitching Outs (how many batters he gets out total), Hits Allowed, Runs Allowed, Walks, Fantasy Points, and first-inning versions of most of these.
 
-- Site: https://app.underdogsports.com/pick-em
-- Requires login (Playwright MCP via Claude skill `/playwright-underdog`)
-- Scraping: `/underdog-mlb [game]` Claude skill iterates all 23 stat tabs and writes to `mlb_game_lines`
-- Analysis: `/underdog-mlb-analyze [game] [lean]` Claude skill reads DB + runs external research
+**Batter bets:** Hits + Runs + RBIs combined, Home Runs, Total Bases (singles=1, doubles=2, triples=3, HRs=4), Hits, Runs, RBIs, Singles, Strikeouts, Walks, Stolen Bases, Doubles.
 
-### What it covers (23 stat tabs per game)
-Pitcher: Strikeouts, Pitching Outs, Hits Allowed, Earned Runs Allowed, Walks Allowed, Fantasy Points, 1st Inn. Strikeouts, 1st Inn. Runs Allowed, 1st Inn. Pitch Count, 1st Inn. Batters Faced, 1st Inn. Hits Allowed
+**Game-level bets:** Moneyline (who wins), Spread (win by how much), Total Runs (game total over/under).
 
-Batter: Hits + Runs + RBIs, Home Runs, Total Bases, Fantasy Points, Hits, Runs, RBIs, Singles, Batter Strikeouts, Batter Walks, Stolen Bases, Doubles
+Each bet also shows a multiplier -- if a pick says 1.05x Higher, a $10 entry pays $10.50 if you're right. If it says 0.88x, you'd only get $8.80 back. The multiplier tells you what the market thinks -- below 1.00x means the market disagrees with that direction.
 
-Team: Moneyline, Spread, Total Runs
+**Navigation note:** The system navigates to the general pick-em page first, then clicks to the MLB section. Going directly to the MLB URL triggers a location check that blocks the page.
 
-### Lean Signal Source
-Daily Discord at 12:00 PT via mlb-lean pipeline (format: OVER/UNDER/AWAY/HOME LEAN, pitcher grades ELITE/mid/FADE, offense grades). Cleanest game = most aligned pitcher + offense grades.
+---
 
-### Playwright Navigation Notes
-- Navigate to `/pick-em/higher-lower/all/home` (not the sport-specific URL -- geo check blocks direct MLB URL)
-- Click MLB button via JS, then click target game button
-- Game URL gains `?match_id=XXXXX&match_type=Game`
-- Click each stat tab button, wait 1.5s, extract `document.body.innerText` sliced between "Doubles\n" and "\nAdd picks"
-- Full scrape: ~23 tabs x 3s = ~70s per game
+## Discord (active)
+
+Two uses:
+1. **Lean signal** -- arrives daily at noon PT. Grades each pitcher and offense for the day's games.
+2. **Alerts** -- the 9am morning brief and 11pm bet status updates post here.
+
+Webhook URL is stored in `.env` (not in the repo -- it's private).
+
+---
+
+## Baseball Reference (not yet active)
+
+Site: https://www.baseball-reference.com
+
+Has rich historical data and advanced stats not available in the free MLB API. Would require scraping (no official API), which is fragile. Only worth adding if we need multi-year historical data for backtesting.
+
+---
+
+## Paid Services (not yet active)
+
+- **The Odds API** -- betting lines from multiple sportsbooks, historical odds. Free tier is 500 requests/month. Would let us compare Underdog lines to the broader market.
+- **Sportradar** -- enterprise MLB data feed. Expensive. Not needed at current scale.
+- **DraftKings / FanDuel** -- unofficial and fragile. Not recommended.
