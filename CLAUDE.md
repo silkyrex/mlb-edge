@@ -97,6 +97,13 @@ python betlog.py summary
 - Python venv: `~/.venv/bin/python` (has requests, sqlite3)
 - No other dependencies beyond `requirements.txt`
 
+## Player Research Rule
+
+**Always research individual player form before finalizing a pick -- offense grade alone is not enough.**
+A FADE team can have hot individual players. Check last 10-15 game averages against the line.
+Example (2026-05-15): Ramos graded FADE offense but averaging 2.07 H+R+RBI/game vs line of 1.5 -- wrong fade.
+Look for: xwOBA significantly below wOBA (regression due), IL return rusty, hamstring limiting DH-only players.
+
 ## Rules
 
 - Never edit `picks.db` schema without updating `schema.sql` first.
