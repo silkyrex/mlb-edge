@@ -1,107 +1,94 @@
 # MLB Edge -- Daily Flow
 
-Step-by-step for every game day. Follow in order.
+What runs automatically vs what needs you.
 
 ---
 
-## The Night Before
+## What Runs Without You
 
-You don't need Underdog to be up yet. Just pre-cache the injury data.
+| Time | What | Where |
+|---|---|---|
+| 9am PT | Morning brief -- all games, starter grades (ELITE/mid/FADE), IL returns | Discord #sports |
+| 11pm PT | Ingest today's results, cache tomorrow's IL for all 15 games, post open bet stats to Discord | Background (daily.sh) |
 
-```bash
-# Check who's on IL, who just came back -- uses team rosters, no scrape needed
-python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-16 --roster
-```
-
-Flags to watch:
-- `IL-10 / IL-15 / IL-60` -- player may not play. Skip their picks.
-- `IL-return-today` -- first game back. Expect rust. Score -10.
-- `IL-return-Nd` (N ≤ 7) -- still shaking off rust. Flag it.
+You wake up with starter grades already done and injury data already cached for tomorrow.
 
 ---
 
-## Game Day -- Before the Discord Lean (~10am PT)
+## What You Do (the short version)
 
-Lines may or may not be up on Underdog yet for evening games. Check with:
+1. Check Discord at noon for the lean signal
+2. `/playwright-underdog` → enter 2FA
+3. `/underdog-mlb [game]` → scrape + auto-caches stats and injuries
+4. `/underdog-mlb-analyze "[game]" "[lean]"` → ranked picks
+5. Log the bet, place it on Underdog
+6. At game end: `python settle.py` → see stats → settle W/L
 
-```bash
-python lines_query.py --list-games
-```
+That's it. Steps 3 auto-triggers the cache scripts now. No manual cache commands needed.
 
-If the game shows up -- lines are live, you can scrape now.
-If not -- wait until closer to noon.
+---
 
-You can also get an early read on today's lean from the MLB Stats API:
+## Game Day Detail
 
+### Before noon -- optional early read
+
+If you want a lean preview before Discord:
 ```bash
 python matchup.py
 ```
 
-This generates the OVER/UNDER/AWAY/HOME signal from team and pitcher tiers.
-Use it as a preview -- Discord signal at noon is the official one.
+Check if Underdog lines are up yet:
+```bash
+python lines_query.py --list-games
+```
 
----
+Drill into a specific player before the session:
+```bash
+python player.py pitcher "McDonald"
+python player.py batter "Chapman"
+python player.py matchup "Chapman" "Civale"
+```
 
-## Game Day -- After Discord Lean (~12pm PT)
+### After Discord lean (~12pm PT)
 
 Discord drops: `UNDER LEAN, Civale ELITE ERA 2.54, Mahle FADE ERA 5.42, ATH mid, SF FADE`
 
-Copy the lean string. Then run the full pipeline:
-
-### 1. Log into Underdog
+**Step 1 -- Log into Underdog**
 ```
 /playwright-underdog
 ```
-Enter 2FA when prompted. Wait for confirmation before continuing.
+Enter 2FA. Wait for confirmation.
 
-### 2. Scrape the lines (~70 seconds)
+**Step 2 -- Scrape lines + auto-cache**
 ```
 /underdog-mlb Giants
 ```
-Writes all 23 stat tabs to picks.db. Confirm "Saved to picks.db mlb_game_lines."
+This scrapes all 23 stat tabs, saves to picks.db, then automatically runs:
+- `cache_stats.py` -- player recent stats (pitchers: last 5 starts, batters: last 15 games + L/R splits)
+- `cache_news.py` -- IL/injury status
 
-### 3. Pre-cache player stats (~5 seconds)
-```bash
-python cache_stats.py --game "SF Giants @ Athletics"
-```
-Pulls last 5 starts (pitchers) and last 15 games (batters) from MLB Stats API.
-The analyze skill reads from here -- no slow web searches per player.
+You'll see the output inline. No extra commands needed.
 
-### 4. Pre-cache injury status (~3 seconds)
-```bash
-python cache_news.py --game "SF Giants @ Athletics"
+**Step 3 -- Analyze**
 ```
-Checks official IL transactions again with today's date. Confirms active roster.
-Skip if you already ran `--roster` the night before with today's date.
-
-### 5. Verify what you have
-```bash
-python cache_stats.py --game "SF Giants @ Athletics" --query
-python cache_news.py --game "SF Giants @ Athletics" --query
-python lines_query.py --game "SF Giants @ Athletics" --type pitcher
+/underdog-mlb-analyze "SF Giants @ Athletics" "UNDER LEAN, Civale ELITE ERA 2.54, ..."
 ```
-
-### 6. Analyze
-```
-/underdog-mlb-analyze "SF Giants @ Athletics" "[lean string from Discord]"
-```
-Outputs GREEN / YELLOW / SKIP picks ranked by score.
+Reads everything from DB. Outputs GREEN / YELLOW / SKIP picks ranked by score.
 
 ---
 
 ## Picking a Slip
 
-Rules:
 - Only GREEN picks (score >= 65)
 - Different teams -- no all-same-team slip
 - Max $50 Flex, max $20 Standard per slip
-- Always check the KEY BATTER FLAGS section -- hot batters override team grade
+- Check KEY BATTER FLAGS -- hot batters override team grade
 
-Red flags that kill a pick regardless of score:
-- Player on IL (`IL-10 / IL-15 / IL-60`) -- skip
-- `IL-return-today` -- first game back, skip or heavily discount
-- Flat multiplier (no market signal) -- treat as 50/50
-- xwOBA significantly below wOBA -- regression due, fade less aggressively
+Hard stops regardless of score:
+- `IL-10 / IL-15 / IL-60` -- skip, player may not play
+- `IL-return-today` -- first game back, skip
+- Flat multiplier on both sides -- market has no signal, treat as 50/50
+- 1st inning pitch count on FADE pitcher -- volatile, only take if opposing lineup walks a lot
 
 ---
 
@@ -120,25 +107,30 @@ python betlog.py add \
 
 ## After the Game
 
-Look up final box score, then settle:
+At 11pm, `daily.sh` posts final stats to Discord automatically. You just read them and settle:
 
 ```bash
-python betlog.py result [ID] W    # win
-python betlog.py result [ID] L    # loss
-python betlog.py summary          # running P&L
+python settle.py              # see current stats for all open bets
+python settle.py --id 1 --settle W
+python settle.py --id 1 --settle L
+python betlog.py summary      # running P&L
 ```
 
-To check live box score mid-game:
+---
+
+## Player Research Commands
+
 ```bash
-curl -s "https://statsapi.mlb.com/api/v1/game/[GAME_PK]/boxscore" | python3 -c "
-import sys, json; data=json.load(sys.stdin)
-for side in ('home','away'):
-    for p in data['teams'][side]['players'].values():
-        name = p['person']['fullName']
-        if 'Chapman' in name or 'Civale' in name:
-            s = p.get('stats', {})
-            print(name, s.get('batting') or s.get('pitching'))
-"
+# Pitcher: last N starts with K/ER/IP per start, home vs away ERA, trend
+python player.py pitcher "Aaron Civale"
+python player.py pitcher "Aaron Civale" --starts 8
+
+# Batter: last 15 games row by row, L/R splits, H+R+RBI trend
+python player.py batter "Matt Chapman"
+python player.py batter "Matt Chapman" --games 20
+
+# Head-to-head: career matchup history by season
+python player.py matchup "Matt Chapman" "Aaron Civale"
 ```
 
 ---
@@ -153,26 +145,23 @@ for side in ('home','away'):
 | FADE pitcher | Earned Runs, Hits Allowed | Higher |
 | FADE offense batter | H+R+RBI, Hits, Total Bases | Lower |
 | ELITE offense batter | H+R+RBI | Higher |
-| Game total (UNDER) | Total Runs | Lower |
-| 1st Inn PC (FADE starter) | Pitch Count | Higher -- VOLATILE, only if opp lineup walks a lot |
+| Game total (UNDER lean) | Total Runs | Lower |
+| 1st Inn PC (FADE starter) | Pitch Count | Higher -- VOLATILE only |
+
+L/R split rule: always check which hand the pitcher throws. If batter's split vs that handedness is significantly better than their season average, trust the split over the team grade.
 
 ---
 
 ## DB Quick Queries
 
 ```bash
-# What games have been scraped?
 python lines_query.py --list-games
-
-# All pitcher lines for a game
 python lines_query.py --game "SF Giants @ Athletics" --type pitcher
-
-# Specific player
 python lines_query.py --game "SF Giants @ Athletics" --player "Civale"
 
-# Open bets
-python betlog.py list
+python cache_stats.py --game "SF Giants @ Athletics" --query
+python cache_news.py --game "SF Giants @ Athletics" --query
 
-# P&L summary
+python betlog.py list
 python betlog.py summary
 ```
