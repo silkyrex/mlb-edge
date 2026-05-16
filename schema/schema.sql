@@ -91,6 +91,9 @@ CREATE TABLE IF NOT EXISTS player_recent_stats (
     last15_tb           REAL,
     season_avg          REAL,
     season_ops          REAL,
+    -- Pitcher: expected stats (contact quality against)
+    x_woba_against      REAL,
+    x_avg_against       REAL,
     -- Batter: L/R splits (season)
     vs_lhp_avg          REAL,
     vs_lhp_ops          REAL,
@@ -98,10 +101,47 @@ CREATE TABLE IF NOT EXISTS player_recent_stats (
     vs_rhp_avg          REAL,
     vs_rhp_ops          REAL,
     vs_rhp_ab           INTEGER,
+    -- Batter: home/away splits (season)
+    split_home_avg      REAL,
+    split_home_ops      REAL,
+    split_home_ab       INTEGER,
+    split_away_avg      REAL,
+    split_away_ops      REAL,
+    split_away_ab       INTEGER,
+    -- Batter: expected stats (regression signal)
+    x_avg               REAL,
+    x_slg               REAL,
+    x_woba              REAL,
     UNIQUE(player, cache_date)
 );
 
 CREATE INDEX IF NOT EXISTS idx_prs_player ON player_recent_stats(player, cache_date);
+
+-- Phase 3: Team-level game stats (bullpen, offense, venue)
+-- Populated by cache_team.py; read by /underdog-mlb-analyze skill
+CREATE TABLE IF NOT EXISTS team_game_stats (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    cache_date      TEXT NOT NULL,
+    game            TEXT NOT NULL,
+    team_name       TEXT NOT NULL,
+    team_id         INTEGER,
+    side            TEXT,           -- 'home' or 'away'
+    bullpen_era     REAL,
+    bullpen_whip    REAL,
+    bullpen_k9      REAL,
+    starter_era     REAL,
+    team_avg        REAL,
+    team_ops        REAL,
+    team_k_pct      REAL,
+    venue_name      TEXT,
+    venue_roof      TEXT,           -- 'Open', 'Dome', 'Retractable'
+    venue_left      INTEGER,
+    venue_center    INTEGER,
+    venue_right     INTEGER,
+    UNIQUE(cache_date, game, team_name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_tgs_game ON team_game_stats(game, cache_date);
 
 -- Phase 3: Player injury status and IL transaction cache
 -- Populated by cache_news.py; read by /underdog-mlb-analyze skill

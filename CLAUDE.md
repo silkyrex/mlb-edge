@@ -32,9 +32,13 @@ Key columns: `scraped_date`, `game`, `player`, `team`, `player_type` (pitcher/ba
 Unique on `(scraped_date, game, player, stat)`.
 
 **player_recent_stats** -- Pre-cached per player per day.
-Pitcher columns: `season_era`, `season_k9`, `season_whip`, `recent_era`, `last5_ks` (JSON array).
-Batter columns: `last15_h_r_rbi`, `last15_hits`, `last15_ks_batter`, `last15_hr`, `last15_tb`, `season_avg`, `season_ops`.
+Pitcher columns: `season_era`, `season_k9`, `season_whip`, `recent_era`, `last5_ks`, `split_home_era`, `split_away_era`, `x_woba_against`, `x_avg_against`.
+Batter columns: `last15_h_r_rbi`, `last15_hits`, `last15_ks_batter`, `last15_hr`, `last15_tb`, `season_avg`, `season_ops`, `vs_lhp_avg`, `vs_lhp_ops`, `vs_rhp_avg`, `vs_rhp_ops`, `split_home_avg`, `split_home_ops`, `split_away_avg`, `split_away_ops`, `x_avg`, `x_slg`, `x_woba`.
 Unique on `(player, cache_date)`.
+
+**team_game_stats** -- Team-level stats per game per day.
+Columns: `side` (home/away), `bullpen_era`, `bullpen_whip`, `bullpen_k9`, `starter_era`, `team_avg`, `team_ops`, `team_k_pct`, `venue_name`, `venue_roof`, `venue_left/center/right`.
+Unique on `(cache_date, game, team_name)`.
 
 **player_news** -- IL status per player per day.
 Key columns: `status` (active / IL-10 / IL-15 / IL-60 / IL-return-today / IL-return-Nd), `note`, `source` (mlb-api / web).
@@ -49,8 +53,9 @@ Key columns: `date`, `matchup`, `signal`, `bet_on`, `line`, `stake`, `result` (o
 
 | File | Purpose |
 |---|---|
-| `cache_stats.py` | MLB Stats API → player_recent_stats. Idempotent. |
+| `cache_stats.py` | MLB Stats API → player_recent_stats (stats + splits + xStats). Idempotent. |
 | `cache_news.py` | MLB transactions API → player_news. `--roster` flag skips mlb_game_lines dependency. |
+| `cache_team.py` | Team bullpen ERA, offense K%, venue roof/dims → team_game_stats. Idempotent. |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player |
 | `betlog.py` | Bet log -- add, result, list, summary |
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- early lean read |

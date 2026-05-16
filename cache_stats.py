@@ -132,6 +132,12 @@ def compute_pitcher_cache(player_id: int) -> dict:
         elif code == "a":
             away_era = _float(split["stat"].get("era"))
 
+    # Expected stats (xBA, xSLG, xwOBA against -- regression signal)
+    x_splits = _fetch_stats(player_id, "pitching", "expectedStatistics")
+    x_stat = x_splits[0].get("stat", {}) if x_splits else {}
+    x_woba_against = _float(x_stat.get("woba"))
+    x_avg_against  = _float(x_stat.get("avg"))
+
     return {
         "player_type": "pitcher",
         "mlb_player_id": player_id,
@@ -143,6 +149,8 @@ def compute_pitcher_cache(player_id: int) -> dict:
         "recent_era": recent_era,
         "split_home_era": home_era,
         "split_away_era": away_era,
+        "x_woba_against": x_woba_against,
+        "x_avg_against": x_avg_against,
     }
 
 
@@ -165,21 +173,42 @@ def compute_batter_cache(player_id: int) -> dict:
     hr_vals = [s["stat"].get("homeRuns", 0) for s in logs]
     tb_vals = [s["stat"].get("totalBases", 0) for s in logs]
 
-    # L/R splits
-    lr_splits = _fetch_stats(player_id, "hitting", "statSplits", extra={"sitCodes": "vl,vr"})
+    # L/R and home/away splits
+    lr_splits = _fetch_stats(player_id, "hitting", "statSplits", extra={"sitCodes": "vl,vr,h,a"})
     vs_lhp_avg = vs_lhp_ops = vs_lhp_ab = None
     vs_rhp_avg = vs_rhp_ops = vs_rhp_ab = None
+    split_home_avg = split_home_ops = split_home_ab = None
+    split_away_avg = split_away_ops = split_away_ab = None
     for split in lr_splits:
         code = split.get("split", {}).get("code", "")
         st = split.get("stat", {})
         if code == "vl":
             vs_lhp_avg = _float(st.get("avg"))
             vs_lhp_ops = _float(st.get("ops"))
-            vs_lhp_ab = st.get("atBats")
+            vs_lhp_ab  = st.get("atBats")
         elif code == "vr":
             vs_rhp_avg = _float(st.get("avg"))
             vs_rhp_ops = _float(st.get("ops"))
-            vs_rhp_ab = st.get("atBats")
+            vs_rhp_ab  = st.get("atBats")
+        elif code == "h":
+            split_home_avg = _float(st.get("avg"))
+            split_home_ops = _float(st.get("ops"))
+            split_home_ab  = st.get("atBats")
+        elif code == "a":
+            split_away_avg = _float(st.get("avg"))
+            split_away_ops = _float(st.get("ops"))
+            split_away_ab  = st.get("atBats")
+
+    # Expected stats (xBA, xwOBA -- regression signal)
+    x_splits = _fetch_stats(player_id, "hitting", "expectedStatistics")
+    x_stat = x_splits[0].get("stat", {}) if x_splits else {}
+    x_woba = _float(x_stat.get("woba"))
+    x_avg  = _float(x_stat.get("avg"))
+    x_slg  = _float(x_stat.get("slg"))
+
+    # wOBA delta: positive = outperforming contact quality (regression risk)
+    actual_woba = _float(season.get("obp"))  # approximation; real wOBA not in season stats
+    woba_delta = None  # computed in player.py display layer
 
     return {
         "player_type": "batter",
@@ -198,6 +227,15 @@ def compute_batter_cache(player_id: int) -> dict:
         "vs_rhp_avg": vs_rhp_avg,
         "vs_rhp_ops": vs_rhp_ops,
         "vs_rhp_ab": vs_rhp_ab,
+        "split_home_avg": split_home_avg,
+        "split_home_ops": split_home_ops,
+        "split_home_ab":  split_home_ab,
+        "split_away_avg": split_away_avg,
+        "split_away_ops": split_away_ops,
+        "split_away_ab":  split_away_ab,
+        "x_avg": x_avg,
+        "x_slg": x_slg,
+        "x_woba": x_woba,
     }
 
 
@@ -206,37 +244,30 @@ def upsert_cache(conn: sqlite3.Connection, player: str, cache_date: str, data: d
         "player", "player_type", "cache_date", "mlb_player_id", "games_lookback",
         "last5_ks", "season_k9", "season_era", "season_whip", "recent_era",
         "split_home_era", "split_away_era",
+        "x_woba_against", "x_avg_against",
         "last15_h_r_rbi", "last15_hits", "last15_ks_batter", "last15_hr", "last15_tb",
         "season_avg", "season_ops",
         "vs_lhp_avg", "vs_lhp_ops", "vs_lhp_ab",
         "vs_rhp_avg", "vs_rhp_ops", "vs_rhp_ab",
+        "split_home_avg", "split_home_ops", "split_home_ab",
+        "split_away_avg", "split_away_ops", "split_away_ab",
+        "x_avg", "x_slg", "x_woba",
     ]
     values = [
-        player,
-        data.get("player_type"),
-        cache_date,
-        data.get("mlb_player_id"),
-        data.get("games_lookback"),
-        data.get("last5_ks"),
-        data.get("season_k9"),
-        data.get("season_era"),
-        data.get("season_whip"),
-        data.get("recent_era"),
-        data.get("split_home_era"),
-        data.get("split_away_era"),
-        data.get("last15_h_r_rbi"),
-        data.get("last15_hits"),
-        data.get("last15_ks_batter"),
-        data.get("last15_hr"),
-        data.get("last15_tb"),
-        data.get("season_avg"),
-        data.get("season_ops"),
-        data.get("vs_lhp_avg"),
-        data.get("vs_lhp_ops"),
-        data.get("vs_lhp_ab"),
-        data.get("vs_rhp_avg"),
-        data.get("vs_rhp_ops"),
-        data.get("vs_rhp_ab"),
+        player, data.get("player_type"), cache_date,
+        data.get("mlb_player_id"), data.get("games_lookback"),
+        data.get("last5_ks"), data.get("season_k9"), data.get("season_era"),
+        data.get("season_whip"), data.get("recent_era"),
+        data.get("split_home_era"), data.get("split_away_era"),
+        data.get("x_woba_against"), data.get("x_avg_against"),
+        data.get("last15_h_r_rbi"), data.get("last15_hits"), data.get("last15_ks_batter"),
+        data.get("last15_hr"), data.get("last15_tb"),
+        data.get("season_avg"), data.get("season_ops"),
+        data.get("vs_lhp_avg"), data.get("vs_lhp_ops"), data.get("vs_lhp_ab"),
+        data.get("vs_rhp_avg"), data.get("vs_rhp_ops"), data.get("vs_rhp_ab"),
+        data.get("split_home_avg"), data.get("split_home_ops"), data.get("split_home_ab"),
+        data.get("split_away_avg"), data.get("split_away_ops"), data.get("split_away_ab"),
+        data.get("x_avg"), data.get("x_slg"), data.get("x_woba"),
     ]
     placeholders = ",".join("?" * len(fields))
     updates = ", ".join(f"{f}=excluded.{f}" for f in fields if f not in ("player", "cache_date"))
