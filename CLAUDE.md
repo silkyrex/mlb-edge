@@ -15,6 +15,8 @@ Discord lean signal (12:00 PT daily)
                 └── picks.db [mlb_game_lines]
                        ├── cache_stats.py --game [game] (pre-cache player stats)
                        │      └── picks.db [player_recent_stats]
+                       ├── cache_news.py --game [game] (pre-cache IL/injury status)
+                       │      └── picks.db [player_news]
                        └── /underdog-mlb-analyze [game] [lean] (Claude analyzer)
                               └── ranked pick list → /bet-score gate → betlog.py add
 ```
@@ -37,6 +39,7 @@ Discord lean signal (12:00 PT daily)
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- produces OVER/UNDER/AWAY/HOME lean |
 | `discord_push.py` | Post daily signals to Discord; reads SPORTS_WEBHOOK_URL from .env |
 | `cache_stats.py` | Pre-cache player recent stats from MLB Stats API → picks.db player_recent_stats |
+| `cache_news.py` | Pre-cache IL/injury status from MLB transactions API → picks.db player_news |
 | `lines_query.py` | Query mlb_game_lines from picks.db by game, stat, player |
 | `query.py` | Query player_game_logs for historical stats |
 | `scout.py` | Player scouting -- recent form, splits |
@@ -78,9 +81,13 @@ python discord_push.py
 # Query historical player stats
 python query.py --player "Aaron Civale" --days 10
 
-# Pre-cache player stats (run after /underdog-mlb, before /underdog-mlb-analyze)
+# Pre-cache player stats and injury status (run after /underdog-mlb, before /underdog-mlb-analyze)
 python cache_stats.py --game "SF Giants @ Athletics"
+python cache_news.py --game "SF Giants @ Athletics"
+
+# Query cached data
 python cache_stats.py --game "SF Giants @ Athletics" --query
+python cache_news.py --game "SF Giants @ Athletics" --query
 
 # Query today's Underdog lines
 python lines_query.py --game "SF Giants @ Athletics"

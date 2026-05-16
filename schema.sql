@@ -93,3 +93,19 @@ CREATE TABLE IF NOT EXISTS player_recent_stats (
 );
 
 CREATE INDEX IF NOT EXISTS idx_prs_player ON player_recent_stats(player, cache_date);
+
+-- Phase 3: Player injury status and IL transaction cache
+-- Populated by cache_news.py; read by /underdog-mlb-analyze skill
+CREATE TABLE IF NOT EXISTS player_news (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    news_date   TEXT NOT NULL,
+    player      TEXT NOT NULL,
+    team        TEXT,
+    status      TEXT,   -- 'active', 'IL-10', 'IL-15', 'IL-60', 'IL-return-today', 'IL-return-Nd', 'DTD', 'note'
+    note        TEXT,
+    source      TEXT DEFAULT 'mlb-api',   -- 'mlb-api' or 'web'
+    UNIQUE(news_date, player)
+);
+
+CREATE INDEX IF NOT EXISTS idx_news_player ON player_news(player, news_date);
+CREATE INDEX IF NOT EXISTS idx_news_date   ON player_news(news_date);
