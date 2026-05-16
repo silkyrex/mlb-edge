@@ -47,6 +47,12 @@ That's it. Steps 3 auto-triggers the cache scripts now. No manual cache commands
 
 ### Before noon -- optional early read
 
+Full game picture before the lean arrives:
+```bash
+python dive.py --game "SF Giants @ Athletics" --date 2026-05-16
+```
+Shows: venue, pitcher matchup with xwOBA/trends, each lineup vs the opposing pitcher (correct L/R split, home/away split, regression flags), pitcher prop angles, IL warnings. Run this first -- it tells you which games are worth playing before you even see the lean.
+
 If you want a lean preview before Discord:
 ```bash
 python matchup.py
@@ -57,7 +63,7 @@ Check if Underdog lines are up yet:
 python lines_query.py --list-games
 ```
 
-Drill into a specific player before the session:
+Drill deeper on a specific player:
 ```bash
 python player.py pitcher "McDonald"
 python player.py batter "Chapman"
