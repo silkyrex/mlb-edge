@@ -9,6 +9,7 @@ Usage:
 """
 
 import argparse
+import json
 import os
 import re
 import requests
@@ -20,9 +21,10 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / ".env")
 
 BETLOG_DB = Path(__file__).parent / "betlog.db"
-PICKS_DB = Path.home() / "sports/dfs/picks.db"
+PICKS_DB = Path(__file__).parent / "mlb.db"
 BASE = "https://statsapi.mlb.com/api/v1"
 WEBHOOK_URL = os.getenv("SPORTS_WEBHOOK_URL", "")
+OB1_URL = os.getenv("OB1_MCP_URL", "http://134.199.137.81:8000/mcp?key=7iQ3-Wqv41JK60Hav2GdWHCOQZbfYrFYayj3l2TCzy0")
 
 
 def get_open_bets(bet_id: int | None = None) -> list[dict]:
@@ -180,6 +182,123 @@ def extract_player_stats(bet_on: str, box: dict) -> list[str]:
     return lines
 
 
+def ob1_capture(content: str) -> bool:
+    """POST a thought to OB1 via StreamableHTTP MCP. Returns True on success."""
+    payload = {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {"name": "capture_thought", "arguments": {"content": content}},
+        "id": 1,
+    }
+    try:
+        r = requests.post(
+            OB1_URL,
+            json=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json, text/event-stream",
+                "User-Agent": "mlb-edge/1.0",
+            },
+            timeout=20,
+        )
+        # SSE response -- find the data: line
+        for line in r.text.splitlines():
+            if line.startswith("data:"):
+                body = json.loads(line[5:].strip())
+                if "error" in body:
+                    print(f"OB1 capture error: {body['error']}")
+                    return False
+                return True
+    except Exception as e:
+        print(f"OB1 capture failed: {e}")
+    return False
+
+
+def build_ob1_content(bet: dict, result: str, profit: float | None) -> str:
+    sign = "+" if profit and profit > 0 else ""
+    profit_str = f"{sign}{profit:.2f}" if profit is not None else "n/a"
+    result_label = "WIN" if result == "W" else "LOSS"
+
+    # Pull FIP/WAR context for pitchers named in the bet
+    fip_context = []
+    try:
+        conn = sqlite3.connect(PICKS_DB)
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute("""
+            SELECT player, season_era, espn_fip, espn_war
+            FROM player_recent_stats
+            WHERE cache_date=? AND player_type='pitcher'
+            AND espn_fip IS NOT NULL
+        """, (bet["date"],)).fetchall()
+        conn.close()
+        for r in rows:
+            if r["player"].split()[-1].lower() in bet["bet_on"].lower():
+                era = r["season_era"]
+                fip = r["espn_fip"]
+                war = r["espn_war"]
+                if era and fip and abs(fip - era) > 0.5:
+                    flag = "ERA LUCKY" if fip > era else "ERA UNLUCKY"
+                    fip_context.append(f"{r['player']}: ERA {era:.2f} FIP {fip:.2f} WAR {war} [{flag}]")
+    except Exception:
+        pass
+
+    lines = [
+        f"MLB bet settled [{result_label}]: {bet['matchup']} ({bet['date']})",
+        f"Lean: {bet.get('signal', 'n/a')}",
+        f"Pick: {bet['bet_on']}",
+        f"Result: {result_label} | Profit: {profit_str} | Stake: ${bet['stake']:.0f} | Line: {bet['line']:+d}",
+        f"Agent: mlb-edge",
+    ]
+    if fip_context:
+        lines.append("FIP context: " + " | ".join(fip_context))
+
+    return "\n".join(lines)
+
+
+RUBRIC_LOG = Path.home() / ".claude/skills/bet-score/mlb-rubric.md"
+
+
+def append_rubric_log(bet: dict, result: str, profit: float | None):
+    """Append a settled bet row to the mlb-rubric.md Data Log."""
+    try:
+        fip_flags = []
+        conn = sqlite3.connect(PICKS_DB)
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute("""
+            SELECT player, season_era, espn_fip
+            FROM player_recent_stats
+            WHERE cache_date=? AND player_type='pitcher' AND espn_fip IS NOT NULL
+        """, (bet["date"],)).fetchall()
+        conn.close()
+        for r in rows:
+            if r["player"].split()[-1].lower() in bet["bet_on"].lower():
+                era, fip = r["season_era"], r["espn_fip"]
+                if era and fip and abs(fip - era) > 0.5:
+                    fip_flags.append(f"{'ERA LUCKY' if fip > era else 'ERA UNLUCKY'} {r['player']}")
+
+        sign = "+" if profit and profit > 0 else ""
+        profit_str = f"{sign}{profit:.2f}" if profit is not None else "n/a"
+        fip_str = " / ".join(fip_flags) if fip_flags else "none"
+        picks = bet["bet_on"].replace("\n", " + ")
+        row = (
+            f"| {bet['date']} | {bet['matchup']} | {bet.get('signal','?')} "
+            f"| {picks} | -- | -- | -- | {result} | {profit_str} | {fip_str} | auto-logged |"
+        )
+
+        text = RUBRIC_LOG.read_text()
+        marker = "| Date | Game | Lean |"
+        header_end = text.find(marker)
+        if header_end == -1:
+            return
+        # Find end of header row + separator row, insert after
+        insert_after = text.find("\n", text.find("\n", header_end) + 1) + 1
+        new_text = text[:insert_after] + row + "\n" + text[insert_after:]
+        RUBRIC_LOG.write_text(new_text)
+        print(f"Rubric log updated.")
+    except Exception as e:
+        print(f"Rubric log append failed: {e}")
+
+
 def settle_bet(bet_id: int, result: str):
     conn = sqlite3.connect(BETLOG_DB)
     conn.row_factory = sqlite3.Row
@@ -206,10 +325,17 @@ def settle_bet(bet_id: int, result: str):
         (result, profit, bet_id)
     )
     conn.commit()
+
+    bet_row = dict(conn.execute("SELECT * FROM bets WHERE id=?", (bet_id,)).fetchone())
     conn.close()
 
     sign = "+" if profit and profit > 0 else ""
     print(f"Bet #{bet_id} settled: {result}  profit={sign}{profit}")
+
+    content = build_ob1_content(bet_row, result, profit)
+    ok = ob1_capture(content)
+    print(f"OB1 capture: {'ok' if ok else 'failed'}")
+    append_rubric_log(bet_row, result, profit)
 
 
 def post_discord(message: str):

@@ -14,6 +14,7 @@ import argparse
 import json
 import os
 import re
+import sqlite3
 import urllib.request as _ur
 import requests
 from datetime import date as date_cls, timedelta
@@ -22,8 +23,12 @@ from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent / ".env")
 
+from cache_stats import compute_pitcher_cache, upsert_cache
+from cache_espn import fetch_espn_pitchers, match_name as espn_match
+
 BASE = "https://statsapi.mlb.com/api/v1"
 SEASON = str(date_cls.today().year)
+PICKS_DB = Path(__file__).parent / "mlb.db"
 WEBHOOK_URL = os.getenv("SPORTS_WEBHOOK_URL", "")
 
 # ── Notion config ──────────────────────────────────────────────────────────────
@@ -211,6 +216,16 @@ def build_brief(game_date: str) -> str:
 
     team_ids_all: list[int] = []
     game_blocks: list[str] = []
+    pitchers_cached: list[tuple[str, int]] = []  # (name, player_id)
+
+    # Pre-fetch ESPN map once for all starters
+    try:
+        espn_map = fetch_espn_pitchers()
+    except Exception:
+        espn_map = {}
+
+    conn = sqlite3.connect(PICKS_DB)
+    conn.row_factory = sqlite3.Row
 
     for g in games:
         teams = g["teams"]
@@ -233,20 +248,51 @@ def build_brief(game_date: str) -> str:
                 continue
             pid = pitcher.get("id")
             name = pitcher.get("fullName", "TBD")
-            stats = get_pitcher_stats(pid) if pid else {}
-            era = _float(stats.get("era"))
-            whip = _float(stats.get("whip"))
-            ip = _float(stats.get("inningsPitched")) or 0
-            ks = stats.get("strikeOuts", 0)
-            k9 = round(ks * 9 / ip, 1) if ip > 0 else None
-            grade = grade_era(era)
 
+            # Full cache (last 5 starts + splits + xStats) → player_recent_stats
+            fip = war = None
+            if pid:
+                try:
+                    data = compute_pitcher_cache(pid)
+                    upsert_cache(conn, name, game_date, data)
+                    pitchers_cached.append((name, pid))
+
+                    # Overlay ESPN stats on the same row
+                    espn = espn_match(name, espn_map)
+                    if espn:
+                        conn.execute("""
+                            UPDATE player_recent_stats
+                            SET espn_war=?, espn_fip=?, espn_k_bb=?
+                            WHERE player=? AND cache_date=? AND player_type='pitcher'
+                        """, (espn["espn_war"], espn["espn_fip"], espn["espn_k_bb"], name, game_date))
+                        fip = espn["espn_fip"]
+                        war = espn["espn_war"]
+
+                    era = data.get("season_era")
+                    whip = data.get("season_whip")
+                    k9 = data.get("season_k9")
+                except Exception:
+                    stats = get_pitcher_stats(pid)
+                    era = _float(stats.get("era"))
+                    whip = _float(stats.get("whip"))
+                    ip = _float(stats.get("inningsPitched")) or 0
+                    ks = stats.get("strikeOuts", 0)
+                    k9 = round(ks * 9 / ip, 1) if ip > 0 else None
+            else:
+                era = whip = k9 = None
+
+            grade = grade_era(era)
             era_str = f"{era:.2f}" if era is not None else "?"
             whip_str = f"{whip:.2f}" if whip is not None else "?"
             k9_str = f"{k9}" if k9 is not None else "?"
-            block.append(f"  {label}: {name} [{grade}] ERA {era_str} WHIP {whip_str} K/9 {k9_str}")
+            fip_str = f" FIP {fip:.2f}" if fip is not None else ""
+            war_str = f" WAR {war:.1f}" if war is not None else ""
+            block.append(f"  {label}: {name} [{grade}] ERA {era_str} WHIP {whip_str} K/9 {k9_str}{fip_str}{war_str}")
 
         game_blocks.append("\n".join(block))
+
+    conn.commit()
+    conn.close()
 
     lines.append("\n\n".join(game_blocks))
 
@@ -256,6 +302,9 @@ def build_brief(game_date: str) -> str:
         lines.append(f"\n**Recent IL Returns (last 7 days):**")
         for r in il_returns:
             lines.append(f"  {r}")
+
+    if pitchers_cached:
+        lines.append(f"\n_{len(pitchers_cached)} starters pre-cached in picks.db (ERA/FIP/WAR ready for /underdog-mlb-analyze)_")
 
     lines.append(f"\n_Lean signal arrives 12pm PT via Discord._")
     return "\n".join(lines)

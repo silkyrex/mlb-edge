@@ -23,8 +23,9 @@ Discord lean signal (12:00 PT)
 
 ## Databases
 
-`picks.db` at `~/sports/dfs/picks.db` -- shared sports DB (also used by NBA tools).
+`mlb.db` at `~/mlb-edge/mlb.db` -- MLB-only DB. All MLB scripts use `Path(__file__).parent / "mlb.db"`.
 `betlog.db` at `./betlog.db` -- repo-local, MLB bet tracking only. Never merge these.
+`~/sports/dfs/picks.db` -- NBA tools only. MLB scripts do not touch this file.
 
 ### picks.db tables in use
 

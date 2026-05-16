@@ -20,7 +20,7 @@ import sqlite3
 from datetime import date as date_cls, timedelta
 from pathlib import Path
 
-PICKS_DB = Path.home() / "sports/dfs/picks.db"
+PICKS_DB = Path(__file__).parent / "mlb.db"
 BASE = "https://statsapi.mlb.com/api/v1"
 SEASON = str(date_cls.today().year)
 

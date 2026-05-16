@@ -13,7 +13,7 @@ import argparse
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path.home() / "sports/dfs/picks.db"
+DB_PATH = Path(__file__).parent / "mlb.db"
 
 
 def get_conn():

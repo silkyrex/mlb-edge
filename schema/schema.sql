@@ -112,6 +112,10 @@ CREATE TABLE IF NOT EXISTS player_recent_stats (
     x_avg               REAL,
     x_slg               REAL,
     x_woba              REAL,
+    -- Pitcher: ESPN season stats (cache_espn.py) -- added 2026-05-16
+    espn_war            REAL,
+    espn_fip            REAL,               -- computed: (13*HR + 3*BB - 2*K) / IP + 3.1
+    espn_k_bb           REAL,               -- K/BB ratio
     UNIQUE(player, cache_date)
 );
 

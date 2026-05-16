@@ -14,7 +14,7 @@ import requests
 import sqlite3
 from pathlib import Path
 
-PICKS_DB = Path.home() / "sports/dfs/picks.db"
+PICKS_DB = Path(__file__).parent / "mlb.db"
 BASE = "https://statsapi.mlb.com/api/v1"
 SEASON = "2026"
 
