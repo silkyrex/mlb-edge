@@ -13,11 +13,57 @@ Usage:
 """
 
 import argparse
+import json
+import os
 import sqlite3
+import urllib.request
 from datetime import date, datetime
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent / "betlog.db"
+
+# OB1 capture -- optional; silently skips if env vars not set
+_SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+_SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+_OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+
+
+def _ob1_push(content: str, metadata: dict) -> None:
+    if not (_SUPABASE_URL and _SUPABASE_KEY and _OPENROUTER_KEY):
+        return
+    try:
+        emb_req = urllib.request.Request(
+            "https://openrouter.ai/api/v1/embeddings",
+            data=json.dumps({"model": "openai/text-embedding-3-small", "input": content}).encode(),
+            headers={"Authorization": f"Bearer {_OPENROUTER_KEY}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(emb_req, timeout=20) as r:
+            embedding = json.loads(r.read())["data"][0]["embedding"]
+    except Exception:
+        embedding = None
+
+    payload = json.dumps({
+        "p_content": content,
+        "p_payload": {"metadata": {**metadata, "source": "betlog", "era": "live"}},
+    }).encode()
+    upsert_req = urllib.request.Request(
+        f"{_SUPABASE_URL}/rest/v1/rpc/upsert_thought",
+        data=payload,
+        headers={"apikey": _SUPABASE_KEY, "Authorization": f"Bearer {_SUPABASE_KEY}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(upsert_req, timeout=15) as r:
+        result = json.loads(r.read())
+
+    if embedding and result and result.get("id"):
+        urllib.request.urlopen(urllib.request.Request(
+            f"{_SUPABASE_URL}/rest/v1/thoughts?id=eq.{result['id']}",
+            data=json.dumps({"embedding": embedding}).encode(),
+            headers={"apikey": _SUPABASE_KEY, "Authorization": f"Bearer {_SUPABASE_KEY}",
+                     "Content-Type": "application/json", "Prefer": "return=minimal"},
+            method="PATCH",
+        ), timeout=15).read()
 
 
 # ── schema ─────────────────────────────────────────────────────────────────────
@@ -72,8 +118,19 @@ def cmd_add(args):
     """, (game_date, args.matchup, args.signal, args.bet, args.line, args.stake, args.notes))
     conn.commit()
     row = conn.execute("SELECT last_insert_rowid() as id").fetchone()
-    print(f"Logged bet #{row['id']}  |  {game_date}  {args.matchup}  |  {args.bet} @ {args.line:+d}  |  ${args.stake:.0f} stake")
+    bet_id = row['id']
+    print(f"Logged bet #{bet_id}  |  {game_date}  {args.matchup}  |  {args.bet} @ {args.line:+d}  |  ${args.stake:.0f} stake")
     conn.close()
+
+    content = (
+        f"mlb bet placed: {args.matchup} | date={game_date} bet_id={bet_id} "
+        f"bet={args.bet} line={args.line:+d} stake=${args.stake:.0f} "
+        f"signal={args.signal or '--'} notes={args.notes or '--'}"
+    )
+    _ob1_push(content, {
+        "type": "mlb_bet_placed", "matchup": args.matchup, "date": game_date,
+        "bet_id": bet_id, "bet": args.bet, "signal": args.signal, "agent": "betlog",
+    })
 
 
 def cmd_result(args):
@@ -100,6 +157,17 @@ def cmd_result(args):
     sign = "+" if profit >= 0 else ""
     print(f"Bet #{args.id} settled: {result}  |  {sign}${profit:.2f}  |  {row['matchup']}  {row['bet_on']}")
     conn.close()
+
+    content = (
+        f"mlb bet outcome: {row['matchup']} | date={row['date']} bet_id={args.id} "
+        f"bet={row['bet_on']} line={row['line']:+d} stake=${row['stake']:.0f} "
+        f"result={result} profit={sign}${profit:.2f} signal={row['signal'] or '--'}"
+    )
+    _ob1_push(content, {
+        "type": "mlb_bet_outcome", "matchup": row["matchup"], "date": row["date"],
+        "bet_id": args.id, "result": result, "profit": profit, "signal": row["signal"],
+        "agent": "betlog",
+    })
 
 
 def cmd_list(args):
