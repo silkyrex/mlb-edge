@@ -2,20 +2,27 @@
 settle.py -- show live/final stats for open bets, prompt for settlement
 
 Usage:
-    python settle.py           # show all open bets with current box score stats
-    python settle.py --id 1    # show specific bet
+    python settle.py                      # show all open bets with box score stats
+    python settle.py --id 1               # show specific bet
+    python settle.py --id 1 --settle W    # settle bet as win
+    python settle.py --post-discord       # post settlement status to Discord (used by daily.sh)
 """
 
 import argparse
+import os
 import re
 import requests
 import sqlite3
 from datetime import date as date_cls
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent / ".env")
 
 BETLOG_DB = Path(__file__).parent / "betlog.db"
 PICKS_DB = Path.home() / "sports/dfs/picks.db"
 BASE = "https://statsapi.mlb.com/api/v1"
+WEBHOOK_URL = os.getenv("SPORTS_WEBHOOK_URL", "")
 
 
 def get_open_bets(bet_id: int | None = None) -> list[dict]:
@@ -205,16 +212,62 @@ def settle_bet(bet_id: int, result: str):
     print(f"Bet #{bet_id} settled: {result}  profit={sign}{profit}")
 
 
+def post_discord(message: str):
+    if not WEBHOOK_URL:
+        return
+    requests.post(WEBHOOK_URL, json={"content": message},
+                  headers={"User-Agent": "mlb-edge/1.0"}, timeout=10)
+
+
+def build_bet_summary(bet: dict) -> tuple[str, str]:
+    """Returns (terminal_text, discord_text) for a single bet."""
+    game_pk = find_game_pk(bet["matchup"], bet["date"])
+    if not game_pk:
+        return f"Bet #{bet['id']}: could not locate game", ""
+
+    status = get_game_status(game_pk)
+    score_data = get_linescore(game_pk)
+    box = get_box_stats(game_pk)
+    stat_lines = extract_player_stats(bet["bet_on"], box)
+
+    score_str = score_data.get("score", "")
+    stats_str = "\n".join(stat_lines)
+
+    terminal = (
+        f"\nBet #{bet['id']} | {bet['matchup']} | {status}\n"
+        f"  {score_str}\n"
+        f"  Bet: {bet['bet_on']}\n"
+        f"{stats_str}"
+    )
+
+    if status == "FINAL":
+        settle_hint = f"  → `python settle.py --id {bet['id']} --settle W/L`"
+        discord = (
+            f"**Bet #{bet['id']} -- FINAL** | {bet['matchup']}\n"
+            f"Score: {score_str}\n"
+            f"Bet: {bet['bet_on']} (line {bet['line']:+d}, stake ${bet['stake']:.0f})\n"
+            f"{chr(10).join(stat_lines)}\n"
+            f"{settle_hint}"
+        )
+    else:
+        discord = ""
+
+    return terminal, discord
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--id", type=int, help="Specific bet ID")
     parser.add_argument("--settle", choices=["W", "L"], help="Settle directly without prompting")
+    parser.add_argument("--post-discord", action="store_true", help="Post final-game summaries to Discord")
     args = parser.parse_args()
 
     bets = get_open_bets(args.id)
     if not bets:
         print("No open bets.")
         return
+
+    discord_posts = []
 
     for bet in bets:
         print(f"\n{'='*60}")
@@ -223,7 +276,6 @@ def main():
         print(f"Bet:    {bet['bet_on']}")
         print(f"Line:   {bet['line']:+d}  |  Stake: ${bet['stake']}")
 
-        # Find game and pull stats
         game_pk = find_game_pk(bet["matchup"], bet["date"])
         if not game_pk:
             print("  Could not locate game in MLB API.")
@@ -238,8 +290,8 @@ def main():
         box = get_box_stats(game_pk)
         stat_lines = extract_player_stats(bet["bet_on"], box)
         print("\nPick stats:")
-        for l in stat_lines:
-            print(l)
+        for line in stat_lines:
+            print(line)
 
         if status == "FINAL":
             if args.settle:
@@ -248,8 +300,21 @@ def main():
                 print(f"\nGame is FINAL. Settle with:")
                 print(f"  python settle.py --id {bet['id']} --settle W")
                 print(f"  python settle.py --id {bet['id']} --settle L")
+
+            if args.post_discord:
+                msg = (
+                    f"**Bet #{bet['id']} -- FINAL** | {bet['matchup']}\n"
+                    f"Score: {score_data.get('score', '?')}\n"
+                    f"Bet: {bet['bet_on']} (line {bet['line']:+d}, stake ${bet['stake']:.0f})\n"
+                    + "\n".join(stat_lines) + "\n"
+                    f"→ Settle: `python settle.py --id {bet['id']} --settle W/L`"
+                )
+                discord_posts.append(msg)
         else:
             print(f"\nGame in progress ({status}). Re-run when final.")
+
+    for msg in discord_posts:
+        post_discord(msg)
 
 
 if __name__ == "__main__":
