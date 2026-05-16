@@ -65,3 +65,31 @@ CREATE TABLE IF NOT EXISTS mlb_game_lines (
 CREATE INDEX IF NOT EXISTS idx_lines_date  ON mlb_game_lines(scraped_date);
 CREATE INDEX IF NOT EXISTS idx_lines_game  ON mlb_game_lines(game, scraped_date);
 CREATE INDEX IF NOT EXISTS idx_lines_player ON mlb_game_lines(player, scraped_date);
+
+-- Phase 3: Pre-cached player recent stats from MLB Stats API
+-- Populated by cache_stats.py; read by /underdog-mlb-analyze skill
+CREATE TABLE IF NOT EXISTS player_recent_stats (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    player              TEXT NOT NULL,
+    player_type         TEXT NOT NULL,      -- 'pitcher' or 'batter'
+    cache_date          TEXT NOT NULL,      -- YYYY-MM-DD
+    mlb_player_id       INTEGER,
+    games_lookback      INTEGER,
+    -- Pitcher: last 5 starts
+    last5_ks            TEXT,               -- JSON array e.g. [5,4,6,3,7]
+    season_k9           REAL,
+    season_era          REAL,
+    season_whip         REAL,
+    recent_era          REAL,               -- ERA over last 5 starts
+    -- Batter: last 15 games
+    last15_h_r_rbi      REAL,               -- avg H+R+RBI per game
+    last15_hits         REAL,
+    last15_ks_batter    REAL,               -- avg batter Ks per game
+    last15_hr           REAL,
+    last15_tb           REAL,
+    season_avg          REAL,
+    season_ops          REAL,
+    UNIQUE(player, cache_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_prs_player ON player_recent_stats(player, cache_date);
