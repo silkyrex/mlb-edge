@@ -4,7 +4,7 @@ MLB betting edge system. Scrapes Underdog pick'em lines, cross-references MLB St
 
 **Phase 3 is active.** Daily workflow: Discord lean → Underdog scrape → player stat + injury cache → ranked pick list → bet log.
 
-See `FLOW.md` for the step-by-step game day runbook.
+See [`docs/FLOW.md`](docs/FLOW.md) for the step-by-step game day runbook.
 
 ---
 
@@ -79,6 +79,6 @@ python betlog.py summary
 
 ## Data Sources
 
-- **MLB Stats API** -- free, no key. Schedule, boxscores, rosters, transactions. See `DATASOURCES.md`.
+- **MLB Stats API** -- free, no key. Schedule, boxscores, rosters, transactions. See [`docs/DATASOURCES.md`](docs/DATASOURCES.md).
 - **Underdog Sports** -- pick'em lines scraped via Playwright skill. Requires login.
 - **Discord lean signal** -- daily at 12pm PT from the mlb-lean pipeline.

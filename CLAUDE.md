@@ -2,7 +2,7 @@
 
 MLB betting edge system. Phase 3 active: Underdog pick'em scraping + lean-based scoring.
 
-For the game day runbook, see `FLOW.md`. For project overview, see `README.md`.
+For the game day runbook, see `docs/FLOW.md`. For project overview, see `README.md`.
 
 ---
 
@@ -55,7 +55,7 @@ Key columns: `date`, `matchup`, `signal`, `bet_on`, `line`, `stake`, `result` (o
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- early lean read |
 | `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet run against picks.db) |
 | `schema.sql` | Full DB schema. Always update before editing picks.db schema. |
-| `FLOW.md` | Game day runbook -- step-by-step order of operations |
+| `docs/FLOW.md` | Game day runbook -- step-by-step order of operations |
 
 ---
 
