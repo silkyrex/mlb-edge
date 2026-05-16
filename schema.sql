@@ -81,6 +81,8 @@ CREATE TABLE IF NOT EXISTS player_recent_stats (
     season_era          REAL,
     season_whip         REAL,
     recent_era          REAL,               -- ERA over last 5 starts
+    split_home_era      REAL,
+    split_away_era      REAL,
     -- Batter: last 15 games
     last15_h_r_rbi      REAL,               -- avg H+R+RBI per game
     last15_hits         REAL,
@@ -89,6 +91,13 @@ CREATE TABLE IF NOT EXISTS player_recent_stats (
     last15_tb           REAL,
     season_avg          REAL,
     season_ops          REAL,
+    -- Batter: L/R splits (season)
+    vs_lhp_avg          REAL,
+    vs_lhp_ops          REAL,
+    vs_lhp_ab           INTEGER,
+    vs_rhp_avg          REAL,
+    vs_rhp_ops          REAL,
+    vs_rhp_ab           INTEGER,
     UNIQUE(player, cache_date)
 );
 

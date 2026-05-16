@@ -88,10 +88,12 @@ def get_player_ids_from_rosters(game_pk: int, game_date: str) -> dict[str, int]:
     return name_to_id
 
 
-def _fetch_stats(player_id: int, group: str, stat_type: str, limit: int | None = None) -> list[dict]:
+def _fetch_stats(player_id: int, group: str, stat_type: str, limit: int | None = None, extra: dict | None = None) -> list[dict]:
     params: dict = {"stats": stat_type, "group": group, "season": SEASON}
     if limit:
         params["limit"] = limit
+    if extra:
+        params.update(extra)
     r = requests.get(f"{BASE}/people/{player_id}/stats", params=params, timeout=10)
     if r.status_code != 200:
         return []
@@ -120,6 +122,16 @@ def compute_pitcher_cache(player_id: int) -> dict:
     season_k = season.get("strikeOuts", 0)
     season_k9 = round(season_k * 9 / season_ip, 2) if season_ip > 0 else None
 
+    # Home/away ERA splits
+    ha_splits = _fetch_stats(player_id, "pitching", "statSplits", extra={"sitCodes": "h,a"})
+    home_era = away_era = None
+    for split in ha_splits:
+        code = split.get("split", {}).get("code", "")
+        if code == "h":
+            home_era = _float(split["stat"].get("era"))
+        elif code == "a":
+            away_era = _float(split["stat"].get("era"))
+
     return {
         "player_type": "pitcher",
         "mlb_player_id": player_id,
@@ -129,6 +141,8 @@ def compute_pitcher_cache(player_id: int) -> dict:
         "season_era": _float(season.get("era")),
         "season_whip": _float(season.get("whip")),
         "recent_era": recent_era,
+        "split_home_era": home_era,
+        "split_away_era": away_era,
     }
 
 
@@ -151,6 +165,22 @@ def compute_batter_cache(player_id: int) -> dict:
     hr_vals = [s["stat"].get("homeRuns", 0) for s in logs]
     tb_vals = [s["stat"].get("totalBases", 0) for s in logs]
 
+    # L/R splits
+    lr_splits = _fetch_stats(player_id, "hitting", "statSplits", extra={"sitCodes": "vl,vr"})
+    vs_lhp_avg = vs_lhp_ops = vs_lhp_ab = None
+    vs_rhp_avg = vs_rhp_ops = vs_rhp_ab = None
+    for split in lr_splits:
+        code = split.get("split", {}).get("code", "")
+        st = split.get("stat", {})
+        if code == "vl":
+            vs_lhp_avg = _float(st.get("avg"))
+            vs_lhp_ops = _float(st.get("ops"))
+            vs_lhp_ab = st.get("atBats")
+        elif code == "vr":
+            vs_rhp_avg = _float(st.get("avg"))
+            vs_rhp_ops = _float(st.get("ops"))
+            vs_rhp_ab = st.get("atBats")
+
     return {
         "player_type": "batter",
         "mlb_player_id": player_id,
@@ -162,6 +192,12 @@ def compute_batter_cache(player_id: int) -> dict:
         "last15_tb": avg(tb_vals),
         "season_avg": _float(season.get("avg")),
         "season_ops": _float(season.get("ops")),
+        "vs_lhp_avg": vs_lhp_avg,
+        "vs_lhp_ops": vs_lhp_ops,
+        "vs_lhp_ab": vs_lhp_ab,
+        "vs_rhp_avg": vs_rhp_avg,
+        "vs_rhp_ops": vs_rhp_ops,
+        "vs_rhp_ab": vs_rhp_ab,
     }
 
 
@@ -169,8 +205,11 @@ def upsert_cache(conn: sqlite3.Connection, player: str, cache_date: str, data: d
     fields = [
         "player", "player_type", "cache_date", "mlb_player_id", "games_lookback",
         "last5_ks", "season_k9", "season_era", "season_whip", "recent_era",
+        "split_home_era", "split_away_era",
         "last15_h_r_rbi", "last15_hits", "last15_ks_batter", "last15_hr", "last15_tb",
         "season_avg", "season_ops",
+        "vs_lhp_avg", "vs_lhp_ops", "vs_lhp_ab",
+        "vs_rhp_avg", "vs_rhp_ops", "vs_rhp_ab",
     ]
     values = [
         player,
@@ -183,6 +222,8 @@ def upsert_cache(conn: sqlite3.Connection, player: str, cache_date: str, data: d
         data.get("season_era"),
         data.get("season_whip"),
         data.get("recent_era"),
+        data.get("split_home_era"),
+        data.get("split_away_era"),
         data.get("last15_h_r_rbi"),
         data.get("last15_hits"),
         data.get("last15_ks_batter"),
@@ -190,6 +231,12 @@ def upsert_cache(conn: sqlite3.Connection, player: str, cache_date: str, data: d
         data.get("last15_tb"),
         data.get("season_avg"),
         data.get("season_ops"),
+        data.get("vs_lhp_avg"),
+        data.get("vs_lhp_ops"),
+        data.get("vs_lhp_ab"),
+        data.get("vs_rhp_avg"),
+        data.get("vs_rhp_ops"),
+        data.get("vs_rhp_ab"),
     ]
     placeholders = ",".join("?" * len(fields))
     updates = ", ".join(f"{f}=excluded.{f}" for f in fields if f not in ("player", "cache_date"))
