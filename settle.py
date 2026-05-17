@@ -22,7 +22,7 @@ from pick_lessons import observe as _pl_observe
 
 load_dotenv(Path(__file__).parent / ".env")
 
-BETLOG_DB = Path(__file__).parent / "betlog.db"
+BETLOG_DB = Path(__file__).parent / "sliplog.db"
 PICKS_DB = Path(__file__).parent / "mlb.db"
 BASE = "https://statsapi.mlb.com/api/v1"
 WEBHOOK_URL = os.getenv("SPORTS_WEBHOOK_URL", "")

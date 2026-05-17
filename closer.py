@@ -28,7 +28,7 @@ from pathlib import Path
 import requests
 
 MLB_DB = Path(__file__).parent / "mlb.db"
-BETLOG_DB = Path(__file__).parent / "betlog.db"
+BETLOG_DB = Path(__file__).parent / "sliplog.db"
 
 MODEL_IDS = {
     "sonnet": "claude-sonnet-4-6",

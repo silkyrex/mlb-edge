@@ -165,8 +165,8 @@ CREATE TABLE IF NOT EXISTS player_news (
 CREATE INDEX IF NOT EXISTS idx_news_player ON player_news(player, news_date);
 CREATE INDEX IF NOT EXISTS idx_news_date   ON player_news(news_date);
 
--- Underdog pick-em slip tracker (betlog.db, managed by sliplog.py)
--- NOTE: this table lives in betlog.db, not mlb.db. Shown here for reference.
+-- Underdog pick-em slip tracker (sliplog.db, managed by sliplog.py)
+-- NOTE: this table lives in sliplog.db, not mlb.db. Shown here for reference.
 CREATE TABLE IF NOT EXISTS slips (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     date        TEXT NOT NULL,
@@ -183,10 +183,10 @@ CREATE TABLE IF NOT EXISTS slips (
     notes       TEXT
 );
 
--- Per-pick structure for Underdog slips (betlog.db, managed by sliplog.py)
+-- Per-pick structure for Underdog slips (sliplog.db, managed by sliplog.py)
 -- Captured on `sliplog.py add --picks`. Settled on `sliplog.py result --outcomes`
 -- which auto-triggers pick_lessons.observe() per pick.
--- NOTE: this table lives in betlog.db, not mlb.db. Shown here for reference.
+-- NOTE: this table lives in sliplog.db, not mlb.db. Shown here for reference.
 CREATE TABLE IF NOT EXISTS slip_picks (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     slip_id     INTEGER NOT NULL REFERENCES slips(id) ON DELETE CASCADE,
@@ -203,11 +203,11 @@ CREATE TABLE IF NOT EXISTS slip_picks (
 );
 CREATE INDEX IF NOT EXISTS idx_slip_picks_slip ON slip_picks(slip_id);
 
--- Pick lessons (betlog.db, managed by pick_lessons.py)
+-- Pick lessons (sliplog.db, managed by pick_lessons.py)
 -- Auto-generated rule tracker. Each settled pick observation increments occurrences
 -- on a matching rule_key, or creates a new 'watching' row. Graduates to 'confirmed'
 -- at 3 same-direction occurrences (0 counters). Falsified at 2 counters.
--- NOTE: this table lives in betlog.db, not mlb.db. Shown here for reference.
+-- NOTE: this table lives in sliplog.db, not mlb.db. Shown here for reference.
 CREATE TABLE IF NOT EXISTS pick_lessons (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     rule_key     TEXT NOT NULL UNIQUE,        -- e.g. 'pitcher_strikeouts_higher_line_ge_l5_median'

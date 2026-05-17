@@ -27,7 +27,7 @@ from pathlib import Path
 
 from ob1 import ob1_push as _ob1_push
 
-DB_PATH = Path(__file__).parent / "betlog.db"
+DB_PATH = Path(__file__).parent / "sliplog.db"
 MLB_DB = Path(__file__).parent / "mlb.db"
 INSIGHTS_MD = Path.home() / "second-brain" / "sports" / "insights.md"
 

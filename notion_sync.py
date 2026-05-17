@@ -14,8 +14,7 @@ Requires:
 Block content (pick blocks, summary body) uses ntn CLI.
 Properties (database fields) use the Notion REST API directly.
 
-Single-bet entries from betlog.py are NOT synced -- only Underdog slips
-(sliplog.py) push to Notion, to keep the database as one source of truth.
+Only Underdog slips (sliplog.py) push to Notion, to keep the database as one source of truth.
 """
 
 import argparse
@@ -27,7 +26,7 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent / "betlog.db"
+DB_PATH = Path(__file__).parent / "sliplog.db"
 DATABASE_ID = os.environ.get("NOTION_DATABASE_ID", "362437cfddcb807183ebc0b51724831c")
 NOTION_VERSION = "2022-06-28"
 

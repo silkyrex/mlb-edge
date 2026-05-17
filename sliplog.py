@@ -33,7 +33,7 @@ import notion_sync as _notion
 
 load_dotenv(Path(__file__).parent / ".env")
 
-DB_PATH = Path(__file__).parent / "betlog.db"
+DB_PATH = Path(__file__).parent / "sliplog.db"
 
 
 SLIPS_SCHEMA = """

@@ -16,7 +16,7 @@ Discord lean signal (12:00 PT)
                 ├── cache_stats.py → picks.db [player_recent_stats]
                 ├── cache_news.py  → picks.db [player_news]
                 ├── cache_team.py  → picks.db [team_game_stats]
-                └── /underdog-mlb-analyze [game] [lean] → ranked picks → betlog.py add
+                └── /underdog-mlb-analyze [game] [lean] → ranked picks → sliplog.py add
 ```
 
 ---
@@ -24,7 +24,7 @@ Discord lean signal (12:00 PT)
 ## Databases
 
 `mlb.db` at `~/mlb-edge/mlb.db` -- MLB-only DB. All MLB scripts use `Path(__file__).parent / "mlb.db"`.
-`betlog.db` at `./betlog.db` -- repo-local, MLB bet tracking only. Never merge these.
+`sliplog.db` at `./sliplog.db` -- repo-local, Underdog slip tracking only (sliplog.py, notion_sync.py, pick_lessons.py, settle.py, closer.py).
 `~/sports/dfs/picks.db` -- NBA tools only. MLB scripts do not touch this file.
 
 ### picks.db tables in use
@@ -46,20 +46,16 @@ Unique on `(news_date, player)`.
 Columns: `side`, `bullpen_era`, `bullpen_whip`, `bullpen_k9`, `starter_era`, `team_avg`, `team_ops`, `team_k_pct`, `venue_name`, `venue_roof`, `venue_left/center/right`.
 Unique on `(cache_date, game, team_name)`.
 
-**betlog.db bets table** -- append-only. Never delete rows.
-Key columns: `date`, `matchup`, `signal`, `bet_on`, `line`, `stake`, `result` (open/W/L), `profit`.
-
-**betlog.db pick_lessons table** -- Auto-generated rule tracker. Managed by `pick_lessons.py`.
+**sliplog.db pick_lessons table** -- Auto-generated rule tracker. Managed by `pick_lessons.py`.
 Key columns: `rule_key` (unique, e.g. `pitcher_strikeouts_higher_line_ge_l5_median`), `hypothesis`, `direction` (fail/hit), `occurrences`, `counters`, `status` (watching/confirmed/falsified/under_review), `evidence` (JSON).
 Same-game observations dedup to 1 occurrence. Confirmed rules push to OB1 + insights.md on promotion.
 
-**betlog.db slips table** -- Underdog pick-em multi-pick entries. Managed by `sliplog.py`.
+**sliplog.db slips table** -- Underdog pick-em multi-pick entries. Managed by `sliplog.py`.
 Key columns: `date`, `picks_count`, `players` (JSON), `boost`, `entry`, `payout`, `multiplier`, `status` (open/win/loss), `profit`.
-Auto-populated by `/underdog-check` skill after verifying slips on Underdog live page.
-OB1 types: `underdog_slip_placed` (on add), `underdog_slip_outcome` (on result). Searchable alongside betlog history.
+OB1 types: `underdog_slip_placed` (on add), `underdog_slip_outcome` (on result).
 
-**betlog.db slip_picks table** -- Per-pick structure for Underdog slips. Managed by `sliplog.py`.
-Key columns: `slip_id` (FK to slips), `player`, `player_type`, `stat`, `line`, `side`, `game`, `actual`, `hit`.
+**sliplog.db slip_picks table** -- Per-pick structure for Underdog slips. Managed by `sliplog.py`.
+Key columns: `slip_id` (FK to slips), `player`, `player_type`, `stat`, `line`, `side`, `game`, `actual`, `hit`, `reason`.
 Populated by `sliplog.py add --picks` JSON or `sliplog.py add-picks` retrofit. Settled by `sliplog.py result --outcomes` JSON,
 which also auto-triggers `pick_lessons.observe()` per pick.
 
@@ -78,7 +74,6 @@ which also auto-triggers `pick_lessons.observe()` per pick.
 | `settle.py` | Live box score lookup for open bets. `--post-discord` for Discord notify. |
 | `morning_brief.py` | 9am PT launchd -- all games + starter grades + IL returns → Discord |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player |
-| `betlog.py` | Bet log -- add, result, list, summary (single-pick American odds bets) |
 | `ob1.py` | Shared OB1 push helper. Import `from ob1 import ob1_push` in any script. Auto-loads creds from `~/.config/credentials/ob1.env`. |
 | `sliplog.py` | Slip log -- add, result, list (--detailed), picks (per-slip), add-picks, summary. Pushes to OB1 on add + result. `--picks` JSON captures per-pick structure; `result --outcomes` auto-triggers pick_lessons.observe per pick. `add-picks` retrofits structure to legacy slips. |
 | `pick_lessons.py` | Auto-generated rule tracker. Each settled pick → rule_key + hypothesis (deterministic classifier). Graduates `watching → confirmed` at 3 same-direction occurrences (game-deduped). Falsifies at 2 counters. Pushes to OB1 + insights.md on promotion. Subcommands: observe, list, stats, review, falsify, resurrect, edit. |
@@ -130,10 +125,10 @@ IL return rule: IL-return-today or IL-return-Nd (N ≤ 7) = -10 to score.
 
 ## Hard Rules
 
-- Never edit picks.db schema without updating `schema/schema.sql` first.
-- betlog.db is append-only -- never delete or update settled rows.
+- Never edit mlb.db schema without updating `schema/schema.sql` first.
+- sliplog.db is append-only -- never delete or update settled rows.
 - All Underdog scraping goes through Claude skills (Playwright). No Python scraping.
-- **Logging split**: `betlog.py` (single bets) pushes to OB1 only. `sliplog.py` (Underdog slips) pushes to OB1 + Notion. Notion is the P&L dashboard and must stay slip-only -- do not re-wire `betlog.py` to Notion, or every multi-leg slip ends up logged twice.
+- `sliplog.py` is the single bet logger -- pushes to OB1 + Notion. Notion is the P&L dashboard.
 - Discord webhook must use `"User-Agent": "mlb-edge/1.0"` -- default Python UA gets 403.
 - `cache_stats.py`, `cache_news.py`, `cache_team.py` are idempotent -- safe to re-run same game+date.
 - `cache_news.py --roster` = night-before mode. Plain mode = game-day (uses mlb_game_lines).
