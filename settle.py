@@ -19,6 +19,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from pick_lessons import observe as _pl_observe
+from ob1 import ob1_push
 
 load_dotenv(Path(__file__).parent / ".env")
 
@@ -26,7 +27,6 @@ BETLOG_DB = Path(__file__).parent / "sliplog.db"
 PICKS_DB = Path(__file__).parent / "mlb.db"
 BASE = "https://statsapi.mlb.com/api/v1"
 WEBHOOK_URL = os.getenv("SPORTS_WEBHOOK_URL", "")
-OB1_URL = os.getenv("OB1_MCP_URL", "http://134.199.137.81:8000/mcp?key=7iQ3-Wqv41JK60Hav2GdWHCOQZbfYrFYayj3l2TCzy0")
 
 
 def get_open_bets(bet_id: int | None = None) -> list[dict]:
@@ -183,37 +183,6 @@ def extract_player_stats(bet_on: str, box: dict) -> list[str]:
 
     return lines
 
-
-def ob1_capture(content: str) -> bool:
-    """POST a thought to OB1 via StreamableHTTP MCP. Returns True on success."""
-    payload = {
-        "jsonrpc": "2.0",
-        "method": "tools/call",
-        "params": {"name": "capture_thought", "arguments": {"content": content}},
-        "id": 1,
-    }
-    try:
-        r = requests.post(
-            OB1_URL,
-            json=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json, text/event-stream",
-                "User-Agent": "mlb-edge/1.0",
-            },
-            timeout=20,
-        )
-        # SSE response -- find the data: line
-        for line in r.text.splitlines():
-            if line.startswith("data:"):
-                body = json.loads(line[5:].strip())
-                if "error" in body:
-                    print(f"OB1 capture error: {body['error']}")
-                    return False
-                return True
-    except Exception as e:
-        print(f"OB1 capture failed: {e}")
-    return False
 
 
 def build_ob1_content(bet: dict, result: str, profit: float | None) -> str:
@@ -427,7 +396,17 @@ def settle_bet(bet_id: int, result: str):
     print(f"Bet #{bet_id} settled: {result}  profit={sign}{profit}")
 
     content = build_ob1_content(bet_row, result, profit)
-    ok = ob1_capture(content)
+    metadata = {
+        "type": "mlb_bet_settled",
+        "outcome": "WIN" if result == "W" else "LOSS",
+        "profit": profit,
+        "stake": bet_row["stake"],
+        "line": bet_row["line"],
+        "matchup": bet_row["matchup"],
+        "signal": bet_row.get("signal", ""),
+        "moved": profit is not None and profit > 0,
+    }
+    ok = ob1_push(content, metadata)
     print(f"OB1 capture: {'ok' if ok else 'failed'}")
     append_rubric_log(bet_row, result, profit)
 
