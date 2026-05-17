@@ -19,13 +19,14 @@ noon-1pm  /playwright-underdog  -- log into Underdog (requires 2FA)
            /underdog-mlb "[game]"  -- scrapes all lines, auto-caches stats
            /underdog-mlb-analyze "[game]" "[lean]"  -- ranked picks, BLOCKED flags
 
-           Pick your 2-pick combo. Confirm different teams + $25 entry.
+           Pick your slip (typically 2-3 picks). Different teams + $20-25 entry.
            Place on Underdog app.
-           betlog.py add  -- log the slip
+           sliplog.py add --picks JSON  -- log the slip with per-pick structure
 
-~10pm PT  settle.py --id X --settle W/L  -- after game ends
-           auto-captures result + FIP context to OB1 memory
-           appends row to bet-score rubric data log (builds toward calibrated rubric)
+~10pm PT  sliplog.py result --id X --result win/loss --outcomes JSON
+           -- per-pick settle; auto-triggers pick_lessons.observe per pick
+           -- captures slip outcome + per-pick observations to OB1 memory
+           -- single-bet flow still uses settle.py / betlog.py
 ```
 
 ---
@@ -95,14 +96,29 @@ python lines_query.py --list-games
 python lines_query.py --game "SF Giants @ Athletics" --type pitcher
 python cache_stats.py --game "SF Giants @ Athletics" --query
 
-# Settle a bet after the game
+# Settle a single-bet after the game (American odds)
 python settle.py
 python settle.py --id 1 --settle W
 
-# Log and review bets
+# Log and review single-bets (American odds)
 python betlog.py add --matchup "SF Giants @ Athletics" --signal "UNDER" --bet-on "McDonald K Higher" --line -115 --stake 25
 python betlog.py list --all
 python betlog.py summary
+
+# Log an Underdog pick-em slip with full per-pick structure
+python sliplog.py add --entry 20 --payout 77.80 --multiplier "3.89x" \
+  --picks '[{"player":"Trevor McDonald","player_type":"pitcher","stat":"Strikeouts","line":4.5,"side":"Higher","game":"SF @ OAK"}]'
+
+# Settle a slip with per-pick outcomes (auto-fires pick_lessons.observe per pick)
+python sliplog.py result --id 1 --result loss --outcomes '{"Trevor McDonald":3}'
+
+# Retrofit per-pick structure on a legacy slip
+python sliplog.py add-picks --slip-id 1 --picks '[{...}]'
+
+# Browse the auto-generated rule tracker
+python pick_lessons.py review               # watching queue
+python pick_lessons.py review --confirmed   # active rules (applied as score modifiers)
+python pick_lessons.py review --graveyard   # falsified rules
 ```
 
 ---
@@ -118,7 +134,9 @@ python betlog.py summary
 | `cache_team.py` | Bullpen ERA, team batting stats, ballpark info → team_game_stats |
 | `cache_tomorrow.py` | Night-before IL pre-cache for all of tomorrow's games. Called by daily.sh. |
 | `settle.py` | Box score lookup for open bets, W/L settlement. Auto-captures result to OB1 with FIP context. |
-| `betlog.py` | Bet log -- add, result, list, summary |
+| `betlog.py` | Single-bet log (American odds) -- add, result, list, summary |
+| `sliplog.py` | Underdog pick-em slip log -- add (with --picks JSON), result (with --outcomes JSON auto-fires pick_lessons), add-picks (retrofit), list, summary |
+| `pick_lessons.py` | Auto-generated rule tracker. Observe per-pick outcomes; rules graduate watching → confirmed at 3 same-direction occurrences. Confirmed rules push to OB1 + sports/insights.md. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles |
 | `player.py` | Per-pitcher start log, per-batter game log + splits, head-to-head |
 | `matchup.py` | Early lean read before noon Discord signal |
@@ -128,26 +146,36 @@ python betlog.py summary
 
 ## Databases
 
-**`~/sports/dfs/picks.db`** -- shared sports DB.
+**`~/mlb-edge/mlb.db`** -- MLB-only stats cache.
 
 | Table | What's in it |
 |---|---|
 | `mlb_game_lines` | Underdog lines scraped per game per day |
-| `player_recent_stats` | Pitcher: ERA, K/9, WHIP, FIP, WAR, K/BB, last 5 starts, splits, xStats. Batter: last 15 games, L/R splits, home/away splits, xStats. |
+| `player_recent_stats` | Pitcher: ERA, K/9, WHIP, FIP, WAR, K/BB, last 5 starts (incl. last5_ip + pitcher_role), splits, xStats. Batter: last 15 games, L/R splits, home/away splits, xStats. |
 | `player_news` | IL status per player per day |
 | `team_game_stats` | Bullpen ERA, offense stats, venue info |
 
-**`./betlog.db`** -- local MLB bet log only. Append-only. Never merge with picks.db.
+**`./betlog.db`** -- local MLB bet + slip log + rule tracker. Append-only on settled rows.
+
+| Table | What's in it |
+|---|---|
+| `bets` | Single-bet log (American odds) -- managed by `betlog.py` |
+| `slips` | Underdog multi-pick slip log -- managed by `sliplog.py` |
+| `slip_picks` | Per-pick structure for each slip (player, stat, line, side, game, actual, hit). Populated by `sliplog.py add --picks` or `add-picks` retrofit. |
+| `pick_lessons` | Auto-generated rule tracker. rule_key uniqueness, status (watching/confirmed/falsified/under_review), evidence (JSON). Managed by `pick_lessons.py`. |
+
+> `~/sports/dfs/picks.db` is the NBA-only shared sports DB. **MLB scripts never touch it.**
 
 ---
 
 ## Bet Rules
 
-- 2 picks per slip, exactly
-- $25 per slip max
+- Slips are typically 2-3 picks; stacking a 3-pick on top of a 2-pick is only +EV if the marginal leg clears `P(new leg | base legs hit) > 1 − base_mult/new_mult` (see `docs/PICK_LESSONS.md`)
+- $20-25 per slip max
 - Picks must be from 2 different teams
 - Never take first-inning pitch count Higher on a FADE pitcher
 - IL player = do not place
+- For pitcher Ks Higher: skip if line ≥ L5 median Ks. For pitcher Ks Lower: skip if L5 sample is from wrong role (`pitcher_role` = reliever/mixed when tonight is a start)
 
 ---
 
