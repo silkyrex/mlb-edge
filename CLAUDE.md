@@ -13,13 +13,19 @@ For new machine setup, copy `.env.example` → `.env` and fill in `SPORTS_WEBHOO
 Discord lean signal (12:00 PT)
   └── /playwright-underdog
          └── /underdog-mlb [game] → mlb.db [mlb_game_lines]
-                ├── cache_stats.py → mlb.db [player_recent_stats]
-                ├── cache_news.py  → mlb.db [player_news]
-                ├── cache_team.py  → mlb.db [team_game_stats]
-                └── /underdog-mlb-analyze [game] [lean] → ranked picks
-                       └── closer.py → 3-agent debate (Scout/Skeptic/Closer)
-                                        + live Statcast (xFIP/wRC+/arsenal)
-                                        → sliplog.py add --picks (with reason)
+                └── prep.py  → runs all 4 cache scripts in parallel per game
+                       ├── cache_stats.py → mlb.db [player_recent_stats]
+                       ├── cache_espn.py  → mlb.db [player_recent_stats] (FIP/WAR/K/BB)
+                       ├── cache_news.py  → mlb.db [player_news]
+                       └── cache_team.py  → mlb.db [team_game_stats]
+
+  └── /underdog-mlb-analyze [game] [lean] → ranked picks (optional quick read)
+
+  └── closer.py → 3-agent debate (Scout/Skeptic/Closer)
+                  + live Statcast (xFIP/wRC+/arsenal)
+                  + umpire rating (UmpScorecards)
+                  + lineup card + pitcher days rest (MLB Stats API)
+                  → sliplog.py add --picks (with reason strings)
 ```
 
 ---
@@ -74,7 +80,8 @@ which also auto-triggers `pick_lessons.observe()` per pick.
 | `cache_team.py` | Bullpen ERA, offense K%, venue roof/dims → team_game_stats. Idempotent. |
 | `cache_tomorrow.py` | Wraps cache_news --roster for all of tomorrow's games. Called by daily.sh. |
 | `player.py` | `pitcher [name]` per-start log / `batter [name]` per-game + splits / `matchup [b] [p]` H2H |
-| `closer.py` | 3-agent final round critique. Scout finds angles, Skeptic challenges, Closer fetches live Statcast (MLB Stats API: xFIP, wRC+, pitch arsenal) and renders 3-5 picks with reason strings. `--dry-run`, `--game`, `--model haiku`. |
+| `prep.py` | One-command cache runner. Finds today's scraped games, runs cache_stats → cache_espn (sequential) + cache_news + cache_team (parallel) across all games. `--check` for status-only, `--game` for single game. Run after /underdog-mlb, before closer.py. |
+| `closer.py` | 3-agent final round critique. Scout finds angles, Skeptic challenges, Closer fetches live Statcast (xFIP/wRC+/arsenal), umpire rating, lineup card, pitcher days rest, renders 3-5 picks with reason strings. `--dry-run`, `--game`, `--model haiku`. |
 | `morning_brief.py` | 9am PT launchd -- all games + starter grades + IL returns → Discord |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player |
 | `ob1.py` | Shared OB1 push helper. Import `from ob1 import ob1_push` in any script. Auto-loads creds from `~/.config/credentials/ob1.env`. |
@@ -133,7 +140,8 @@ IL return rule: IL-return-today or IL-return-Nd (N ≤ 7) = -10 to score.
 - All Underdog scraping goes through Claude skills (Playwright). No Python scraping.
 - `sliplog.py` is the single bet logger -- pushes to OB1 + Notion. Notion is the P&L dashboard.
 - Discord webhook must use `"User-Agent": "mlb-edge/1.0"` -- default Python UA gets 403.
-- `cache_stats.py`, `cache_news.py`, `cache_team.py` are idempotent -- safe to re-run same game+date.
+- `prep.py` runs all 4 cache scripts for today's games in one command -- use instead of running scripts individually.
+- `cache_stats.py`, `cache_news.py`, `cache_team.py`, `cache_espn.py` are idempotent -- safe to re-run same game+date.
 - `cache_news.py --roster` = night-before mode. Plain mode = game-day (uses mlb_game_lines).
 - `daily.sh` and `run_morning_brief.sh` source `.env` automatically. Update `.env` if paths change.
 - First-inning pitch count on FADE pitchers is volatile. Only take 1st Inn PC Higher when opposing lineup has documented high walk rates. Season WHIP does not predict first-inning behavior.

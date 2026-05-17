@@ -16,9 +16,12 @@ See `docs/FLOW.md` for the step-by-step game day cheat sheet.
 noon PT   Discord lean signal arrives (OVER / UNDER / AWAY / HOME)
 
 noon-1pm  /playwright-underdog  -- log into Underdog (requires 2FA)
-           /underdog-mlb "[game]"  -- scrapes all lines, auto-caches stats
-           /underdog-mlb-analyze "[game]" "[lean]"  -- ranked picks, BLOCKED flags
+           /underdog-mlb "[game]"  -- scrapes all prop lines → mlb.db
+           python prep.py  -- caches stats/ESPN/news/team for all scraped games (parallel)
+                             use --check first to verify all surfaces are warm
+           /underdog-mlb-analyze "[game]" "[lean]"  -- optional quick ranked read
            python closer.py  -- 3-agent debate (Scout/Skeptic/Closer) + live Statcast
+                               + umpire rating + lineup card
                                outputs ready-to-paste sliplog.py command with reasons
 
            Pick your slip (typically 2-3 picks). Different teams + $20-25 entry.
@@ -92,6 +95,11 @@ python player.py pitcher "Trevor McDonald"
 python player.py batter "Brent Rooker"
 python player.py matchup "Brent Rooker" "Trevor McDonald"
 
+# Cache all data for today's scraped games (one command)
+python prep.py                                     # run all 4 cache scripts in parallel
+python prep.py --check                             # status table only, no writes
+python prep.py --game "SF Giants @ Athletics"      # single game
+
 # Check what's in the DB
 python lines_query.py --list-games
 python lines_query.py --game "SF Giants @ Athletics" --type pitcher
@@ -131,6 +139,7 @@ python pick_lessons.py review --graveyard   # falsified rules
 | Script | What it does |
 |---|---|
 | `morning_brief.py` | 9am auto-brief -- pitcher grades (ERA/FIP/WAR), IL flags → Discord. Also caches all starter stats to DB. `--notion` posts the brief to the Notion "Game Day Briefs" page via `ntn_create` (shared from `notion_sync`). |
+| `prep.py` | **One-command cache runner.** Finds today's scraped games, runs cache_stats → cache_espn (sequential) + cache_news + cache_team (parallel) across all games. `--check` shows status table without writing. |
 | `cache_stats.py` | MLB Stats API → player_recent_stats (last 5 starts / last 15 games, splits, expected stats) |
 | `cache_espn.py` | ESPN API → adds WAR, FIP, K/BB to pitcher rows in player_recent_stats. Run after cache_stats.py. |
 | `cache_news.py` | IL status per player. `--roster` works the night before without Underdog lines. |

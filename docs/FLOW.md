@@ -9,6 +9,7 @@ For explanations of terms (ERA, WHIP, splits, etc.) see `README.md`.
 ```bash
 # Pre-load injury data for tomorrow -- no Underdog login needed
 python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-16 --roster
+# Or let daily.sh handle it automatically via cache_tomorrow.py
 ```
 
 ---
@@ -38,23 +39,32 @@ Discord: `UNDER LEAN, Civale ELITE ERA 2.54, Mahle FADE ERA 5.42, ATH mid, SF FA
 ```
 Enter the 6-digit phone code. Wait for confirmation.
 
-**2. Scrape lines + auto-cache everything**
+**2. Scrape lines**
 ```
 /underdog-mlb Giants
 ```
-Takes ~70 seconds. Automatically runs `cache_stats`, `cache_news`, `cache_team` when done.
+Takes ~70 seconds. Saves all prop lines to mlb.db.
 
-**3. Analyze**
+**3. Cache all stats (one command)**
+```bash
+python prep.py
+```
+Runs `cache_stats` → `cache_espn` → `cache_news` + `cache_team` for every scraped game in parallel. Takes ~30-60s. Verify first with `--check`:
+```bash
+python prep.py --check    # all + before running closer.py
+```
+
+**4. Analyze (optional quick read)**
 ```
 /underdog-mlb-analyze "SF Giants @ Athletics" "UNDER LEAN, Civale ELITE ERA 2.54, ..."
 ```
-Outputs GREEN / YELLOW / SKIP picks ranked by score.
+Outputs GREEN / YELLOW / SKIP picks ranked by score. Use as a sanity check before closer.py.
 
-**4. Final round critique (3-agent debate)**
+**5. Final round critique (3-agent debate)**
 ```bash
 python closer.py
 ```
-Scout finds 6-8 angles. Skeptic tears each apart. Closer fetches live Statcast (xFIP, wRC+, pitch arsenal) and renders final 3-5 picks with pre-filled `reason` strings. Outputs a ready-to-paste `sliplog.py add --picks` command.
+Scout finds 6-8 angles. Skeptic tears each apart. Closer fetches live Statcast (xFIP, wRC+, pitch arsenal), umpire rating, and today's lineup card, then renders final 3-5 picks with pre-filled `reason` strings. Outputs a ready-to-paste `sliplog.py add --picks` command.
 
 ---
 
