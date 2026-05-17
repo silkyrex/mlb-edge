@@ -50,6 +50,12 @@ Takes ~70 seconds. Automatically runs `cache_stats`, `cache_news`, `cache_team` 
 ```
 Outputs GREEN / YELLOW / SKIP picks ranked by score.
 
+**4. Final round critique (3-agent debate)**
+```bash
+python closer.py
+```
+Scout finds 6-8 angles. Skeptic tears each apart. Closer fetches live Statcast (xFIP, wRC+, pitch arsenal) and renders final 3-5 picks with pre-filled `reason` strings. Outputs a ready-to-paste `sliplog.py add --picks` command.
+
 ---
 
 ## Picking a Slip
@@ -74,6 +80,8 @@ Adding a 3rd leg is only +EV if `P(new leg hits | base legs hit) > 1 − (base_m
 
 ## Log the Slip (Underdog pick-em)
 
+Paste the command from `closer.py` output, or build manually:
+
 ```bash
 python sliplog.py add \
   --entry 20 --payout 77.80 --multiplier "3.89x" \
@@ -82,16 +90,6 @@ python sliplog.py add \
     {"player":"Aaron Civale","player_type":"pitcher","stat":"Strikeouts","line":5.5,"side":"Higher","game":"SF @ OAK","reason":"ELITE ERA 2.54, L5 Ks above line, UNDER lean aligns"},
     {"player":"Matt Chapman","player_type":"batter","stat":"Batter Strikeouts","line":1.5,"side":"Higher","game":"SF @ OAK","reason":"FADE lineup, high K rate"}
   ]'
-```
-
-For a single-bet (American odds, not Underdog pick-em):
-
-```bash
-python betlog.py add \
-  --matchup "SF @ ATH" \
-  --signal "UNDER LEAN -- Civale ELITE / SF FADE" \
-  --bet "Civale ERA 2.5 Lower" \
-  --line -115 --stake 25
 ```
 
 ---
@@ -103,22 +101,16 @@ python betlog.py add \
 python sliplog.py picks --slip-id 6              # focused per-slip detail
 python sliplog.py list --all --detailed          # all slips with per-pick rows indented
 
-# Underdog slip -- settle with per-pick outcomes (auto-fires pick_lessons.observe)
+# Settle with per-pick outcomes (auto-fires pick_lessons.observe per pick)
 python sliplog.py result --id 6 --result loss \
   --outcomes '{"Aaron Civale":4,"Matt Chapman":0}'
 
 # Notion pages auto-update after result (slip + summary)
 
-# Single-bet flow
-python settle.py                      # see current stats for all open bets
-python settle.py --id 1 --settle W    # mark win
-python settle.py --id 1 --settle L    # mark loss
-
 # Review running totals
-python sliplog.py summary             # slip P&L
-python betlog.py summary              # single-bet P&L
-python pick_lessons.py review         # watching queue (near-graduation rules)
-python pick_lessons.py review --confirmed   # active score-modifier rules
+python sliplog.py summary                       # slip P&L
+python pick_lessons.py review                   # watching queue (near-graduation rules)
+python pick_lessons.py review --confirmed       # active score-modifier rules
 ```
 
 ---

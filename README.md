@@ -18,6 +18,8 @@ noon PT   Discord lean signal arrives (OVER / UNDER / AWAY / HOME)
 noon-1pm  /playwright-underdog  -- log into Underdog (requires 2FA)
            /underdog-mlb "[game]"  -- scrapes all lines, auto-caches stats
            /underdog-mlb-analyze "[game]" "[lean]"  -- ranked picks, BLOCKED flags
+           python closer.py  -- 3-agent debate (Scout/Skeptic/Closer) + live Statcast
+                               outputs ready-to-paste sliplog.py command with reasons
 
            Pick your slip (typically 2-3 picks). Different teams + $20-25 entry.
            Place on Underdog app.
@@ -26,7 +28,6 @@ noon-1pm  /playwright-underdog  -- log into Underdog (requires 2FA)
 ~10pm PT  sliplog.py result --id X --result win/loss --outcomes JSON
            -- per-pick settle; auto-triggers pick_lessons.observe per pick
            -- captures slip outcome + per-pick observations to OB1 memory
-           -- single-bet flow still uses settle.py / betlog.py
 ```
 
 ---
@@ -96,14 +97,11 @@ python lines_query.py --list-games
 python lines_query.py --game "SF Giants @ Athletics" --type pitcher
 python cache_stats.py --game "SF Giants @ Athletics" --query
 
-# Settle a single-bet after the game (American odds)
-python settle.py
-python settle.py --id 1 --settle W
-
-# Log and review single-bets (American odds)
-python betlog.py add --matchup "SF Giants @ Athletics" --signal "UNDER" --bet-on "McDonald K Higher" --line -115 --stake 25
-python betlog.py list --all
-python betlog.py summary
+# Final round critique -- 3-agent debate + live Statcast, outputs sliplog command
+python closer.py
+python closer.py --game "SF Giants @ Athletics"   # single game
+python closer.py --dry-run                         # verify data brief before agents run
+python closer.py --model haiku                     # budget run
 
 # Log an Underdog pick-em slip with full per-pick structure
 python sliplog.py add --entry 20 --payout 77.80 --multiplier "3.89x" \
@@ -138,8 +136,7 @@ python pick_lessons.py review --graveyard   # falsified rules
 | `cache_news.py` | IL status per player. `--roster` works the night before without Underdog lines. |
 | `cache_team.py` | Bullpen ERA, team batting stats, ballpark info → team_game_stats |
 | `cache_tomorrow.py` | Night-before IL pre-cache for all of tomorrow's games. Called by daily.sh. |
-| `settle.py` | Box score lookup for open bets, W/L settlement. Auto-captures result to OB1 with FIP context. |
-| `betlog.py` | Single-bet log (American odds) -- add, result, list, summary. Local-only; does not sync to Notion. |
+| `closer.py` | 3-agent final round critique (Scout/Skeptic/Closer). Reads today's lines + cached stats, fetches live Statcast (xFIP, wRC+, pitch arsenal) between Skeptic and Closer, outputs ranked picks with reason strings + ready-to-paste sliplog command. `--dry-run` to verify data first, `--model haiku` for budget run. |
 | `sliplog.py` | Underdog pick-em slip log -- add (with --picks JSON), result (with --outcomes JSON auto-fires pick_lessons), add-picks (retrofit), list (--detailed for per-pick view), picks (per-slip detail), summary. Auto-syncs to Notion after result. |
 | `notion_sync.py` | Sync Underdog slips + P&L summary to Notion. Auto-triggered by sliplog.py result. `--slip N`, `--slips`, `--summary`. Single-bet entries from betlog.py are NOT synced (one source of truth: slips). Exports 3 public helpers: `notion_request` (raw REST for properties), `ntn_update` (replace blocks via ntn CLI), `ntn_create` (new page with markdown content via ntn CLI). |
 | `pick_lessons.py` | Auto-generated rule tracker. Observe per-pick outcomes; rules graduate watching → confirmed at 3 same-direction occurrences. Confirmed rules push to OB1 + sports/insights.md. |
@@ -161,11 +158,10 @@ python pick_lessons.py review --graveyard   # falsified rules
 | `player_news` | IL status per player per day |
 | `team_game_stats` | Bullpen ERA, offense stats, venue info |
 
-**`./betlog.db`** -- local MLB bet + slip log + rule tracker. Append-only on settled rows.
+**`./sliplog.db`** -- local slip log + rule tracker. Append-only on settled rows.
 
 | Table | What's in it |
 |---|---|
-| `bets` | Single-bet log (American odds) -- managed by `betlog.py` |
 | `slips` | Underdog multi-pick slip log -- managed by `sliplog.py` |
 | `slip_picks` | Per-pick structure for each slip (player, stat, line, side, game, actual, hit, reason). reason = why the pick was made. Populated by `sliplog.py add --picks` or `add-picks` retrofit. |
 | `pick_lessons` | Auto-generated rule tracker. rule_key uniqueness, status (watching/confirmed/falsified/under_review), evidence (JSON). Managed by `pick_lessons.py`. |
@@ -187,7 +183,7 @@ python pick_lessons.py review --graveyard   # falsified rules
 
 ## Data Sources
 
-- **MLB Stats API** -- free, no account. Schedules, box scores, player stats, injuries, expected stats.
+- **MLB Stats API** -- free, no account. Schedules, box scores, player stats, injuries, expected stats. Also used live by `closer.py` for Statcast: xFIP, wRC+, pitch arsenal (velocity + usage).
 - **ESPN API** -- unofficial JSON endpoint. Pitcher WAR, FIP, K/BB for qualified starters (75 pitchers, updated after each outing).
 - **Underdog Sports** -- where bets are placed. Requires browser login and Playwright automation.
 - **OB1** -- semantic memory. Every settled bet is captured with full context (lean, picks, FIP flags, result). Queryable: "which stat types win under UNDER lean."
@@ -198,10 +194,9 @@ python pick_lessons.py review --graveyard   # falsified rules
 
 | Log | OB1 (signal memory) | Notion (P&L dashboard) | Purpose |
 |---|:---:|:---:|---|
-| `betlog.py` (bets table) | yes | no | Single-bet signal capture for AI brain |
-| `sliplog.py` (slips table) | yes | yes | Actual P&L source of truth |
+| `sliplog.py` (slips table) | yes | yes | P&L source of truth; per-pick settle drives pick_lessons |
 
-`sliplog` is canonical for P&L; `betlog` is for tracking single American-odds bets and feeding OB1 context. Both still log to OB1 so the brain sees every wager; Notion stays clean.
+`sliplog` is canonical for everything -- placement, settlement, P&L, and rule generation.
 
 ---
 
