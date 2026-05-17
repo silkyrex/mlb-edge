@@ -95,6 +95,7 @@ def _validate_pick(p: dict) -> dict:
         "line": float(p["line"]),
         "side": str(p["side"]).capitalize(),
         "game": str(p.get("game", "")).strip() or None,
+        "reason": str(p["reason"]).strip() if p.get("reason") else None,
     }
 
 
@@ -102,9 +103,9 @@ def _insert_slip_picks(conn, slip_id: int, picks: list[dict]) -> None:
     for p in picks:
         v = _validate_pick(p)
         conn.execute(
-            "INSERT OR IGNORE INTO slip_picks (slip_id, player, player_type, stat, line, side, game) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (slip_id, v["player"], v["player_type"], v["stat"], v["line"], v["side"], v["game"]),
+            "INSERT OR IGNORE INTO slip_picks (slip_id, player, player_type, stat, line, side, game, reason) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (slip_id, v["player"], v["player_type"], v["stat"], v["line"], v["side"], v["game"], v["reason"]),
         )
     conn.commit()
 
@@ -161,7 +162,8 @@ def cmd_add(args):
     if picks:
         for p in picks:
             game_tag = f" ({p['game']})" if p['game'] else ""
-            print(f"    {p['player']} {p['stat']} {p['line']} {p['side']}{game_tag}")
+            reason_tag = f"  -- {p['reason']}" if p.get('reason') else ""
+            print(f"    {p['player']} {p['stat']} {p['line']} {p['side']}{game_tag}{reason_tag}")
     conn.close()
 
     _ob1_push(
@@ -248,6 +250,7 @@ def cmd_result(args):
                     "actual": actual,
                     "hit": hit,
                     "game": sp["game"] or "",
+                    "reason": sp["reason"] or "",
                 })
             conn.commit()
 
@@ -257,6 +260,7 @@ def cmd_result(args):
     if triggered_picks:
         print(f"\nAuto-trigger: pick_lessons.observe for {len(triggered_picks)} pick(s):")
         for tp in triggered_picks:
+            ctx = json.dumps({"reason": tp["reason"]}) if tp.get("reason") else None
             _pl_observe(
                 player=tp["player"],
                 player_type=tp["player_type"],
@@ -267,6 +271,7 @@ def cmd_result(args):
                 hit=tp["hit"],
                 game=tp["game"],
                 date_str=slip["date"],
+                context=ctx,
             )
 
     players = json.loads(slip["players"])
@@ -323,7 +328,8 @@ def cmd_list(args):
                         result_tag = " HIT" if sp["hit"] else " MISS"
                     actual_tag = f"  -> {sp['actual']}" if sp["actual"] is not None else ""
                     game_tag = f"  ({sp['game']})" if sp["game"] else ""
-                    print(f"      {sp['player']:<28} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}")
+                    reason_tag = f"  [{sp['reason']}]" if sp["reason"] else ""
+                    print(f"      {sp['player']:<28} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}{reason_tag}")
             else:
                 print(f"      (no per-pick structure -- legacy slip, retrofit via 'add-picks')")
     conn.close()
@@ -353,7 +359,8 @@ def cmd_picks(args):
             result_tag = "  HIT" if sp["hit"] else "  MISS"
         actual_tag = f"  -> {sp['actual']}" if sp["actual"] is not None else "  (pending)"
         game_tag = f"  ({sp['game']})" if sp["game"] else ""
-        print(f"  {sp['player']:<28} {sp['player_type']:<8} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}")
+        reason_tag = f"\n    reason: {sp['reason']}" if sp["reason"] else ""
+        print(f"  {sp['player']:<28} {sp['player_type']:<8} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}{reason_tag}")
 
 
 def cmd_summary(args):

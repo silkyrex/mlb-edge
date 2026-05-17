@@ -18,6 +18,8 @@ from datetime import date as date_cls
 from pathlib import Path
 from dotenv import load_dotenv
 
+from pick_lessons import observe as _pl_observe
+
 load_dotenv(Path(__file__).parent / ".env")
 
 BETLOG_DB = Path(__file__).parent / "betlog.db"
@@ -255,6 +257,98 @@ def build_ob1_content(bet: dict, result: str, profit: float | None) -> str:
     return "\n".join(lines)
 
 
+_STAT_ABBREVS = {
+    "ks": ("Strikeouts", "pitcher"),
+    "po": ("Pitching Outs", "pitcher"),
+    "er": ("Earned Runs", "pitcher"),
+    "h+r+rbi": ("Hits + Runs + RBIs", "batter"),
+    "tb": ("Total Bases", "batter"),
+    "hr": ("Home Runs", "batter"),
+}
+
+_PICK_RE = re.compile(
+    r"(?P<name>[A-Z][a-zA-Z\-']+(?:\s+[A-Z][a-zA-Z\-']+)*)\s+"
+    r"(?P<stat>[A-Za-z+]+(?:\+[A-Za-z]+)*)\s+"
+    r"(?P<line>\d+(?:\.\d+)?)\s+"
+    r"(?P<side>Higher|Lower)",
+    re.IGNORECASE,
+)
+
+
+def _get_actual_from_box(matched_name: str, stat_key: str, box: dict) -> float | None:
+    """Pull the numeric actual for a stat from the box score entry."""
+    stats = box.get(matched_name, {})
+    pit = stats.get("pitching", {})
+    bat = stats.get("batting", {})
+    if stat_key == "Strikeouts":
+        v = pit.get("strikeOuts")
+        return float(v) if v is not None else None
+    if stat_key == "Pitching Outs":
+        ip = pit.get("inningsPitched")
+        return round(float(ip) * 3, 0) if ip else None
+    if stat_key == "Earned Runs":
+        v = pit.get("earnedRuns")
+        return float(v) if v is not None else None
+    if stat_key == "Hits + Runs + RBIs":
+        h = bat.get("hits", 0) or 0
+        r = bat.get("runs", 0) or 0
+        rbi = bat.get("rbi", 0) or 0
+        return float(h + r + rbi)
+    if stat_key == "Total Bases":
+        v = bat.get("totalBases")
+        return float(v) if v is not None else None
+    if stat_key == "Home Runs":
+        v = bat.get("homeRuns")
+        return float(v) if v is not None else None
+    return None
+
+
+def auto_observe_picks(bet: dict, box: dict, result: str) -> None:
+    """Parse bet_on string and call pick_lessons.observe for each pick with box data."""
+    raw_picks = re.split(r"\s*\+\s*|\n", bet["bet_on"])
+    game = bet["matchup"].split("/")[0].strip()
+
+    for raw in raw_picks:
+        raw = raw.strip()
+        m = _PICK_RE.search(raw)
+        if not m:
+            continue
+        name_hint = m.group("name").split()[-1].lower()
+        stat_abbrev = m.group("stat").lower()
+        line = float(m.group("line"))
+        side = m.group("side").capitalize()
+
+        stat_key, player_type = _STAT_ABBREVS.get(stat_abbrev, (None, "pitcher"))
+        if not stat_key:
+            continue
+
+        matched_name = next(
+            (n for n in box if name_hint in n.lower()), None
+        )
+        if not matched_name:
+            print(f"  [pick_lessons] no box match for {name_hint} -- skipped")
+            continue
+
+        actual = _get_actual_from_box(matched_name, stat_key, box)
+        if actual is None:
+            print(f"  [pick_lessons] no actual for {matched_name} {stat_key} -- skipped")
+            continue
+
+        hit = (actual > line) if side == "Higher" else (actual < line)
+        _pl_observe(
+            player=matched_name,
+            player_type=player_type,
+            stat=stat_key,
+            line=line,
+            side=side,
+            actual=actual,
+            hit=hit,
+            game=game,
+            date_str=bet["date"],
+        )
+        print(f"  [pick_lessons] {matched_name} {stat_key} {line} {side} -> actual={actual}  {'HIT' if hit else 'MISS'}")
+
+
 RUBRIC_LOG = Path.home() / ".claude/skills/bet-score/mlb-rubric.md"
 
 
@@ -422,6 +516,8 @@ def main():
         if status == "FINAL":
             if args.settle:
                 settle_bet(bet["id"], args.settle)
+                print("\nAuto-trigger: pick_lessons.observe per pick:")
+                auto_observe_picks(bet, box, args.settle)
             else:
                 print(f"\nGame is FINAL. Settle with:")
                 print(f"  python settle.py --id {bet['id']} --settle W")

@@ -68,10 +68,13 @@ ALTER TABLE bets ADD COLUMN notion_page_id TEXT;
 def connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
-    # add notion_page_id column if missing
     cols = [r[1] for r in conn.execute("PRAGMA table_info(bets)").fetchall()]
     if "notion_page_id" not in cols:
         conn.execute("ALTER TABLE bets ADD COLUMN notion_page_id TEXT")
+        conn.commit()
+    slip_cols = [r[1] for r in conn.execute("PRAGMA table_info(slips)").fetchall()]
+    if "notion_page_id" not in slip_cols:
+        conn.execute("ALTER TABLE slips ADD COLUMN notion_page_id TEXT")
         conn.commit()
     return conn
 
@@ -130,6 +133,77 @@ def create_page(row: sqlite3.Row) -> str:
 
 def update_page(page_id: str, row: sqlite3.Row) -> None:
     _notion_request("PATCH", f"/pages/{page_id}", {"properties": _build_properties(row)})
+
+
+# ── slip sync ─────────────────────────────────────────────────────────────────
+
+def _build_slip_properties(row: sqlite3.Row) -> dict:
+    players = json.loads(row["players"]) if row["players"] else []
+    label = ", ".join(players)
+    boost = row["boost"] or ""
+    result_map = {"win": "W", "loss": "L", "open": None}
+    result = result_map.get(row["status"])
+    mult = row["multiplier"] or f"{row['payout'] / row['entry']:.2f}x" if row["entry"] else ""
+    signal = f"slip {row['picks_count']}-pick" + (f" [{boost}]" if boost else "")
+    props: dict = {
+        "Bet": {"title": [{"text": {"content": label}}]},
+        "Matchup": {"rich_text": [{"text": {"content": f"Underdog slip {mult}"}}]},
+        "Line": {"number": 0},
+        "Stake": {"number": row["entry"]},
+        "Signal": {"rich_text": [{"text": {"content": signal}}]},
+    }
+    if row["date"]:
+        props["Date"] = {"date": {"start": row["date"]}}
+    if result:
+        props["Result"] = {"select": {"name": result}}
+    else:
+        props["Result"] = {"select": {"name": "Open"}}
+    if row["profit"] is not None:
+        props["Profit"] = {"number": row["profit"]}
+    return props
+
+
+def sync_slip(slip_id: int):
+    conn = connect()
+    row = conn.execute("SELECT * FROM slips WHERE id = ?", (slip_id,)).fetchone()
+    if not row:
+        print(f"Slip #{slip_id} not found")
+        conn.close()
+        return
+    props = _build_slip_properties(row)
+    if not row["notion_page_id"]:
+        body = {"parent": {"database_id": DATABASE_ID}, "properties": props}
+        result = _notion_request("POST", "/pages", body)
+        page_id = result["id"]
+        conn.execute("UPDATE slips SET notion_page_id = ? WHERE id = ?", (page_id, slip_id))
+        conn.commit()
+        print(f"created slip #{slip_id} -> {page_id[:8]}...")
+    else:
+        _notion_request("PATCH", f"/pages/{row['notion_page_id']}", {"properties": props})
+        print(f"updated slip #{slip_id} ({row['status']})")
+    conn.close()
+
+
+def sync_all_slips():
+    conn = connect()
+    rows = conn.execute("SELECT * FROM slips ORDER BY id").fetchall()
+    created = updated = 0
+    for row in rows:
+        props = _build_slip_properties(row)
+        if not row["notion_page_id"]:
+            body = {"parent": {"database_id": DATABASE_ID}, "properties": props}
+            result = _notion_request("POST", "/pages", body)
+            page_id = result["id"]
+            conn.execute("UPDATE slips SET notion_page_id = ? WHERE id = ?", (page_id, row["id"]))
+            conn.commit()
+            print(f"  created slip #{row['id']} -> {page_id[:8]}...")
+            created += 1
+        else:
+            _notion_request("PATCH", f"/pages/{row['notion_page_id']}", {"properties": props})
+            print(f"  updated slip #{row['id']} ({row['status']})")
+            updated += 1
+    conn.close()
+    print(f"slips done -- {created} created, {updated} updated")
 
 
 # ── sync commands ──────────────────────────────────────────────────────────────
@@ -203,20 +277,35 @@ def post_summary() -> None:
     page_id = _get_or_create_summary_page()
 
     conn = connect()
-    settled = conn.execute("SELECT * FROM bets WHERE result IS NOT NULL ORDER BY date").fetchall()
-    open_bets = conn.execute("SELECT * FROM bets WHERE result IS NULL ORDER BY date").fetchall()
+    settled_bets = conn.execute("SELECT * FROM bets WHERE result IS NOT NULL ORDER BY date").fetchall()
+    open_bets    = conn.execute("SELECT * FROM bets WHERE result IS NULL ORDER BY date").fetchall()
+    settled_slips = conn.execute("SELECT * FROM slips WHERE status IN ('win','loss') ORDER BY date").fetchall()
+    open_slips    = conn.execute("SELECT * FROM slips WHERE status = 'open' ORDER BY date").fetchall()
     conn.close()
 
-    wins   = sum(1 for r in settled if r["result"] == "W")
-    losses = sum(1 for r in settled if r["result"] == "L")
-    pushes = sum(1 for r in settled if r["result"] == "P")
-    total_stake = sum(r["stake"] for r in settled) if settled else 0.0
-    net_pnl = sum(r["profit"] for r in settled) if settled else 0.0
-    win_pct = wins / (wins + losses) * 100 if (wins + losses) else 0
-    roi = net_pnl / total_stake * 100 if total_stake else 0
+    # ── bets stats ──
+    b_wins   = sum(1 for r in settled_bets if r["result"] == "W")
+    b_losses = sum(1 for r in settled_bets if r["result"] == "L")
+    b_pushes = sum(1 for r in settled_bets if r["result"] == "P")
+    b_stake  = sum(r["stake"] for r in settled_bets) if settled_bets else 0.0
+    b_pnl    = sum(r["profit"] for r in settled_bets) if settled_bets else 0.0
+
+    # ── slips stats ──
+    s_wins   = sum(1 for r in settled_slips if r["status"] == "win")
+    s_losses = sum(1 for r in settled_slips if r["status"] == "loss")
+    s_stake  = sum(r["entry"] for r in settled_slips) if settled_slips else 0.0
+    s_pnl    = sum(r["profit"] for r in settled_slips) if settled_slips else 0.0
+
+    # ── combined ──
+    total_wins   = b_wins + s_wins
+    total_losses = b_losses + s_losses
+    total_stake  = b_stake + s_stake
+    net_pnl      = b_pnl + s_pnl
+    win_pct = total_wins / (total_wins + total_losses) * 100 if (total_wins + total_losses) else 0
+    roi     = net_pnl / total_stake * 100 if total_stake else 0
 
     by_signal: dict = {}
-    for r in settled:
+    for r in settled_bets:
         sig = (r["signal"] or "no signal").split("--")[0].strip().lower()
         if sig not in by_signal:
             by_signal[sig] = {"w": 0, "l": 0, "p": 0, "profit": 0.0}
@@ -225,6 +314,8 @@ def post_summary() -> None:
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M PT")
     pnl_sign = "+" if net_pnl >= 0 else ""
+    b_sign   = "+" if b_pnl >= 0 else ""
+    s_sign   = "+" if s_pnl >= 0 else ""
 
     def h2(t):
         return {"object": "block", "type": "heading_2", "heading_2": {"rich_text": [{"type": "text", "text": {"content": t}}]}}
@@ -237,15 +328,25 @@ def post_summary() -> None:
     def callout(t, emoji="📊"):
         return {"object": "block", "type": "callout", "callout": {"rich_text": [{"type": "text", "text": {"content": t}}], "icon": {"type": "emoji", "emoji": emoji}}}
 
+    total_settled = len(settled_bets) + len(settled_slips)
+    total_open    = len(open_bets) + len(open_slips)
+
     blocks = [
-        callout(f"Updated {now}  --  {len(settled)} settled  |  {len(open_bets)} open"),
-        h2("Overall"),
-        p(f"Record:  {wins}W - {losses}L - {pushes}P  ({win_pct:.0f}% win rate)"),
-        p(f"Stake:   ${total_stake:.2f}"),
+        callout(f"Updated {now}  --  {total_settled} settled  |  {total_open} open"),
+        h2("Overall (Bets + Slips)"),
+        p(f"Record:  {total_wins}W - {total_losses}L  ({win_pct:.0f}% win rate)"),
+        p(f"Staked:  ${total_stake:.2f}"),
         p(f"Net P&L: {pnl_sign}${net_pnl:.2f}"),
         p(f"ROI:     {roi:+.1f}%"),
         divider(),
-        h2("By Signal"),
+        h2("Bets"),
+        p(f"Record:  {b_wins}W - {b_losses}L - {b_pushes}P"),
+        p(f"Staked:  ${b_stake:.2f}  |  P&L: {b_sign}${b_pnl:.2f}"),
+        h2("Underdog Slips"),
+        p(f"Record:  {s_wins}W - {s_losses}L"),
+        p(f"Staked:  ${s_stake:.2f}  |  P&L: {s_sign}${s_pnl:.2f}"),
+        divider(),
+        h2("Bets by Signal"),
     ]
 
     if by_signal:
@@ -258,12 +359,18 @@ def post_summary() -> None:
         blocks.append(p("No settled bets yet."))
 
     blocks.append(divider())
-    blocks.append(h2("Open Bets"))
+    blocks.append(h2("Open"))
 
     if open_bets:
+        blocks.append(p("Bets:"))
         for r in open_bets:
             blocks.append(bullet(f"#{r['id']}  {r['date']}  {r['matchup']}  |  {r['bet_on']}  @{r['line']:+d}  ${r['stake']:.0f}"))
-    else:
+    if open_slips:
+        blocks.append(p("Slips:"))
+        for r in open_slips:
+            players = ", ".join(json.loads(r["players"]))
+            blocks.append(bullet(f"slip#{r['id']}  {r['date']}  {players}  ${r['entry']:.0f}"))
+    if not open_bets and not open_slips:
         blocks.append(p("None."))
 
     _clear_page(page_id)
@@ -276,18 +383,29 @@ def post_summary() -> None:
 def main():
     parser = argparse.ArgumentParser(description="Sync betlog.db to Notion")
     parser.add_argument("--bet", type=int, default=None, help="Sync a single bet ID")
-    parser.add_argument("--summary", action="store_true", help="Update P&L summary page")
-    parser.add_argument("--and-summary", action="store_true", help="Also update summary after bet sync")
+    parser.add_argument("--slip", type=int, default=None, help="Sync a single slip ID")
+    parser.add_argument("--slips", action="store_true", help="Sync all slips")
+    parser.add_argument("--summary", action="store_true", help="Update P&L summary page (bets + slips)")
+    parser.add_argument("--and-summary", action="store_true", help="Also update summary after sync")
     args = parser.parse_args()
 
     if args.summary:
         post_summary()
+    elif args.slip:
+        sync_slip(args.slip)
+        if args.and_summary:
+            post_summary()
+    elif args.slips:
+        sync_all_slips()
+        if args.and_summary:
+            post_summary()
     elif args.bet:
         sync_one(args.bet)
         if args.and_summary:
             post_summary()
     else:
         sync_all()
+        sync_all_slips()
 
 
 if __name__ == "__main__":
