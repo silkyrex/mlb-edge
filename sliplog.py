@@ -300,8 +300,8 @@ def cmd_list(args):
         rows = conn.execute(
             "SELECT * FROM slips WHERE status='open' ORDER BY date DESC, id DESC"
         ).fetchall()
-    conn.close()
     if not rows:
+        conn.close()
         print("No slips found.")
         return
     print(f"\n{'ID':<4} {'Date':<12} {'Picks':<6} {'Players':<35} {'Boost':<14} {'Entry':>7} {'Payout':>9} {'Status':<8} {'P&L'}")
@@ -311,6 +311,49 @@ def cmd_list(args):
         boost = r["boost"] or "-"
         pnl = f"+${r['profit']:.2f}" if r["profit"] and r["profit"] > 0 else (f"-${abs(r['profit']):.2f}" if r["profit"] else "-")
         print(f"{r['id']:<4} {r['date']:<12} {r['picks_count']:<6} {players:<35} {boost:<14} ${r['entry']:>6.2f} ${r['payout']:>8.2f} {r['status']:<8} {pnl}")
+        if args.detailed:
+            picks = conn.execute(
+                "SELECT player, player_type, stat, line, side, game, actual, hit "
+                "FROM slip_picks WHERE slip_id=? ORDER BY id", (r["id"],)
+            ).fetchall()
+            if picks:
+                for sp in picks:
+                    result_tag = ""
+                    if sp["hit"] is not None:
+                        result_tag = " HIT" if sp["hit"] else " MISS"
+                    actual_tag = f"  -> {sp['actual']}" if sp["actual"] is not None else ""
+                    game_tag = f"  ({sp['game']})" if sp["game"] else ""
+                    print(f"      {sp['player']:<28} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}")
+            else:
+                print(f"      (no per-pick structure -- legacy slip, retrofit via 'add-picks')")
+    conn.close()
+
+
+def cmd_picks(args):
+    """Show per-pick structure for one slip."""
+    conn = connect()
+    slip = conn.execute("SELECT * FROM slips WHERE id=?", (args.slip_id,)).fetchone()
+    if not slip:
+        print(f"Slip #{args.slip_id} not found.")
+        conn.close()
+        return
+    picks = conn.execute(
+        "SELECT * FROM slip_picks WHERE slip_id=? ORDER BY id", (args.slip_id,)
+    ).fetchall()
+    conn.close()
+    boost = f" [{slip['boost']}]" if slip["boost"] else ""
+    print(f"\nSlip #{slip['id']} ({slip['date']}, {slip['status']}){boost}  "
+          f"${slip['entry']:.2f} -> ${slip['payout']:.2f}")
+    if not picks:
+        print("  (no per-pick structure -- legacy slip, retrofit via 'sliplog.py add-picks')")
+        return
+    for sp in picks:
+        result_tag = ""
+        if sp["hit"] is not None:
+            result_tag = "  HIT" if sp["hit"] else "  MISS"
+        actual_tag = f"  -> {sp['actual']}" if sp["actual"] is not None else "  (pending)"
+        game_tag = f"  ({sp['game']})" if sp["game"] else ""
+        print(f"  {sp['player']:<28} {sp['player_type']:<8} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}")
 
 
 def cmd_summary(args):
@@ -365,7 +408,12 @@ def main():
                        help='JSON dict of {player_name: actual_value}. Triggers pick_lessons.observe per pick.')
 
     p_list = sub.add_parser("list", help="List slips")
-    p_list.add_argument("--all", action="store_true")
+    p_list.add_argument("--all", action="store_true", help="Include settled slips")
+    p_list.add_argument("--detailed", "-d", action="store_true",
+                        help="Show per-pick structure under each slip (player, stat, line, side, outcome)")
+
+    p_picks = sub.add_parser("picks", help="Show per-pick detail for one slip")
+    p_picks.add_argument("--slip-id", type=int, required=True)
 
     sub.add_parser("summary", help="P&L summary")
 
@@ -378,6 +426,8 @@ def main():
         cmd_result(args)
     elif args.cmd == "list":
         cmd_list(args)
+    elif args.cmd == "picks":
+        cmd_picks(args)
     elif args.cmd == "summary":
         cmd_summary(args)
     else:
