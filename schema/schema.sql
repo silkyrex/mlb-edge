@@ -162,3 +162,21 @@ CREATE TABLE IF NOT EXISTS player_news (
 
 CREATE INDEX IF NOT EXISTS idx_news_player ON player_news(player, news_date);
 CREATE INDEX IF NOT EXISTS idx_news_date   ON player_news(news_date);
+
+-- Underdog pick-em slip tracker (betlog.db, managed by sliplog.py)
+-- NOTE: this table lives in betlog.db, not mlb.db. Shown here for reference.
+CREATE TABLE IF NOT EXISTS slips (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    date        TEXT NOT NULL,
+    platform    TEXT NOT NULL DEFAULT 'underdog',
+    picks_count INTEGER NOT NULL,
+    players     TEXT NOT NULL,         -- JSON list e.g. '["Teng","Soriano"]'
+    boost       TEXT,
+    entry       REAL NOT NULL,
+    payout      REAL NOT NULL,
+    multiplier  TEXT,
+    status      TEXT NOT NULL DEFAULT 'open',  -- open / win / loss
+    profit      REAL,
+    logged_at   TEXT DEFAULT (datetime('now')),
+    notes       TEXT
+);

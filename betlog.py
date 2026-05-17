@@ -125,6 +125,22 @@ CREATE TABLE IF NOT EXISTS bets (
     notes       TEXT,
     logged_at   TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS slips (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    date        TEXT NOT NULL,
+    platform    TEXT NOT NULL DEFAULT 'underdog',
+    picks_count INTEGER NOT NULL,
+    players     TEXT NOT NULL,         -- JSON list e.g. '["Teng","Soriano"]'
+    boost       TEXT,
+    entry       REAL NOT NULL,
+    payout      REAL NOT NULL,
+    multiplier  TEXT,
+    status      TEXT NOT NULL DEFAULT 'open',  -- open / win / loss
+    profit      REAL,
+    logged_at   TEXT DEFAULT (datetime('now')),
+    notes       TEXT
+);
 """
 
 
