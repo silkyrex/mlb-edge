@@ -52,6 +52,7 @@ Key columns: `date`, `matchup`, `signal`, `bet_on`, `line`, `stake`, `result` (o
 **betlog.db slips table** -- Underdog pick-em multi-pick entries. Managed by `sliplog.py`.
 Key columns: `date`, `picks_count`, `players` (JSON), `boost`, `entry`, `payout`, `multiplier`, `status` (open/win/loss), `profit`.
 Auto-populated by `/underdog-check` skill after verifying slips on Underdog live page.
+OB1 types: `underdog_slip_placed` (on add), `underdog_slip_outcome` (on result). Searchable alongside betlog history.
 
 ---
 
@@ -69,7 +70,7 @@ Auto-populated by `/underdog-check` skill after verifying slips on Underdog live
 | `morning_brief.py` | 9am PT launchd -- all games + starter grades + IL returns → Discord |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player |
 | `betlog.py` | Bet log -- add, result, list, summary (single-pick American odds bets) |
-| `sliplog.py` | Slip log -- add, result, list, summary (Underdog multi-pick pick-em entries) |
+| `sliplog.py` | Slip log -- add, result, list, summary (Underdog multi-pick pick-em entries). Pushes to OB1 on add + result. |
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- early lean read |
 | `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet active against picks.db) |
 | `schema/schema.sql` | Full DB schema. Always update before editing picks.db schema. |
