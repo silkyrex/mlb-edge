@@ -272,7 +272,7 @@ def cmd_result(args):
                 hit=tp["hit"],
                 game=tp["game"],
                 date_str=slip["date"],
-                context=ctx,
+                extra_context=json.loads(ctx) if ctx else None,
             )
 
     try:
