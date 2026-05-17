@@ -183,6 +183,26 @@ CREATE TABLE IF NOT EXISTS slips (
     notes       TEXT
 );
 
+-- Per-pick structure for Underdog slips (betlog.db, managed by sliplog.py)
+-- Captured on `sliplog.py add --picks`. Settled on `sliplog.py result --outcomes`
+-- which auto-triggers pick_lessons.observe() per pick.
+-- NOTE: this table lives in betlog.db, not mlb.db. Shown here for reference.
+CREATE TABLE IF NOT EXISTS slip_picks (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    slip_id     INTEGER NOT NULL REFERENCES slips(id) ON DELETE CASCADE,
+    player      TEXT NOT NULL,
+    player_type TEXT NOT NULL,           -- 'pitcher' | 'batter' | 'team'
+    stat        TEXT NOT NULL,           -- 'Strikeouts', 'Pitching Outs', 'Hits + Runs + RBIs', etc.
+    line        REAL NOT NULL,
+    side        TEXT NOT NULL,           -- 'Higher' | 'Lower'
+    game        TEXT,                    -- 'TEX @ HOU' (per-pick: multi-game slips are common)
+    actual      REAL,                    -- filled on result --outcomes
+    hit         INTEGER,                 -- 0/1, filled on result --outcomes
+    logged_at   TEXT DEFAULT (datetime('now')),
+    UNIQUE(slip_id, player, stat)
+);
+CREATE INDEX IF NOT EXISTS idx_slip_picks_slip ON slip_picks(slip_id);
+
 -- Pick lessons (betlog.db, managed by pick_lessons.py)
 -- Auto-generated rule tracker. Each settled pick observation increments occurrences
 -- on a matching rule_key, or creates a new 'watching' row. Graduates to 'confirmed'

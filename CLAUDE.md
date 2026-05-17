@@ -58,6 +58,11 @@ Key columns: `date`, `picks_count`, `players` (JSON), `boost`, `entry`, `payout`
 Auto-populated by `/underdog-check` skill after verifying slips on Underdog live page.
 OB1 types: `underdog_slip_placed` (on add), `underdog_slip_outcome` (on result). Searchable alongside betlog history.
 
+**betlog.db slip_picks table** -- Per-pick structure for Underdog slips. Managed by `sliplog.py`.
+Key columns: `slip_id` (FK to slips), `player`, `player_type`, `stat`, `line`, `side`, `game`, `actual`, `hit`.
+Populated by `sliplog.py add --picks` JSON or `sliplog.py add-picks` retrofit. Settled by `sliplog.py result --outcomes` JSON,
+which also auto-triggers `pick_lessons.observe()` per pick.
+
 ---
 
 ## Key Files
@@ -75,7 +80,7 @@ OB1 types: `underdog_slip_placed` (on add), `underdog_slip_outcome` (on result).
 | `lines_query.py` | Query mlb_game_lines by game, stat, player |
 | `betlog.py` | Bet log -- add, result, list, summary (single-pick American odds bets) |
 | `ob1.py` | Shared OB1 push helper. Import `from ob1 import ob1_push` in any script. Auto-loads creds from `~/.config/credentials/ob1.env`. |
-| `sliplog.py` | Slip log -- add, result, list, summary (Underdog multi-pick pick-em entries). Pushes to OB1 on add + result. |
+| `sliplog.py` | Slip log -- add, result, list, summary (Underdog multi-pick pick-em entries). Pushes to OB1 on add + result. `--picks` JSON captures per-pick structure; `result --outcomes` auto-triggers pick_lessons.observe per pick. `add-picks` retrofits structure to legacy slips. |
 | `pick_lessons.py` | Auto-generated rule tracker. Each settled pick → rule_key + hypothesis (deterministic classifier). Graduates `watching → confirmed` at 3 same-direction occurrences (game-deduped). Falsifies at 2 counters. Pushes to OB1 + insights.md on promotion. Subcommands: observe, list, review, falsify, resurrect, edit. |
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- early lean read |
 | `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet active against picks.db) |

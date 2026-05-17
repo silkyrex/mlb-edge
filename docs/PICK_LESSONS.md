@@ -173,10 +173,28 @@ Shipped 2026-05-16:
 - [x] Two real seed observations (Teng Lower role-mismatch, deGrom Higher line_ge_median)
 - [x] Smoke test verified promotion + insights.md prepend + OB1 push (then reverted)
 
-Deferred to v1.5:
-- [ ] Wire post-settle hook in `sliplog.py result` and `betlog.py result` (requires per-pick capture refactor — `slips.players` is just a JSON name list, no stat/line/side)
-- [ ] Backfill over historical settled rows (blocked on same — need per-pick structure first)
-- [ ] `/lessons-review` skill wrapper (CLI works for now)
-- [ ] Wire `underdog-mlb-analyze` to read confirmed rules and apply score modifiers
+Shipped 2026-05-16 (v1.5 — sliplog auto-trigger):
+- [x] `slip_picks` table added to `betlog.db` and `schema/schema.sql`
+- [x] `sliplog.py add --picks` JSON arg captures per-pick structure on slip log
+- [x] `sliplog.py add-picks --slip-id N --picks JSON` retrofits structure to legacy slips
+- [x] `sliplog.py result --outcomes` JSON arg settles per-pick (computes hit/miss) and auto-triggers `pick_lessons.observe()` for each pick
+- [x] Backwards compat: legacy `--players` csv flow still works (no slip_picks rows, no auto-trigger)
+- [x] Graceful warnings for `--outcomes` without `slip_picks` rows, name mismatches, JSON parse failures
+- [x] Smoke test: 4 picks across 3 games verified add → settle → observe → same-game dedup → promotion flow → OB1 push → insights.md prepend; all test data rolled back
 
-Manual seeding works today via `python pick_lessons.py observe ...`. Auto-trigger from sliplog needs the sliplog refactor to capture per-pick structure on `add`.
+Daily flow going forward:
+```
+# Log slip with full structure
+python sliplog.py add --entry 20 --payout 77.80 --multiplier "3.89x" \
+  --picks '[{"player":"...","player_type":"pitcher","stat":"Strikeouts","line":7.5,"side":"Higher","game":"TEX @ HOU"},...]'
+
+# Settle with per-pick outcomes -- triggers pick_lessons.observe automatically
+python sliplog.py result --id 6 --result loss \
+  --outcomes '{"player one":4,"player two":15}'
+```
+
+Deferred to v2:
+- [ ] Backfill subcommand over historical settled rows (low priority — most legacy slips lack per-pick context to regenerate)
+- [ ] `/lessons-review` skill wrapper (CLI works for now)
+- [ ] Wire `underdog-mlb-analyze` to read confirmed rules as score modifiers (defer until ≥5 confirmed rules exist)
+- [ ] `slip_picks` columns in `sliplog.py list` output
