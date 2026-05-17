@@ -97,7 +97,8 @@ def _fetch_stats(player_id: int, group: str, stat_type: str, limit: int | None =
     r = requests.get(f"{BASE}/people/{player_id}/stats", params=params, timeout=10)
     if r.status_code != 200:
         return []
-    return r.json().get("stats", [{}])[0].get("splits", [])
+    stats = r.json().get("stats") or [{}]
+    return stats[0].get("splits", []) if stats else []
 
 
 def _float(val) -> float | None:

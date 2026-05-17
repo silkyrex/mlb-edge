@@ -137,7 +137,8 @@ def get_pitcher_stats(player_id: int) -> dict:
     }, timeout=10)
     if r.status_code != 200:
         return {}
-    splits = r.json().get("stats", [{}])[0].get("splits", [])
+    stats = r.json().get("stats") or [{}]
+    splits = stats[0].get("splits", []) if stats else []
     return splits[0].get("stat", {}) if splits else {}
 
 
