@@ -70,6 +70,7 @@ OB1 types: `underdog_slip_placed` (on add), `underdog_slip_outcome` (on result).
 | `morning_brief.py` | 9am PT launchd -- all games + starter grades + IL returns → Discord |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player |
 | `betlog.py` | Bet log -- add, result, list, summary (single-pick American odds bets) |
+| `ob1.py` | Shared OB1 push helper. Import `from ob1 import ob1_push` in any script. Auto-loads creds from `~/.config/credentials/ob1.env`. |
 | `sliplog.py` | Slip log -- add, result, list, summary (Underdog multi-pick pick-em entries). Pushes to OB1 on add + result. |
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- early lean read |
 | `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet active against picks.db) |
