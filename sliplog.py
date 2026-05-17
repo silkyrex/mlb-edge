@@ -13,11 +13,60 @@ Usage:
 
 import argparse
 import json
+import os
 import sqlite3
+import urllib.request
 from datetime import date
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent / ".env")
 
 DB_PATH = Path(__file__).parent / "betlog.db"
+
+_SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+_SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+_OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+
+
+def _ob1_push(content: str, metadata: dict) -> None:
+    if not (_SUPABASE_URL and _SUPABASE_KEY and _OPENROUTER_KEY):
+        return
+    try:
+        emb_req = urllib.request.Request(
+            "https://openrouter.ai/api/v1/embeddings",
+            data=json.dumps({"model": "openai/text-embedding-3-small", "input": content}).encode(),
+            headers={"Authorization": f"Bearer {_OPENROUTER_KEY}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(emb_req, timeout=20) as r:
+            embedding = json.loads(r.read())["data"][0]["embedding"]
+    except Exception:
+        embedding = None
+
+    payload = json.dumps({
+        "p_content": content,
+        "p_payload": {"metadata": {**metadata, "source": "sliplog", "era": "live"}},
+    }).encode()
+    upsert_req = urllib.request.Request(
+        f"{_SUPABASE_URL}/rest/v1/rpc/upsert_thought",
+        data=payload,
+        headers={"apikey": _SUPABASE_KEY, "Authorization": f"Bearer {_SUPABASE_KEY}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(upsert_req, timeout=15) as r:
+            result = json.loads(r.read())
+        if embedding and result and result.get("id"):
+            urllib.request.urlopen(urllib.request.Request(
+                f"{_SUPABASE_URL}/rest/v1/thoughts?id=eq.{result['id']}",
+                data=json.dumps({"embedding": embedding}).encode(),
+                headers={"apikey": _SUPABASE_KEY, "Authorization": f"Bearer {_SUPABASE_KEY}",
+                         "Content-Type": "application/json", "Prefer": "return=minimal"},
+                method="PATCH",
+            ), timeout=15).read()
+    except Exception:
+        pass
 
 
 def connect() -> sqlite3.Connection:
@@ -64,10 +113,20 @@ def cmd_add(args):
     conn.commit()
     slip_id = cur.lastrowid
     boost_str = f" [{boost}]" if boost else ""
-    print(f"Logged slip #{slip_id}  |  {args.date or date.today().isoformat()}  |  "
+    slip_date = args.date or date.today().isoformat()
+    print(f"Logged slip #{slip_id}  |  {slip_date}  |  "
           f"{len(players)}-pick: {', '.join(players)}{boost_str}  |  "
           f"${args.entry} entry → ${args.payout} payout")
     conn.close()
+
+    _ob1_push(
+        f"underdog slip placed: {', '.join(players)} | date={slip_date} slip_id={slip_id} "
+        f"picks={len(players)} entry=${args.entry:.0f} payout=${args.payout:.2f} "
+        f"boost={boost or 'none'} multiplier={args.multiplier or '--'}",
+        {"type": "underdog_slip_placed", "slip_id": slip_id, "date": slip_date,
+         "players": players, "picks_count": len(players), "entry": args.entry,
+         "payout": args.payout, "boost": boost, "agent": "sliplog"},
+    )
 
 
 def cmd_result(args):
@@ -91,6 +150,16 @@ def cmd_result(args):
     sign = "+" if profit > 0 else ""
     print(f"Slip #{args.id} settled: {result.upper()}  |  P&L: {sign}${profit}")
     conn.close()
+
+    players = json.loads(slip["players"])
+    _ob1_push(
+        f"underdog slip outcome: {', '.join(players)} | date={slip['date']} slip_id={args.id} "
+        f"picks={slip['picks_count']} entry=${slip['entry']:.0f} payout=${slip['payout']:.2f} "
+        f"result={result} profit={sign}${abs(profit):.2f} boost={slip['boost'] or 'none'}",
+        {"type": "underdog_slip_outcome", "slip_id": args.id, "date": slip["date"],
+         "players": players, "result": result, "profit": profit,
+         "entry": slip["entry"], "payout": slip["payout"], "agent": "sliplog"},
+    )
 
 
 def cmd_list(args):
