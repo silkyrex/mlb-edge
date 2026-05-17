@@ -362,6 +362,72 @@ def append_rubric_log(bet: dict, result: str, profit: float | None):
         print(f"Rubric log append failed: {e}")
 
 
+def capture_loss_lesson(bet: dict, profit: float | None) -> None:
+    """Prompt for a lesson-learned on a losing bet and capture to OB1 + second brain."""
+    print("\n--- LOSS REVIEW ---")
+    print(f"Signal: {bet.get('signal', 'n/a')}  |  Pick: {bet['bet_on'].replace(chr(10), ' + ')}")
+
+    # Pull FIP flags for context
+    fip_lines = []
+    try:
+        conn = sqlite3.connect(PICKS_DB)
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute("""
+            SELECT player, season_era, espn_fip
+            FROM player_recent_stats
+            WHERE cache_date=? AND player_type='pitcher' AND espn_fip IS NOT NULL
+        """, (bet["date"],)).fetchall()
+        conn.close()
+        for r in rows:
+            if r["player"].split()[-1].lower() in bet["bet_on"].lower():
+                era, fip = r["season_era"], r["espn_fip"]
+                if era and fip and abs(fip - era) > 0.5:
+                    flag = "ERA LUCKY (regression risk)" if fip > era else "ERA UNLUCKY"
+                    fip_lines.append(f"  {r['player']}: ERA {era:.2f} FIP {fip:.2f} [{flag}]")
+    except Exception:
+        pass
+
+    if fip_lines:
+        print("FIP at time of pick:")
+        for line in fip_lines:
+            print(line)
+
+    try:
+        lesson = input("Lesson (enter to skip): ").strip()
+    except EOFError:
+        lesson = ""
+
+    profit_str = f"{profit:.2f}" if profit is not None else "n/a"
+    content = (
+        f"[{bet['date']}] bet loss lesson: {bet['matchup']} | "
+        f"signal={bet.get('signal', '?')} | pick={bet['bet_on'].replace(chr(10), ' + ')} | "
+        f"profit={profit_str} | lesson={lesson or 'none'}"
+    )
+    ok = ob1_push(content, {
+        "type": "bet_loss_lesson",
+        "matchup": bet["matchup"],
+        "signal": bet.get("signal", ""),
+        "pick": bet["bet_on"],
+        "profit": profit,
+        "fip_flags": len(fip_lines),
+        "lesson": lesson,
+        "outcome": "captured" if lesson else "skipped",
+        "moved": False,
+    })
+    print(f"Loss lesson OB1: {'captured' if ok else 'failed'}")
+
+    if lesson:
+        sb_path = Path.home() / "second-brain/sports/insights.md"
+        if sb_path.exists():
+            entry = (
+                f"## {bet['date']} -- Loss: {bet['matchup']}\n"
+                f"**Signal:** {bet.get('signal', '?')}  |  **Pick:** {bet['bet_on'].replace(chr(10), ' + ')}\n"
+                f"**Lesson:** {lesson}\n\n---\n\n"
+            )
+            sb_path.write_text(entry + sb_path.read_text())
+            print("Lesson written to sports/insights.md")
+
+
 def settle_bet(bet_id: int, result: str):
     conn = sqlite3.connect(BETLOG_DB)
     conn.row_factory = sqlite3.Row
@@ -409,6 +475,9 @@ def settle_bet(bet_id: int, result: str):
     ok = ob1_push(content, metadata)
     print(f"OB1 capture: {'ok' if ok else 'failed'}")
     append_rubric_log(bet_row, result, profit)
+
+    if result == "L":
+        capture_loss_lesson(bet_row, profit)
 
 
 def post_discord(message: str):
