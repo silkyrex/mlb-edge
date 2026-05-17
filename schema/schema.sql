@@ -182,3 +182,24 @@ CREATE TABLE IF NOT EXISTS slips (
     logged_at   TEXT DEFAULT (datetime('now')),
     notes       TEXT
 );
+
+-- Pick lessons (betlog.db, managed by pick_lessons.py)
+-- Auto-generated rule tracker. Each settled pick observation increments occurrences
+-- on a matching rule_key, or creates a new 'watching' row. Graduates to 'confirmed'
+-- at 3 same-direction occurrences (0 counters). Falsified at 2 counters.
+-- NOTE: this table lives in betlog.db, not mlb.db. Shown here for reference.
+CREATE TABLE IF NOT EXISTS pick_lessons (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    rule_key     TEXT NOT NULL UNIQUE,        -- e.g. 'pitcher_strikeouts_higher_line_ge_l5_median'
+    hypothesis   TEXT NOT NULL,               -- one-sentence plain-talk rule, frozen on first-seen
+    direction    TEXT NOT NULL,               -- 'fail' | 'hit' (rule predicts misses or hits)
+    occurrences  INTEGER NOT NULL DEFAULT 1,  -- count of same-direction confirmations (game-deduped)
+    counters     INTEGER NOT NULL DEFAULT 0,  -- count of opposite-direction outcomes
+    status       TEXT NOT NULL DEFAULT 'watching',  -- watching | confirmed | falsified | under_review
+    first_seen   DATE NOT NULL,
+    last_seen    DATE NOT NULL,
+    evidence     TEXT NOT NULL,               -- JSON: [{date, player, stat, line, side, actual, hit, game, redundant?}, ...]
+    promoted_at  DATETIME,                    -- when status flipped to confirmed
+    notes        TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_pl_status ON pick_lessons(status);
