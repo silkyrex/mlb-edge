@@ -21,8 +21,11 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from pathlib import Path
+
+import requests
 
 MLB_DB = Path(__file__).parent / "mlb.db"
 BETLOG_DB = Path(__file__).parent / "betlog.db"
@@ -312,10 +315,11 @@ Flag aggressively:
 Write as numbered list matching Scout's numbering. Be brutal -- if a pick has no strong counter, say clearly why."""
 
 CLOSER_PROMPT = """You are the final decision-maker for MLB prop bets.
-You have seen the bull case from Scout and the ruthless challenges from Skeptic.
+You have seen the bull case from Scout, the ruthless challenges from Skeptic, and fresh Statcast data
+pulled live from the MLB Stats API (same source as Baseball Savant).
 Cut without mercy. Only keep picks where the bull case clearly survives the Skeptic's strongest challenge.
 
-Today's data:
+Today's cached data:
 {data_brief}
 
 Scout's picks:
@@ -324,16 +328,24 @@ Scout's picks:
 Skeptic's challenges:
 {skeptic_output}
 
+LIVE STATCAST DATA (fetched now -- use this to override stale cached stats):
+{savant_supplement}
+
 SELECTION RULES:
 - Drop if Skeptic's strongest counter is Strong AND you cannot specifically rebut it
 - Drop if any IL flag is present (active IL or returned within 7 days)
 - Drop if multiplier on the pick side is below 0.95x (market has priced this out)
 - Keep only where Scout's evidence is specific and Skeptic's counters are Moderate or Weak
+- FLAG: if live Statcast data contradicts Scout's thesis (e.g. xFIP much higher than FIP, velocity down,
+  wRC+ trending negative), either drop the pick or explicitly note the conflict in the reason string
+- FLAG: if live Statcast data validates Skeptic's counter, weight that counter more heavily
 
 For each surviving pick, write a 'reason' string (1-2 tight sentences):
-  "[Key stat evidence with numbers]. [Skeptic's main counter + one-line rebuttal or why it doesn't kill the pick]."
+  "[Key stat evidence with numbers, including any live Statcast metric that clinches the case].
+   [Skeptic's main counter + one-line rebuttal]. [If Statcast flagged anything, note it explicitly]."
 
-Example: "L5 avg 8.4 Ks vs 6.5 line; FIP 2.81 confirms ERA not luck. Skeptic: low mult (1.03x) -- clears on evidence volume."
+Example: "L5 avg 8.4 Ks vs 6.5 line; live xFIP 2.91 < FIP 3.10 -- ERA is sustainable. Skeptic: low mult (1.03x) -- evidence volume clears it."
+Example with flag: "STATCAST FLAG: velocity down 1.8 mph from season avg -- Skeptic's regression concern confirmed; DROPPED."
 
 OUTPUT: Return ONLY valid JSON array. No markdown fences, no preamble, no explanation. Start with [ and end with ].
 
@@ -350,6 +362,172 @@ Schema for each pick object:
 
 If fewer than 3 picks survive, output what remains -- do not force weak picks to reach a minimum."""
 
+# ---------------------------------------------------------------------------
+# Live Statcast fetch (MLB Stats API -- same data source as Baseball Savant)
+# ---------------------------------------------------------------------------
+
+_STATS_BASE = "https://statsapi.mlb.com/api/v1"
+
+
+def extract_candidate_players(scout_output: str, target_date: str) -> list[tuple[str, str, int]]:
+    """
+    Return (player_name, player_type, mlb_player_id) for players mentioned
+    in Scout's output that have a cached mlb_player_id for today.
+    Matches on last name (robust to formatting differences).
+    """
+    mlb = sqlite3.connect(MLB_DB)
+    mlb.row_factory = sqlite3.Row
+    rows = mlb.execute(
+        "SELECT player, player_type, mlb_player_id FROM player_recent_stats "
+        "WHERE cache_date=? AND mlb_player_id IS NOT NULL",
+        (target_date,),
+    ).fetchall()
+    mlb.close()
+
+    scout_lower = scout_output.lower()
+    seen: set[int] = set()
+    candidates = []
+    for row in rows:
+        pid = row["mlb_player_id"]
+        if pid in seen:
+            continue
+        last = row["player"].split()[-1].lower()
+        if last in scout_lower:
+            seen.add(pid)
+            candidates.append((row["player"], row["player_type"], pid))
+    return candidates
+
+
+def _stats_get(player_id: int, stat_type: str, group: str) -> list[dict]:
+    """Single-stat-type request to MLB Stats API (API does not accept multiple types per call)."""
+    season = str(date.today().year)
+    try:
+        r = requests.get(
+            f"{_STATS_BASE}/people/{player_id}/stats",
+            params={"stats": stat_type, "group": group, "season": season},
+            timeout=10,
+            headers={"User-Agent": "mlb-edge/1.0"},
+        )
+        if r.status_code != 200:
+            return []
+        blocks = r.json().get("stats") or []
+        return blocks[0].get("splits", []) if blocks else []
+    except Exception:
+        return []
+
+
+def fetch_statcast(player_name: str, player_type: str, player_id: int) -> dict:
+    """
+    Fetch live Statcast metrics from MLB Stats API for one player.
+    Returns a dict of the most useful fields; sets 'error' key on failure.
+    """
+    group = "pitching" if player_type == "pitcher" else "hitting"
+    result: dict = {"player": player_name, "player_type": player_type}
+
+    # Expected stats (xBA, xSLG, xwOBA)
+    exp = _stats_get(player_id, "expectedStatistics", group)
+    if exp:
+        s = exp[0].get("stat", {})
+        result["x_ba"] = s.get("avg")
+        result["x_slg"] = s.get("slg")
+        result["x_woba"] = s.get("woba")
+
+    # Sabermetrics (FIP/xFIP/WAR/ERA- for pitchers; wRC+/WAR/wOBA for batters)
+    sab = _stats_get(player_id, "sabermetrics", group)
+    if sab:
+        s = sab[0].get("stat", {})
+        if player_type == "pitcher":
+            result["fip"] = s.get("fip")
+            result["x_fip"] = s.get("xfip")
+            result["war"] = s.get("war")
+            result["era_minus"] = s.get("eraMinus")
+        else:
+            result["wrc_plus"] = s.get("wRcPlus")
+            result["war"] = s.get("war")
+            result["woba"] = s.get("woba")
+
+    # Pitch arsenal (pitchers only)
+    if player_type == "pitcher":
+        arsenal_splits = _stats_get(player_id, "pitchArsenal", group)
+        if arsenal_splits:
+            parts = []
+            for split in arsenal_splits:
+                ps = split.get("stat", {})
+                pname = ps.get("type", {}).get("description", "")
+                mph = ps.get("averageSpeed")
+                pct = ps.get("percentage")
+                if pname and mph:
+                    pct_str = f" ({pct*100:.0f}%)" if pct else ""
+                    parts.append(f"{pname} {mph:.1f}mph{pct_str}")
+            if parts:
+                result["arsenal"] = ", ".join(parts)
+
+    return result
+
+
+def build_savant_supplement(candidates: list[tuple[str, str, int]]) -> str:
+    """
+    Fetch live Statcast for all candidate players in parallel and format
+    as a text block for the Closer prompt.
+    """
+    if not candidates:
+        return "[No candidate players identified -- Statcast supplement unavailable]"
+
+    print(f"[closer] Fetching live Statcast for {len(candidates)} candidates...", end=" ", flush=True)
+
+    results: dict[str, dict] = {}
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        futures = {
+            pool.submit(fetch_statcast, name, ptype, pid): name
+            for name, ptype, pid in candidates
+        }
+        for fut in as_completed(futures):
+            data = fut.result()
+            results[data["player"]] = data
+
+    print("done.")
+
+    lines = ["Live Statcast (MLB Stats API, fetched now):"]
+    for name, _, _ in candidates:
+        d = results.get(name, {})
+        if "error" in d:
+            lines.append(f"  {name}: [fetch failed -- {d['error']}]")
+            continue
+
+        ptype = d.get("player_type", "?")
+        parts = []
+        if ptype == "pitcher":
+            if d.get("x_fip"):
+                parts.append(f"live xFIP {d['x_fip']}")
+            if d.get("fip"):
+                parts.append(f"FIP {d['fip']}")
+            if d.get("war"):
+                parts.append(f"WAR {d['war']}")
+            if d.get("era_minus"):
+                parts.append(f"ERA- {d['era_minus']}")
+            if d.get("x_woba"):
+                parts.append(f"xwOBA-against {d['x_woba']}")
+            if d.get("arsenal"):
+                parts.append(f"arsenal: {d['arsenal']}")
+        else:
+            if d.get("wrc_plus"):
+                parts.append(f"wRC+ {d['wrc_plus']}")
+            if d.get("war"):
+                parts.append(f"WAR {d['war']}")
+            if d.get("x_woba"):
+                parts.append(f"xwOBA {d['x_woba']}")
+            if d.get("x_ba"):
+                parts.append(f"xBA {d['x_ba']}")
+            if d.get("x_slg"):
+                parts.append(f"xSLG {d['x_slg']}")
+
+        if parts:
+            lines.append(f"  {name} ({ptype}): {' | '.join(parts)}")
+        else:
+            lines.append(f"  {name}: [no Statcast data returned for this season]")
+
+    return "\n".join(lines)
+
 
 def run_scout(data_brief: str, model_id: str) -> str:
     return run_agent(SCOUT_PROMPT.format(data_brief=data_brief), "Scout", model_id)
@@ -363,10 +541,19 @@ def run_skeptic(data_brief: str, scout_output: str, model_id: str) -> str:
     )
 
 
-def run_closer(data_brief: str, scout_output: str, skeptic_output: str, model_id: str) -> list[dict]:
+def run_closer(
+    data_brief: str,
+    scout_output: str,
+    skeptic_output: str,
+    savant_supplement: str,
+    model_id: str,
+) -> list[dict]:
     raw = run_agent(
         CLOSER_PROMPT.format(
-            data_brief=data_brief, scout_output=scout_output, skeptic_output=skeptic_output
+            data_brief=data_brief,
+            scout_output=scout_output,
+            skeptic_output=skeptic_output,
+            savant_supplement=savant_supplement,
         ),
         "Closer",
         model_id,
@@ -471,7 +658,9 @@ def main() -> None:
 
     scout = run_scout(data_brief, model_id)
     skeptic = run_skeptic(data_brief, scout, model_id)
-    picks = run_closer(data_brief, scout, skeptic, model_id)
+    candidates = extract_candidate_players(scout, target_date)
+    savant = build_savant_supplement(candidates)
+    picks = run_closer(data_brief, scout, skeptic, savant, model_id)
     print_results(picks, scout, skeptic)
 
 
