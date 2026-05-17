@@ -163,6 +163,41 @@ def _build_slip_properties(row: sqlite3.Row) -> dict:
     return props
 
 
+def _pick_blocks(conn: sqlite3.Connection, slip_id: int) -> list:
+    picks = conn.execute(
+        "SELECT * FROM slip_picks WHERE slip_id=? ORDER BY id", (slip_id,)
+    ).fetchall()
+    if not picks:
+        return []
+
+    def bullet(t):
+        return {"object": "block", "type": "bulleted_list_item",
+                "bulleted_list_item": {"rich_text": [{"type": "text", "text": {"content": t}}]}}
+
+    blocks = [{"object": "block", "type": "heading_3",
+               "heading_3": {"rich_text": [{"type": "text", "text": {"content": "Picks"}}]}}]
+    for sp in picks:
+        actual = f"  ->  actual: {sp['actual']}" if sp["actual"] is not None else ""
+        hit_tag = "  HIT" if sp["hit"] == 1 else ("  MISS" if sp["hit"] == 0 else "")
+        reason = f"  [{sp['reason']}]" if sp["reason"] else ""
+        game = f"  ({sp['game']})" if sp["game"] else ""
+        line = f"{sp['side']} {sp['line']}"
+        blocks.append(bullet(
+            f"{sp['player']}  |  {sp['stat']}  |  {line}{game}{actual}{hit_tag}{reason}"
+        ))
+    return blocks
+
+
+def _write_pick_blocks(page_id: str, conn: sqlite3.Connection, slip_id: int) -> None:
+    blocks = _pick_blocks(conn, slip_id)
+    if not blocks:
+        return
+    existing = _notion_request("GET", f"/blocks/{page_id}/children").get("results", [])
+    for b in existing:
+        _notion_request("DELETE", f"/blocks/{b['id']}")
+    _notion_request("PATCH", f"/blocks/{page_id}/children", {"children": blocks})
+
+
 def sync_slip(slip_id: int):
     conn = connect()
     row = conn.execute("SELECT * FROM slips WHERE id = ?", (slip_id,)).fetchone()
@@ -179,8 +214,10 @@ def sync_slip(slip_id: int):
         conn.commit()
         print(f"created slip #{slip_id} -> {page_id[:8]}...")
     else:
-        _notion_request("PATCH", f"/pages/{row['notion_page_id']}", {"properties": props})
+        page_id = row["notion_page_id"]
+        _notion_request("PATCH", f"/pages/{page_id}", {"properties": props})
         print(f"updated slip #{slip_id} ({row['status']})")
+    _write_pick_blocks(page_id, conn, slip_id)
     conn.close()
 
 
@@ -199,9 +236,11 @@ def sync_all_slips():
             print(f"  created slip #{row['id']} -> {page_id[:8]}...")
             created += 1
         else:
-            _notion_request("PATCH", f"/pages/{row['notion_page_id']}", {"properties": props})
+            page_id = row["notion_page_id"]
+            _notion_request("PATCH", f"/pages/{page_id}", {"properties": props})
             print(f"  updated slip #{row['id']} ({row['status']})")
             updated += 1
+        _write_pick_blocks(page_id, conn, row["id"])
     conn.close()
     print(f"slips done -- {created} created, {updated} updated")
 

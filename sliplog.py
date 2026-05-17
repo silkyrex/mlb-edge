@@ -29,6 +29,7 @@ from dotenv import load_dotenv
 
 from ob1 import ob1_push as _ob1_push
 from pick_lessons import observe as _pl_observe
+import notion_sync as _notion
 
 load_dotenv(Path(__file__).parent / ".env")
 
@@ -273,6 +274,13 @@ def cmd_result(args):
                 date_str=slip["date"],
                 context=ctx,
             )
+
+    try:
+        _notion.sync_slip(args.id)
+        _notion.post_summary()
+        print("Notion: slip + summary updated")
+    except Exception as e:
+        print(f"Notion sync failed (non-fatal): {e}")
 
     players = json.loads(slip["players"])
     _ob1_push(
