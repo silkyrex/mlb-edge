@@ -1,9 +1,8 @@
 """
-notion_sync.py -- Sync betlog.db to the MLB Edge Bet Log Notion database.
+notion_sync.py -- Sync Underdog slips + P&L summary to Notion.
 
 Usage:
-  python notion_sync.py             # sync all unsynced bets + update settled ones
-  python notion_sync.py --bet 3     # sync a single bet by ID
+  python notion_sync.py             # sync all slips
   python notion_sync.py --summary   # update the P&L summary page
   python notion_sync.py --slip 5    # sync a single slip
   python notion_sync.py --slips     # sync all slips
@@ -14,6 +13,9 @@ Requires:
 
 Block content (pick blocks, summary body) uses ntn CLI.
 Properties (database fields) use the Notion REST API directly.
+
+Single-bet entries from betlog.py are NOT synced -- only Underdog slips
+(sliplog.py) push to Notion, to keep the database as one source of truth.
 """
 
 import argparse
@@ -98,10 +100,6 @@ def ntn_create(parent_id: str, markdown: str, parent_type: str = "page") -> str:
 def connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
-    cols = [r[1] for r in conn.execute("PRAGMA table_info(bets)").fetchall()]
-    if "notion_page_id" not in cols:
-        conn.execute("ALTER TABLE bets ADD COLUMN notion_page_id TEXT")
-        conn.commit()
     slip_cols = [r[1] for r in conn.execute("PRAGMA table_info(slips)").fetchall()]
     if "notion_page_id" not in slip_cols:
         conn.execute("ALTER TABLE slips ADD COLUMN notion_page_id TEXT")
@@ -128,41 +126,6 @@ def notion_request(method: str, path: str, body: dict | None = None) -> dict:
     )
     with urllib.request.urlopen(req, timeout=15) as r:
         return json.loads(r.read())
-
-
-def _build_properties(row: sqlite3.Row) -> dict:
-    props: dict = {
-        "Bet": {"title": [{"text": {"content": row["bet_on"]}}]},
-        "Matchup": {"rich_text": [{"text": {"content": row["matchup"] or ""}}]},
-        "Line": {"number": row["line"]},
-        "Stake": {"number": row["stake"]},
-    }
-    if row["date"]:
-        props["Date"] = {"date": {"start": row["date"]}}
-    if row["signal"]:
-        props["Signal"] = {"rich_text": [{"text": {"content": row["signal"]}}]}
-    if row["notes"]:
-        props["Notes"] = {"rich_text": [{"text": {"content": row["notes"]}}]}
-    if row["result"]:
-        props["Result"] = {"select": {"name": row["result"]}}
-    else:
-        props["Result"] = {"select": {"name": "Open"}}
-    if row["profit"] is not None:
-        props["Profit"] = {"number": row["profit"]}
-    return props
-
-
-def create_page(row: sqlite3.Row) -> str:
-    body = {
-        "parent": {"database_id": DATABASE_ID},
-        "properties": _build_properties(row),
-    }
-    result = notion_request("POST", "/pages", body)
-    return result["id"]
-
-
-def update_page(page_id: str, row: sqlite3.Row) -> None:
-    notion_request("PATCH", f"/pages/{page_id}", {"properties": _build_properties(row)})
 
 
 # ── slip sync ─────────────────────────────────────────────────────────────────
@@ -257,45 +220,6 @@ def sync_all_slips():
     print(f"slips done -- {created} created, {updated} updated")
 
 
-# ── sync commands ──────────────────────────────────────────────────────────────
-
-def sync_all():
-    conn = connect()
-    rows = conn.execute("SELECT * FROM bets ORDER BY id").fetchall()
-    created = updated = 0
-    for row in rows:
-        if not row["notion_page_id"]:
-            page_id = create_page(row)
-            conn.execute("UPDATE bets SET notion_page_id = ? WHERE id = ?", (page_id, row["id"]))
-            conn.commit()
-            print(f"  created #{row['id']} -> {page_id[:8]}...")
-            created += 1
-        else:
-            update_page(row["notion_page_id"], row)
-            print(f"  updated #{row['id']} ({row['result'] or 'open'})")
-            updated += 1
-    conn.close()
-    print(f"done -- {created} created, {updated} updated")
-
-
-def sync_one(bet_id: int):
-    conn = connect()
-    row = conn.execute("SELECT * FROM bets WHERE id = ?", (bet_id,)).fetchone()
-    if not row:
-        print(f"Bet #{bet_id} not found")
-        conn.close()
-        return
-    if not row["notion_page_id"]:
-        page_id = create_page(row)
-        conn.execute("UPDATE bets SET notion_page_id = ? WHERE id = ?", (page_id, bet_id))
-        conn.commit()
-        print(f"created #{bet_id} -> {page_id[:8]}...")
-    else:
-        update_page(row["notion_page_id"], row)
-        print(f"updated #{bet_id} ({row['result'] or 'open'})")
-    conn.close()
-
-
 # ── P&L summary ───────────────────────────────────────────────────────────────
 
 def _get_or_create_summary_page() -> str:
@@ -367,8 +291,7 @@ def post_summary() -> None:
 # ── main ───────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Sync betlog.db to Notion")
-    parser.add_argument("--bet", type=int, default=None, help="Sync a single bet ID")
+    parser = argparse.ArgumentParser(description="Sync Underdog slips to Notion")
     parser.add_argument("--slip", type=int, default=None, help="Sync a single slip ID")
     parser.add_argument("--slips", action="store_true", help="Sync all slips")
     parser.add_argument("--summary", action="store_true", help="Update P&L summary page")
@@ -381,17 +304,10 @@ def main():
         sync_slip(args.slip)
         if args.and_summary:
             post_summary()
-    elif args.slips:
-        sync_all_slips()
-        if args.and_summary:
-            post_summary()
-    elif args.bet:
-        sync_one(args.bet)
-        if args.and_summary:
-            post_summary()
     else:
-        sync_all()
         sync_all_slips()
+        if args.and_summary:
+            post_summary()
 
 
 if __name__ == "__main__":

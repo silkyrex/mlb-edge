@@ -139,9 +139,9 @@ python pick_lessons.py review --graveyard   # falsified rules
 | `cache_team.py` | Bullpen ERA, team batting stats, ballpark info → team_game_stats |
 | `cache_tomorrow.py` | Night-before IL pre-cache for all of tomorrow's games. Called by daily.sh. |
 | `settle.py` | Box score lookup for open bets, W/L settlement. Auto-captures result to OB1 with FIP context. |
-| `betlog.py` | Single-bet log (American odds) -- add, result, list, summary |
+| `betlog.py` | Single-bet log (American odds) -- add, result, list, summary. Local-only; does not sync to Notion. |
 | `sliplog.py` | Underdog pick-em slip log -- add (with --picks JSON), result (with --outcomes JSON auto-fires pick_lessons), add-picks (retrofit), list (--detailed for per-pick view), picks (per-slip detail), summary. Auto-syncs to Notion after result. |
-| `notion_sync.py` | Sync slips + summary to Notion. Auto-triggered by sliplog.py result. `--slip N`, `--slips`, `--summary`. Exports 3 public helpers used by other scripts: `notion_request` (raw REST for properties), `ntn_update` (replace page blocks via ntn CLI), `ntn_create` (new page with markdown content via ntn CLI). The split exists because ntn has no property-mutation API. |
+| `notion_sync.py` | Sync Underdog slips + P&L summary to Notion. Auto-triggered by sliplog.py result. `--slip N`, `--slips`, `--summary`. Single-bet entries from betlog.py are NOT synced (one source of truth: slips). Exports 3 public helpers: `notion_request` (raw REST for properties), `ntn_update` (replace blocks via ntn CLI), `ntn_create` (new page with markdown content via ntn CLI). |
 | `pick_lessons.py` | Auto-generated rule tracker. Observe per-pick outcomes; rules graduate watching → confirmed at 3 same-direction occurrences. Confirmed rules push to OB1 + sports/insights.md. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles |
 | `player.py` | Per-pitcher start log, per-batter game log + splits, head-to-head |
