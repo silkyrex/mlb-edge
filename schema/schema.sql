@@ -77,6 +77,8 @@ CREATE TABLE IF NOT EXISTS player_recent_stats (
     games_lookback      INTEGER,
     -- Pitcher: last 5 starts
     last5_ks            TEXT,               -- JSON array e.g. [5,4,6,3,7]
+    last5_ip            TEXT,               -- JSON array of IP per outing e.g. [1.0,0.2,5.0] -- detects role changes
+    pitcher_role        TEXT,               -- 'starter' (avg IP>=4), 'reliever' (<3), 'mixed'
     season_k9           REAL,
     season_era          REAL,
     season_whip         REAL,

@@ -113,8 +113,13 @@ def compute_pitcher_cache(player_id: int) -> dict:
     season = season_splits[0].get("stat", {}) if season_splits else {}
 
     last5_ks = [s["stat"].get("strikeOuts", 0) for s in logs]
+    last5_ip = [_float(s["stat"].get("inningsPitched", 0)) or 0.0 for s in logs]
 
-    total_ip = sum(_float(s["stat"].get("inningsPitched", 0)) or 0 for s in logs)
+    # pitcher_role: starter if avg IP >= 4.0, reliever if < 3.0, mixed otherwise
+    avg_ip = sum(last5_ip) / len(last5_ip) if last5_ip else 0
+    pitcher_role = "starter" if avg_ip >= 4.0 else ("reliever" if avg_ip < 3.0 else "mixed")
+
+    total_ip = sum(last5_ip)
     total_er = sum(s["stat"].get("earnedRuns", 0) for s in logs)
     recent_era = round(total_er * 9 / total_ip, 2) if total_ip > 0 else None
 
@@ -143,6 +148,8 @@ def compute_pitcher_cache(player_id: int) -> dict:
         "mlb_player_id": player_id,
         "games_lookback": len(logs),
         "last5_ks": json.dumps(last5_ks),
+        "last5_ip": json.dumps(last5_ip),
+        "pitcher_role": pitcher_role,
         "season_k9": season_k9,
         "season_era": _float(season.get("era")),
         "season_whip": _float(season.get("whip")),
@@ -242,7 +249,8 @@ def compute_batter_cache(player_id: int) -> dict:
 def upsert_cache(conn: sqlite3.Connection, player: str, cache_date: str, data: dict):
     fields = [
         "player", "player_type", "cache_date", "mlb_player_id", "games_lookback",
-        "last5_ks", "season_k9", "season_era", "season_whip", "recent_era",
+        "last5_ks", "last5_ip", "pitcher_role",
+        "season_k9", "season_era", "season_whip", "recent_era",
         "split_home_era", "split_away_era",
         "x_woba_against", "x_avg_against",
         "last15_h_r_rbi", "last15_hits", "last15_ks_batter", "last15_hr", "last15_tb",
@@ -256,7 +264,8 @@ def upsert_cache(conn: sqlite3.Connection, player: str, cache_date: str, data: d
     values = [
         player, data.get("player_type"), cache_date,
         data.get("mlb_player_id"), data.get("games_lookback"),
-        data.get("last5_ks"), data.get("season_k9"), data.get("season_era"),
+        data.get("last5_ks"), data.get("last5_ip"), data.get("pitcher_role"),
+        data.get("season_k9"), data.get("season_era"),
         data.get("season_whip"), data.get("recent_era"),
         data.get("split_home_era"), data.get("split_away_era"),
         data.get("x_woba_against"), data.get("x_avg_against"),
