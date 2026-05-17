@@ -13,20 +13,17 @@ Usage:
 """
 
 import argparse
-import json
 import os
 import sqlite3
-import urllib.request
 from datetime import date, datetime
 from pathlib import Path
+from dotenv import load_dotenv
+
+from ob1 import ob1_push as _ob1_push
+
+load_dotenv(Path(__file__).parent / ".env")
 
 DB_PATH = Path(__file__).parent / "betlog.db"
-
-# OB1 capture -- optional; silently skips if env vars not set
-_SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
-_SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
-_OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-
 
 _IMPROVE_SCRIPT = Path.home() / "projects" / "core" / "workloads" / "ob1-self-improve" / "improve.py"
 
@@ -57,8 +54,6 @@ def _notion_sync(bet_id: int, update_summary: bool = False) -> None:
 
 def _trigger_self_improve() -> None:
     """Fire ob1-self-improve sports after every settled outcome. Runs in background."""
-    if not (_SUPABASE_URL and _SUPABASE_KEY and _OPENROUTER_KEY):
-        return
     if not _IMPROVE_SCRIPT.exists():
         return
     import subprocess, sys
@@ -69,44 +64,6 @@ def _trigger_self_improve() -> None:
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
-
-
-def _ob1_push(content: str, metadata: dict) -> None:
-    if not (_SUPABASE_URL and _SUPABASE_KEY and _OPENROUTER_KEY):
-        return
-    try:
-        emb_req = urllib.request.Request(
-            "https://openrouter.ai/api/v1/embeddings",
-            data=json.dumps({"model": "openai/text-embedding-3-small", "input": content}).encode(),
-            headers={"Authorization": f"Bearer {_OPENROUTER_KEY}", "Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(emb_req, timeout=20) as r:
-            embedding = json.loads(r.read())["data"][0]["embedding"]
-    except Exception:
-        embedding = None
-
-    payload = json.dumps({
-        "p_content": content,
-        "p_payload": {"metadata": {**metadata, "source": "betlog", "era": "live"}},
-    }).encode()
-    upsert_req = urllib.request.Request(
-        f"{_SUPABASE_URL}/rest/v1/rpc/upsert_thought",
-        data=payload,
-        headers={"apikey": _SUPABASE_KEY, "Authorization": f"Bearer {_SUPABASE_KEY}", "Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(upsert_req, timeout=15) as r:
-        result = json.loads(r.read())
-
-    if embedding and result and result.get("id"):
-        urllib.request.urlopen(urllib.request.Request(
-            f"{_SUPABASE_URL}/rest/v1/thoughts?id=eq.{result['id']}",
-            data=json.dumps({"embedding": embedding}).encode(),
-            headers={"apikey": _SUPABASE_KEY, "Authorization": f"Bearer {_SUPABASE_KEY}",
-                     "Content-Type": "application/json", "Prefer": "return=minimal"},
-            method="PATCH",
-        ), timeout=15).read()
 
 
 # ── schema ─────────────────────────────────────────────────────────────────────

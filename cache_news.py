@@ -19,8 +19,11 @@ import requests
 import sqlite3
 from datetime import date as date_cls, timedelta
 from pathlib import Path
+from dotenv import load_dotenv
 
-PICKS_DB = Path(__file__).parent / "mlb.db"
+from ob1 import ob1_push as _ob1_push
+
+load_dotenv(Path(__file__).parent / ".env")
 BASE = "https://statsapi.mlb.com/api/v1"
 SEASON = str(date_cls.today().year)
 
@@ -238,6 +241,14 @@ def cache_game(game_name: str, game_date: str, use_roster: bool = False):
 
     print(f"\nCLEAN ({len(clean)} players): {', '.join(p for p, *_ in clean)}")
     print(f'\nQuery: python cache_news.py --game "{game_name}" --query')
+
+    for player, team, status, note in flagged:
+        _ob1_push(
+            f"mlb injury flag: {player} ({team}) | date={game_date} game={game_name} "
+            f"status={status} note={note[:120]}",
+            {"type": "mlb_injury_flag", "player": player, "team": team,
+             "status": status, "date": game_date, "game": game_name, "agent": "cache_news"},
+        )
 
 
 def query_cache(game_name: str, game_date: str):
