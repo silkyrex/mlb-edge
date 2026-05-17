@@ -67,15 +67,30 @@ def _save_env_key(key: str, val: str) -> None:
         f.write(f"\n{key}={val}\n")
 
 
-# ── ntn block helper ───────────────────────────────────────────────────────────
+# ── ntn block helpers ──────────────────────────────────────────────────────────
 
-def _ntn_update(page_id: str, markdown: str) -> None:
+def ntn_update(page_id: str, markdown: str) -> None:
     """Replace all page block content with markdown via ntn CLI."""
     env = {**os.environ, "NOTION_API_TOKEN": _NTN_TOKEN}
     subprocess.run(
         ["ntn", "pages", "update", page_id, "--content", markdown or " "],
         env=env, check=True, capture_output=True,
     )
+
+
+def ntn_create(parent_id: str, markdown: str, parent_type: str = "page") -> str:
+    """Create a page under parent via ntn CLI. Returns new page ID."""
+    env = {**os.environ, "NOTION_API_TOKEN": _NTN_TOKEN}
+    result = subprocess.run(
+        ["ntn", "pages", "create",
+         "--parent", f"{parent_type}:{parent_id}",
+         "--content", markdown, "--json"],
+        env=env, check=True, capture_output=True, text=True,
+    )
+    try:
+        return json.loads(result.stdout).get("id", "")
+    except json.JSONDecodeError:
+        return ""
 
 
 # ── schema migration ───────────────────────────────────────────────────────────
@@ -96,7 +111,7 @@ def connect() -> sqlite3.Connection:
 
 # ── Notion API helpers (properties only) ──────────────────────────────────────
 
-def _notion_request(method: str, path: str, body: dict | None = None) -> dict:
+def notion_request(method: str, path: str, body: dict | None = None) -> dict:
     if not NOTION_TOKEN:
         raise RuntimeError("NOTION_TOKEN not set. See module docstring for setup.")
     url = f"https://api.notion.com/v1{path}"
@@ -142,12 +157,12 @@ def create_page(row: sqlite3.Row) -> str:
         "parent": {"database_id": DATABASE_ID},
         "properties": _build_properties(row),
     }
-    result = _notion_request("POST", "/pages", body)
+    result = notion_request("POST", "/pages", body)
     return result["id"]
 
 
 def update_page(page_id: str, row: sqlite3.Row) -> None:
-    _notion_request("PATCH", f"/pages/{page_id}", {"properties": _build_properties(row)})
+    notion_request("PATCH", f"/pages/{page_id}", {"properties": _build_properties(row)})
 
 
 # ── slip sync ─────────────────────────────────────────────────────────────────
@@ -192,7 +207,7 @@ def _write_pick_blocks(page_id: str, conn: sqlite3.Connection, slip_id: int) -> 
         game = f"  ({sp['game']})" if sp["game"] else ""
         line = f"{sp['side']} {sp['line']}"
         lines.append(f"- {sp['player']}  |  {sp['stat']}  |  {line}{game}{actual}{hit_tag}{reason}")
-    _ntn_update(page_id, "\n".join(lines))
+    ntn_update(page_id, "\n".join(lines))
 
 
 def sync_slip(slip_id: int):
@@ -205,14 +220,14 @@ def sync_slip(slip_id: int):
     props = _build_slip_properties(row)
     if not row["notion_page_id"]:
         body = {"parent": {"database_id": DATABASE_ID}, "properties": props}
-        result = _notion_request("POST", "/pages", body)
+        result = notion_request("POST", "/pages", body)
         page_id = result["id"]
         conn.execute("UPDATE slips SET notion_page_id = ? WHERE id = ?", (page_id, slip_id))
         conn.commit()
         print(f"created slip #{slip_id} -> {page_id[:8]}...")
     else:
         page_id = row["notion_page_id"]
-        _notion_request("PATCH", f"/pages/{page_id}", {"properties": props})
+        notion_request("PATCH", f"/pages/{page_id}", {"properties": props})
         print(f"updated slip #{slip_id} ({row['status']})")
     _write_pick_blocks(page_id, conn, slip_id)
     conn.close()
@@ -226,7 +241,7 @@ def sync_all_slips():
         props = _build_slip_properties(row)
         if not row["notion_page_id"]:
             body = {"parent": {"database_id": DATABASE_ID}, "properties": props}
-            result = _notion_request("POST", "/pages", body)
+            result = notion_request("POST", "/pages", body)
             page_id = result["id"]
             conn.execute("UPDATE slips SET notion_page_id = ? WHERE id = ?", (page_id, row["id"]))
             conn.commit()
@@ -234,7 +249,7 @@ def sync_all_slips():
             created += 1
         else:
             page_id = row["notion_page_id"]
-            _notion_request("PATCH", f"/pages/{page_id}", {"properties": props})
+            notion_request("PATCH", f"/pages/{page_id}", {"properties": props})
             print(f"  updated slip #{row['id']} ({row['status']})")
             updated += 1
         _write_pick_blocks(page_id, conn, row["id"])
@@ -287,7 +302,7 @@ def _get_or_create_summary_page() -> str:
     global _SUMMARY_PAGE_ID
     if _SUMMARY_PAGE_ID:
         return _SUMMARY_PAGE_ID
-    result = _notion_request("POST", "/pages", {
+    result = notion_request("POST", "/pages", {
         "parent": {"page_id": "9d23fc7feed448a994c7543ce29a593d"},
         "properties": {"title": [{"text": {"content": "P&L Summary"}}]},
     })
@@ -345,7 +360,7 @@ def post_summary() -> None:
     else:
         lines.append("None.")
 
-    _ntn_update(page_id, "\n".join(lines))
+    ntn_update(page_id, "\n".join(lines))
     print(f"Summary updated -> {page_id[:8]}...")
 
 

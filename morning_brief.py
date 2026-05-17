@@ -15,7 +15,6 @@ import json
 import os
 import re
 import sqlite3
-import urllib.request as _ur
 import requests
 from datetime import date as date_cls, timedelta
 from pathlib import Path
@@ -25,6 +24,7 @@ load_dotenv(Path(__file__).parent / ".env")
 
 from cache_stats import compute_pitcher_cache, upsert_cache
 from cache_espn import fetch_espn_pitchers, match_name as espn_match
+from notion_sync import notion_request, ntn_create, NOTION_TOKEN as _NS_NOTION_TOKEN
 
 BASE = "https://statsapi.mlb.com/api/v1"
 SEASON = str(date_cls.today().year)
@@ -32,8 +32,6 @@ PICKS_DB = Path(__file__).parent / "mlb.db"
 WEBHOOK_URL = os.getenv("SPORTS_WEBHOOK_URL", "")
 
 # ── Notion config ──────────────────────────────────────────────────────────────
-NOTION_TOKEN = os.getenv("NOTION_TOKEN", "")
-NOTION_VERSION = "2022-06-28"
 _SETUP_PAGE_ID = "9d23fc7feed448a994c7543ce29a593d"
 _BRIEFS_PAGE_KEY = "NOTION_BRIEFS_PAGE_ID"
 _env_file = Path(__file__).parent / ".env"
@@ -50,29 +48,14 @@ def _save_env_key(key: str, val: str) -> None:
     with open(_env_file, "a") as f:
         f.write(f"\n{key}={val}\n")
 
-if not NOTION_TOKEN:
-    NOTION_TOKEN = _load_env_key("NOTION_TOKEN")
-
 _BRIEFS_PAGE_ID = os.getenv(_BRIEFS_PAGE_KEY, "") or _load_env_key(_BRIEFS_PAGE_KEY)
-
-
-def _notion_req(method: str, path: str, body: dict | None = None) -> dict:
-    url = f"https://api.notion.com/v1{path}"
-    data = json.dumps(body).encode() if body else None
-    req = _ur.Request(url, data=data, method=method, headers={
-        "Authorization": f"Bearer {NOTION_TOKEN}",
-        "Notion-Version": NOTION_VERSION,
-        "Content-Type": "application/json",
-    })
-    with _ur.urlopen(req, timeout=15) as r:
-        return json.loads(r.read())
 
 
 def _get_or_create_briefs_page() -> str:
     global _BRIEFS_PAGE_ID
     if _BRIEFS_PAGE_ID:
         return _BRIEFS_PAGE_ID
-    result = _notion_req("POST", "/pages", {
+    result = notion_request("POST", "/pages", {
         "parent": {"page_id": _SETUP_PAGE_ID},
         "properties": {"title": [{"text": {"content": "Game Day Briefs"}}]},
     })
@@ -82,47 +65,35 @@ def _get_or_create_briefs_page() -> str:
     return _BRIEFS_PAGE_ID
 
 
-def _brief_to_blocks(brief_text: str) -> list:
-    blocks = []
+def _brief_to_markdown(brief_text: str, game_date: str) -> str:
+    """Convert Discord-formatted brief text to Notion markdown."""
+    out = [f"# Brief -- {game_date}", ""]
     for line in brief_text.splitlines():
         stripped = line.strip()
         if not stripped:
-            blocks.append({"object": "block", "type": "paragraph", "paragraph": {"rich_text": []}})
-            continue
-        if stripped.startswith("**MLB Brief"):
-            text = stripped.replace("**", "").strip()
-            blocks.append({"object": "block", "type": "heading_1", "heading_1": {"rich_text": [{"type": "text", "text": {"content": text}}]}})
-        elif stripped.startswith("**") and "@" in stripped:
-            text = stripped.replace("**", "").strip()
-            blocks.append({"object": "block", "type": "heading_2", "heading_2": {"rich_text": [{"type": "text", "text": {"content": text}}]}})
+            out.append("")
+        elif stripped.startswith("**MLB Brief"):
+            out.append(f"## {stripped.replace('**', '').strip()}")
         elif stripped.startswith("**Recent IL"):
-            text = stripped.replace("**", "").strip()
-            blocks.append({"object": "block", "type": "heading_3", "heading_3": {"rich_text": [{"type": "text", "text": {"content": text}}]}})
+            out.append(f"### {stripped.replace('**', '').strip()}")
+        elif stripped.startswith("**") and "@" in stripped:
+            out.append(f"## {stripped.replace('**', '').strip()}")
         elif line.startswith("  "):
-            blocks.append({"object": "block", "type": "bulleted_list_item", "bulleted_list_item": {"rich_text": [{"type": "text", "text": {"content": stripped}}]}})
-        elif stripped.startswith("_") and stripped.endswith("_"):
-            text = stripped.strip("_")
-            blocks.append({"object": "block", "type": "paragraph", "paragraph": {"rich_text": [{"type": "text", "text": {"content": text}, "annotations": {"italic": True}}]}})
+            out.append(f"- {stripped}")
         else:
-            blocks.append({"object": "block", "type": "paragraph", "paragraph": {"rich_text": [{"type": "text", "text": {"content": stripped}}]}})
-    return blocks
+            out.append(stripped)
+    return "\n".join(out)
 
 
 def post_to_notion(brief_text: str, game_date: str) -> None:
-    if not NOTION_TOKEN:
+    if not _NS_NOTION_TOKEN:
         print("NOTION_TOKEN not set -- skipping Notion post.")
         return
     parent_id = _get_or_create_briefs_page()
-    blocks = _brief_to_blocks(brief_text)
-    result = _notion_req("POST", "/pages", {
-        "parent": {"page_id": parent_id},
-        "properties": {"title": [{"text": {"content": f"Brief -- {game_date}"}}]},
-        "children": blocks[:100],
-    })
-    page_id = result["id"]
-    if len(blocks) > 100:
-        _notion_req("PATCH", f"/blocks/{page_id}/children", {"children": blocks[100:]})
-    print(f"Brief posted to Notion -> {page_id[:8]}...")
+    markdown = _brief_to_markdown(brief_text, game_date)
+    page_id = ntn_create(parent_id, markdown)
+    tag = f"{page_id[:8]}..." if page_id else "(id unavailable)"
+    print(f"Brief posted to Notion -> {tag}")
 
 ERA_ELITE = 3.00
 ERA_FADE  = 4.50
