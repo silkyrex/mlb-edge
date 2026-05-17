@@ -28,7 +28,7 @@ from pathlib import Path
 import requests
 
 MLB_DB = Path(__file__).parent / "mlb.db"
-BETLOG_DB = Path(__file__).parent / "sliplog.db"
+SLIPLOG_DB = Path(__file__).parent / "sliplog.db"
 
 MODEL_IDS = {
     "sonnet": "claude-sonnet-4-6",
@@ -49,7 +49,7 @@ def parse_args() -> argparse.Namespace:
 def build_data_brief(target_date: str, game_filter: str | None) -> str:
     mlb = sqlite3.connect(MLB_DB)
     mlb.row_factory = sqlite3.Row
-    bet = sqlite3.connect(BETLOG_DB)
+    bet = sqlite3.connect(SLIPLOG_DB)
     bet.row_factory = sqlite3.Row
 
     where = "scraped_date = ?"
@@ -369,6 +369,16 @@ If fewer than 3 picks survive, output what remains -- do not force weak picks to
 _STATS_BASE = "https://statsapi.mlb.com/api/v1"
 
 
+def _fmt(val, decimals: int = 2) -> str:
+    """Round a numeric API value to a readable string."""
+    if val is None:
+        return "n/a"
+    try:
+        return f"{float(val):.{decimals}f}"
+    except (ValueError, TypeError):
+        return str(val)
+
+
 def extract_candidate_players(scout_output: str, target_date: str) -> list[tuple[str, str, int]]:
     """
     Return (player_name, player_type, mlb_player_id) for players mentioned
@@ -391,8 +401,8 @@ def extract_candidate_players(scout_output: str, target_date: str) -> list[tuple
         pid = row["mlb_player_id"]
         if pid in seen:
             continue
-        last = row["player"].split()[-1].lower()
-        if last in scout_lower:
+        last = re.escape(row["player"].split()[-1].lower())
+        if re.search(rf"\b{last}\b", scout_lower):
             seen.add(pid)
             candidates.append((row["player"], row["player_type"], pid))
     return candidates
@@ -498,22 +508,22 @@ def build_savant_supplement(candidates: list[tuple[str, str, int]]) -> str:
         parts = []
         if ptype == "pitcher":
             if d.get("x_fip"):
-                parts.append(f"live xFIP {d['x_fip']}")
+                parts.append(f"live xFIP {_fmt(d['x_fip'])}")
             if d.get("fip"):
-                parts.append(f"FIP {d['fip']}")
+                parts.append(f"FIP {_fmt(d['fip'])}")
             if d.get("war"):
-                parts.append(f"WAR {d['war']}")
+                parts.append(f"WAR {_fmt(d['war'], 1)}")
             if d.get("era_minus"):
-                parts.append(f"ERA- {d['era_minus']}")
+                parts.append(f"ERA- {_fmt(d['era_minus'], 0)}")
             if d.get("x_woba"):
                 parts.append(f"xwOBA-against {d['x_woba']}")
             if d.get("arsenal"):
                 parts.append(f"arsenal: {d['arsenal']}")
         else:
             if d.get("wrc_plus"):
-                parts.append(f"wRC+ {d['wrc_plus']}")
+                parts.append(f"wRC+ {_fmt(d['wrc_plus'], 0)}")
             if d.get("war"):
-                parts.append(f"WAR {d['war']}")
+                parts.append(f"WAR {_fmt(d['war'], 1)}")
             if d.get("x_woba"):
                 parts.append(f"xwOBA {d['x_woba']}")
             if d.get("x_ba"):
@@ -631,7 +641,7 @@ def print_results(picks: list[dict], scout_output: str, skeptic_output: str) -> 
         f"  Debate: Scout proposed ~{proposed} | Skeptic challenged all | "
         f"Closer kept {len(picks)} (dropped ~{dropped})"
     )
-    if isinstance(len(picks), int) and len(picks) < 3:
+    if len(picks) < 3:
         print(f"  WARNING: thin slate -- only {len(picks)} pick(s) cleared")
 
     # Sliplog command
