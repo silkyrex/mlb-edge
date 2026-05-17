@@ -88,6 +88,10 @@ def build_data_brief(target_date: str, game_filter: str | None) -> str:
     mlb.close()
     bet.close()
 
+    # Fetch game context (lineup + ump) and ump ratings -- live, not cached in DB
+    schedule_ctx = fetch_schedule_context(target_date)
+    ump_ratings = fetch_ump_ratings()
+
     # Reopen for per-game line queries (simpler with a fresh connection scoped here)
     mlb = sqlite3.connect(MLB_DB)
     mlb.row_factory = sqlite3.Row
@@ -120,6 +124,41 @@ def build_data_brief(target_date: str, game_filter: str | None) -> str:
                 )
         else:
             sections.append("\nTEAM CONTEXT: [not cached -- run cache_team.py]")
+
+        # Game context: umpire + today's lineup card
+        gctx = _match_game_ctx(game, schedule_ctx)
+        sections.append("\nGAME CONTEXT:")
+        if gctx:
+            # Umpire
+            ump = gctx.get("ump_name", "")
+            if ump:
+                ur = ump_ratings.get(ump.lower(), {})
+                if ur:
+                    acc = f"acc {_fmt(ur['accuracy_pct'], 1)}%" if ur.get("accuracy_pct") else ""
+                    err = f"err {ur['error_rate_pct']}%" if ur.get("error_rate_pct") else ""
+                    score = f"score {_fmt(ur['weighted_score'], 1)}" if ur.get("weighted_score") else ""
+                    games_str = f"{ur['games']}g"
+                    sections.append(f"  HP Ump: {ump} | {games_str} | {acc} | {err} | {score}")
+                else:
+                    sections.append(f"  HP Ump: {ump} | [no rating data this season]")
+            else:
+                sections.append("  HP Ump: [not yet assigned]")
+            # Lineups
+            for side, lineup_key, label in [
+                ("away", "away_lineup", gctx.get("away_name", "Away")),
+                ("home", "home_lineup", gctx.get("home_name", "Home")),
+            ]:
+                lineup = gctx.get(lineup_key, [])
+                if lineup and any(p["name"] for p in lineup):
+                    order = " ".join(
+                        f"{i+1}.{(p['name'].split()[-1] if p['name'] else '?')}({p['bats']})"
+                        for i, p in enumerate(lineup[:9])
+                    )
+                    sections.append(f"  {label}: {order}")
+                else:
+                    sections.append(f"  {label} lineup: [not posted yet -- check closer to game time]")
+        else:
+            sections.append("  [Game context unavailable -- schedule API returned no match]")
 
         players_in_game = mlb.execute(
             "SELECT DISTINCT player, player_type FROM mlb_game_lines "
@@ -165,11 +204,18 @@ def build_data_brief(target_date: str, game_filter: str | None) -> str:
                             fip_flag = " [ERA LUCKY]"
                         elif diff < -0.75:
                             fip_flag = " [ERA UNLUCKY]"
+                    rest_str = ""
+                    pid = stats["mlb_player_id"]
+                    if pid:
+                        rest = pitcher_days_rest(pid, target_date)
+                        if rest is not None:
+                            label = "short" if rest <= 3 else "extra" if rest >= 6 else "regular"
+                            rest_str = f" | rest {rest}d ({label})"
                     sections.append(
                         f"    ERA {era or 'n/a'} / FIP {fip or 'n/a'}{fip_flag} / "
                         f"WAR {stats['espn_war'] or 'n/a'} / K9 {stats['season_k9'] or 'n/a'} / "
                         f"K/BB {stats['espn_k_bb'] or 'n/a'} / WHIP {stats['season_whip'] or 'n/a'}"
-                        f"{l5_str}"
+                        f"{l5_str}{rest_str}"
                     )
                     home_era = stats["split_home_era"]
                     away_era = stats["split_away_era"]
@@ -306,11 +352,15 @@ Flag aggressively:
 - Small sample (< 5 recent starts/games)
 - IL return within 7 days (rust factor)
 - Low multiplier on Scout's side (market disagrees)
-- Opposing split advantage for batters
+- Opposing split advantage for batters (check lineup handedness vs pitcher arm)
 - Starter early exit risk on K props
 - ERA LUCKY flag (regression incoming)
 - ELITE offense opposing a pitcher Lower prop
 - No confirmed pick lesson backing the pick
+- Short rest (3d or less) -- fewer Ks, worse command
+- Extra rest (6d+) -- potential rust, rough first inning
+- HP umpire with high error rate or tight zone tendency -- suppresses K props
+- Lineup missing a key bat (star sitting) -- reduces opposing K exposure or H+R+RBI ceiling
 
 Write as numbered list matching Scout's numbering. Be brutal -- if a pick has no strong counter, say clearly why."""
 
@@ -339,6 +389,10 @@ SELECTION RULES:
 - FLAG: if live Statcast data contradicts Scout's thesis (e.g. xFIP much higher than FIP, velocity down,
   wRC+ trending negative), either drop the pick or explicitly note the conflict in the reason string
 - FLAG: if live Statcast data validates Skeptic's counter, weight that counter more heavily
+- FLAG: ump with high error_rate or low accuracy -- downgrade K props for both pitchers in that game
+- FLAG: short rest pitcher (3d) -- reduce confidence on K Higher props; Extra rest (6d+) -- note rust risk
+- FLAG: lineup missing a key bat -- reduces H+R+RBI ceiling for that team's batters
+- NOTE: lineup handedness is provided -- use batter hand vs pitcher arm to validate or challenge split-based picks
 
 For each surviving pick, write a 'reason' string (1-2 tight sentences):
   "[Key stat evidence with numbers, including any live Statcast metric that clinches the case].
@@ -363,7 +417,7 @@ Schema for each pick object:
 If fewer than 3 picks survive, output what remains -- do not force weak picks to reach a minimum."""
 
 # ---------------------------------------------------------------------------
-# Live Statcast fetch (MLB Stats API -- same data source as Baseball Savant)
+# Shared MLB Stats API helpers
 # ---------------------------------------------------------------------------
 
 _STATS_BASE = "https://statsapi.mlb.com/api/v1"
@@ -377,6 +431,130 @@ def _fmt(val, decimals: int = 2) -> str:
         return f"{float(val):.{decimals}f}"
     except (ValueError, TypeError):
         return str(val)
+
+
+# ---------------------------------------------------------------------------
+# Game context: lineup card + umpire + pitcher days rest
+# Fetched inline in build_data_brief() -- no DB cache (lineup changes pre-game)
+# ---------------------------------------------------------------------------
+
+def fetch_schedule_context(target_date: str) -> dict[str, dict]:
+    """
+    Single MLB Stats API call: lineups + HP umpire for all today's games.
+    Returns {"{Away} @ {Home}": {ump_name, away_lineup, home_lineup, away_name, home_name}}
+    """
+    try:
+        r = requests.get(
+            f"{_STATS_BASE}/schedule",
+            params={"sportId": 1, "date": target_date, "hydrate": "lineups,officials"},
+            timeout=10,
+            headers={"User-Agent": "mlb-edge/1.0"},
+        )
+        r.raise_for_status()
+        dates = r.json().get("dates", [])
+        games = dates[0].get("games", []) if dates else []
+    except Exception:
+        return {}
+
+    result = {}
+    for g in games:
+        away_name = g.get("teams", {}).get("away", {}).get("team", {}).get("name", "")
+        home_name = g.get("teams", {}).get("home", {}).get("team", {}).get("name", "")
+
+        ump_name = ""
+        for off in g.get("officials", []):
+            if off.get("officialType") == "Home Plate":
+                ump_name = off.get("official", {}).get("fullName", "")
+                break
+
+        lineups = g.get("lineups", {})
+        def _parse_lineup(players: list) -> list[dict]:
+            return [
+                {"name": p.get("person", {}).get("fullName", ""), "bats": p.get("batSide", {}).get("code", "?")}
+                for p in players
+            ]
+
+        result[f"{away_name} @ {home_name}"] = {
+            "ump_name": ump_name,
+            "away_lineup": _parse_lineup(lineups.get("awayPlayers", [])),
+            "home_lineup": _parse_lineup(lineups.get("homePlayers", [])),
+            "away_name": away_name,
+            "home_name": home_name,
+        }
+    return result
+
+
+def fetch_ump_ratings() -> dict[str, dict]:
+    """
+    Fetch season ump ratings from umpscorecards.com.
+    Returns {ump_name_lower: {name, games, accuracy_pct, error_rate_pct, weighted_score}}
+    """
+    try:
+        r = requests.get(
+            "https://umpscorecards.com/api/umpires",
+            timeout=10,
+            headers={"User-Agent": "mlb-edge/1.0"},
+        )
+        r.raise_for_status()
+        rows = r.json().get("rows", [])
+    except Exception:
+        return {}
+
+    result = {}
+    for row in rows:
+        name = row.get("umpire", "")
+        if not name:
+            continue
+        called = row.get("called_pitches_sum") or 0
+        wrong = row.get("called_wrong_sum") or 0
+        result[name.lower()] = {
+            "name": name,
+            "games": row.get("n", 0),
+            "accuracy_pct": row.get("overall_accuracy_wmean"),
+            "error_rate_pct": round(wrong / called * 100, 1) if called else None,
+            "weighted_score": row.get("weighted_score"),
+        }
+    return result
+
+
+def _match_game_ctx(game_str: str, ctx_map: dict[str, dict]) -> dict | None:
+    """
+    Fuzzy-match mlb_game_lines.game string (e.g. 'Los Angeles Dodgers @ Los Angeles Angels'
+    or 'LAD @ LAA') against schedule API full team names.
+    Matches on last word of each team name (e.g. 'Dodgers', 'Angels').
+    """
+    if not ctx_map:
+        return None
+    if game_str in ctx_map:
+        return ctx_map[game_str]
+    game_lower = game_str.lower()
+    for ctx in ctx_map.values():
+        away_last = ctx.get("away_name", "").split()[-1].lower()
+        home_last = ctx.get("home_name", "").split()[-1].lower()
+        if away_last and home_last and away_last in game_lower and home_last in game_lower:
+            return ctx
+    return None
+
+
+def pitcher_days_rest(player_id: int, target_date: str) -> int | None:
+    """Days since last pitching appearance. None if no recent game log."""
+    splits = _stats_get(player_id, "gameLog", "pitching")
+    if not splits:
+        return None
+    today = date.fromisoformat(target_date)
+    past_dates = []
+    for s in splits:
+        d_str = s.get("date")
+        if d_str:
+            try:
+                d = date.fromisoformat(d_str)
+                if d < today:
+                    past_dates.append(d)
+            except ValueError:
+                pass
+    if not past_dates:
+        return None
+    return (today - max(past_dates)).days
 
 
 def extract_candidate_players(scout_output: str, target_date: str) -> list[tuple[str, str, int]]:
