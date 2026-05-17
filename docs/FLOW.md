@@ -79,8 +79,8 @@ python sliplog.py add \
   --entry 20 --payout 77.80 --multiplier "3.89x" \
   --notes "UNDER LEAN -- Civale ELITE / SF FADE" \
   --picks '[
-    {"player":"Aaron Civale","player_type":"pitcher","stat":"Strikeouts","line":5.5,"side":"Higher","game":"SF @ OAK"},
-    {"player":"Matt Chapman","player_type":"batter","stat":"Batter Strikeouts","line":1.5,"side":"Higher","game":"SF @ OAK"}
+    {"player":"Aaron Civale","player_type":"pitcher","stat":"Strikeouts","line":5.5,"side":"Higher","game":"SF @ OAK","reason":"ELITE ERA 2.54, L5 Ks above line, UNDER lean aligns"},
+    {"player":"Matt Chapman","player_type":"batter","stat":"Batter Strikeouts","line":1.5,"side":"Higher","game":"SF @ OAK","reason":"FADE lineup, high K rate"}
   ]'
 ```
 
@@ -106,6 +106,8 @@ python sliplog.py list --all --detailed          # all slips with per-pick rows 
 # Underdog slip -- settle with per-pick outcomes (auto-fires pick_lessons.observe)
 python sliplog.py result --id 6 --result loss \
   --outcomes '{"Aaron Civale":4,"Matt Chapman":0}'
+
+# Notion pages auto-update after result (slip + summary)
 
 # Single-bet flow
 python settle.py                      # see current stats for all open bets

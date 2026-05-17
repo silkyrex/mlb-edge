@@ -107,7 +107,7 @@ python betlog.py summary
 
 # Log an Underdog pick-em slip with full per-pick structure
 python sliplog.py add --entry 20 --payout 77.80 --multiplier "3.89x" \
-  --picks '[{"player":"Trevor McDonald","player_type":"pitcher","stat":"Strikeouts","line":4.5,"side":"Higher","game":"SF @ OAK"}]'
+  --picks '[{"player":"Trevor McDonald","player_type":"pitcher","stat":"Strikeouts","line":4.5,"side":"Higher","game":"SF @ OAK","reason":"ELITE ERA 2.30, L5 Ks 6,7,5,8,6 all above line"}]'
 
 # Settle a slip with per-pick outcomes (auto-fires pick_lessons.observe per pick)
 python sliplog.py result --id 1 --result loss --outcomes '{"Trevor McDonald":3}'
@@ -140,7 +140,8 @@ python pick_lessons.py review --graveyard   # falsified rules
 | `cache_tomorrow.py` | Night-before IL pre-cache for all of tomorrow's games. Called by daily.sh. |
 | `settle.py` | Box score lookup for open bets, W/L settlement. Auto-captures result to OB1 with FIP context. |
 | `betlog.py` | Single-bet log (American odds) -- add, result, list, summary |
-| `sliplog.py` | Underdog pick-em slip log -- add (with --picks JSON), result (with --outcomes JSON auto-fires pick_lessons), add-picks (retrofit), list (--detailed for per-pick view), picks (per-slip detail), summary |
+| `sliplog.py` | Underdog pick-em slip log -- add (with --picks JSON), result (with --outcomes JSON auto-fires pick_lessons), add-picks (retrofit), list (--detailed for per-pick view), picks (per-slip detail), summary. Auto-syncs to Notion after result. |
+| `notion_sync.py` | Sync slips + summary to Notion. Block content via ntn CLI; properties via REST API. Auto-triggered by sliplog.py result. `--slip N`, `--slips`, `--summary`. |
 | `pick_lessons.py` | Auto-generated rule tracker. Observe per-pick outcomes; rules graduate watching → confirmed at 3 same-direction occurrences. Confirmed rules push to OB1 + sports/insights.md. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles |
 | `player.py` | Per-pitcher start log, per-batter game log + splits, head-to-head |
@@ -166,7 +167,7 @@ python pick_lessons.py review --graveyard   # falsified rules
 |---|---|
 | `bets` | Single-bet log (American odds) -- managed by `betlog.py` |
 | `slips` | Underdog multi-pick slip log -- managed by `sliplog.py` |
-| `slip_picks` | Per-pick structure for each slip (player, stat, line, side, game, actual, hit). Populated by `sliplog.py add --picks` or `add-picks` retrofit. |
+| `slip_picks` | Per-pick structure for each slip (player, stat, line, side, game, actual, hit, reason). reason = why the pick was made. Populated by `sliplog.py add --picks` or `add-picks` retrofit. |
 | `pick_lessons` | Auto-generated rule tracker. rule_key uniqueness, status (watching/confirmed/falsified/under_review), evidence (JSON). Managed by `pick_lessons.py`. |
 
 > `~/sports/dfs/picks.db` is the NBA-only shared sports DB. **MLB scripts never touch it.**
@@ -202,5 +203,9 @@ cd mlb-edge
 cp .env.example .env
 # Edit .env: SPORTS_WEBHOOK_URL, MLB_EDGE_DIR, PYTHON_BIN, OB1_MCP_URL
 pip install -r requirements.txt
+
+# Install Notion CLI (for notion_sync.py block writes)
+# Add NOTION_API_TOKEN to ~/.config/credentials/notion.env
+
 launchctl load ~/Library/LaunchAgents/com.mlb-edge.morning-brief.plist
 ```

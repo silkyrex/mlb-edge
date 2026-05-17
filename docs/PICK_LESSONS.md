@@ -196,6 +196,13 @@ python sliplog.py result --id 6 --result loss \
 Shipped post-v1.5 follow-up (e5abc92):
 - [x] `sliplog.py list --detailed` and `sliplog.py picks --slip-id N` for per-pick visibility
 
+Shipped 2026-05-16 (v1.6 -- reason capture + Notion sync):
+- [x] `reason` column added to `slip_picks` table -- captures why each pick was made
+- [x] `sliplog.py add --picks` JSON now accepts `reason` field per pick
+- [x] `sliplog.py result` auto-syncs to Notion (sync_slip + post_summary) after settle; non-fatal on error
+- [x] `notion_sync.py` block writes migrated to ntn CLI (ntn pages update); token from ~/.config/credentials/notion.env
+- [x] `notion_sync.py --slips` and `--slip N` flags added
+
 Deferred to v2:
 - [ ] Backfill subcommand over historical settled rows (low priority — most legacy slips lack per-pick context to regenerate)
 - [ ] `/lessons-review` skill wrapper (CLI works for now)
