@@ -115,6 +115,10 @@ python sliplog.py result --id 1 --result loss --outcomes '{"Trevor McDonald":3}'
 # Retrofit per-pick structure on a legacy slip
 python sliplog.py add-picks --slip-id 1 --picks '[{...}]'
 
+# Verify what got captured
+python sliplog.py list --all --detailed   # all slips with per-pick rows indented
+python sliplog.py picks --slip-id 6       # focused view for one slip
+
 # Browse the auto-generated rule tracker
 python pick_lessons.py review               # watching queue
 python pick_lessons.py review --confirmed   # active rules (applied as score modifiers)
@@ -135,7 +139,7 @@ python pick_lessons.py review --graveyard   # falsified rules
 | `cache_tomorrow.py` | Night-before IL pre-cache for all of tomorrow's games. Called by daily.sh. |
 | `settle.py` | Box score lookup for open bets, W/L settlement. Auto-captures result to OB1 with FIP context. |
 | `betlog.py` | Single-bet log (American odds) -- add, result, list, summary |
-| `sliplog.py` | Underdog pick-em slip log -- add (with --picks JSON), result (with --outcomes JSON auto-fires pick_lessons), add-picks (retrofit), list, summary |
+| `sliplog.py` | Underdog pick-em slip log -- add (with --picks JSON), result (with --outcomes JSON auto-fires pick_lessons), add-picks (retrofit), list (--detailed for per-pick view), picks (per-slip detail), summary |
 | `pick_lessons.py` | Auto-generated rule tracker. Observe per-pick outcomes; rules graduate watching → confirmed at 3 same-direction occurrences. Confirmed rules push to OB1 + sports/insights.md. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles |
 | `player.py` | Per-pitcher start log, per-batter game log + splits, head-to-head |

@@ -193,8 +193,10 @@ python sliplog.py result --id 6 --result loss \
   --outcomes '{"player one":4,"player two":15}'
 ```
 
+Shipped post-v1.5 follow-up (e5abc92):
+- [x] `sliplog.py list --detailed` and `sliplog.py picks --slip-id N` for per-pick visibility
+
 Deferred to v2:
 - [ ] Backfill subcommand over historical settled rows (low priority — most legacy slips lack per-pick context to regenerate)
 - [ ] `/lessons-review` skill wrapper (CLI works for now)
 - [ ] Wire `underdog-mlb-analyze` to read confirmed rules as score modifiers (defer until ≥5 confirmed rules exist)
-- [ ] `slip_picks` columns in `sliplog.py list` output

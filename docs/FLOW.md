@@ -99,6 +99,10 @@ python betlog.py add \
 ## After the Game
 
 ```bash
+# Verify what got captured before settling
+python sliplog.py picks --slip-id 6              # focused per-slip detail
+python sliplog.py list --all --detailed          # all slips with per-pick rows indented
+
 # Underdog slip -- settle with per-pick outcomes (auto-fires pick_lessons.observe)
 python sliplog.py result --id 6 --result loss \
   --outcomes '{"Aaron Civale":4,"Matt Chapman":0}'
