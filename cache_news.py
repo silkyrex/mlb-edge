@@ -26,6 +26,7 @@ from ob1 import ob1_push as _ob1_push
 load_dotenv(Path(__file__).parent / ".env")
 BASE = "https://statsapi.mlb.com/api/v1"
 SEASON = str(date_cls.today().year)
+PICKS_DB = Path(__file__).parent / "mlb.db"
 
 IL_PLACED_RE = re.compile(r"placed .+ on the (\d+)-day injured list", re.I)
 IL_TRANSFERRED_RE = re.compile(r"transferred .+ to the (\d+)-day injured list", re.I)
