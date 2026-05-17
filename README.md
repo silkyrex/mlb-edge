@@ -132,7 +132,7 @@ python pick_lessons.py review --graveyard   # falsified rules
 
 | Script | What it does |
 |---|---|
-| `morning_brief.py` | 9am auto-brief -- pitcher grades (ERA/FIP/WAR), IL flags → Discord. Also caches all starter stats to DB. |
+| `morning_brief.py` | 9am auto-brief -- pitcher grades (ERA/FIP/WAR), IL flags → Discord. Also caches all starter stats to DB. `--notion` posts the brief to the Notion "Game Day Briefs" page via `ntn_create` (shared from `notion_sync`). |
 | `cache_stats.py` | MLB Stats API → player_recent_stats (last 5 starts / last 15 games, splits, expected stats) |
 | `cache_espn.py` | ESPN API → adds WAR, FIP, K/BB to pitcher rows in player_recent_stats. Run after cache_stats.py. |
 | `cache_news.py` | IL status per player. `--roster` works the night before without Underdog lines. |
@@ -141,7 +141,7 @@ python pick_lessons.py review --graveyard   # falsified rules
 | `settle.py` | Box score lookup for open bets, W/L settlement. Auto-captures result to OB1 with FIP context. |
 | `betlog.py` | Single-bet log (American odds) -- add, result, list, summary |
 | `sliplog.py` | Underdog pick-em slip log -- add (with --picks JSON), result (with --outcomes JSON auto-fires pick_lessons), add-picks (retrofit), list (--detailed for per-pick view), picks (per-slip detail), summary. Auto-syncs to Notion after result. |
-| `notion_sync.py` | Sync slips + summary to Notion. Block content via ntn CLI; properties via REST API. Auto-triggered by sliplog.py result. `--slip N`, `--slips`, `--summary`. |
+| `notion_sync.py` | Sync slips + summary to Notion. Auto-triggered by sliplog.py result. `--slip N`, `--slips`, `--summary`. Exports 3 public helpers used by other scripts: `notion_request` (raw REST for properties), `ntn_update` (replace page blocks via ntn CLI), `ntn_create` (new page with markdown content via ntn CLI). The split exists because ntn has no property-mutation API. |
 | `pick_lessons.py` | Auto-generated rule tracker. Observe per-pick outcomes; rules graduate watching → confirmed at 3 same-direction occurrences. Confirmed rules push to OB1 + sports/insights.md. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles |
 | `player.py` | Per-pitcher start log, per-batter game log + splits, head-to-head |
