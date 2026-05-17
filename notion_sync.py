@@ -277,45 +277,19 @@ def post_summary() -> None:
     page_id = _get_or_create_summary_page()
 
     conn = connect()
-    settled_bets = conn.execute("SELECT * FROM bets WHERE result IS NOT NULL ORDER BY date").fetchall()
-    open_bets    = conn.execute("SELECT * FROM bets WHERE result IS NULL ORDER BY date").fetchall()
     settled_slips = conn.execute("SELECT * FROM slips WHERE status IN ('win','loss') ORDER BY date").fetchall()
     open_slips    = conn.execute("SELECT * FROM slips WHERE status = 'open' ORDER BY date").fetchall()
     conn.close()
 
-    # ── bets stats ──
-    b_wins   = sum(1 for r in settled_bets if r["result"] == "W")
-    b_losses = sum(1 for r in settled_bets if r["result"] == "L")
-    b_pushes = sum(1 for r in settled_bets if r["result"] == "P")
-    b_stake  = sum(r["stake"] for r in settled_bets) if settled_bets else 0.0
-    b_pnl    = sum(r["profit"] for r in settled_bets) if settled_bets else 0.0
-
-    # ── slips stats ──
-    s_wins   = sum(1 for r in settled_slips if r["status"] == "win")
-    s_losses = sum(1 for r in settled_slips if r["status"] == "loss")
-    s_stake  = sum(r["entry"] for r in settled_slips) if settled_slips else 0.0
-    s_pnl    = sum(r["profit"] for r in settled_slips) if settled_slips else 0.0
-
-    # ── combined ──
-    total_wins   = b_wins + s_wins
-    total_losses = b_losses + s_losses
-    total_stake  = b_stake + s_stake
-    net_pnl      = b_pnl + s_pnl
-    win_pct = total_wins / (total_wins + total_losses) * 100 if (total_wins + total_losses) else 0
-    roi     = net_pnl / total_stake * 100 if total_stake else 0
-
-    by_signal: dict = {}
-    for r in settled_bets:
-        sig = (r["signal"] or "no signal").split("--")[0].strip().lower()
-        if sig not in by_signal:
-            by_signal[sig] = {"w": 0, "l": 0, "p": 0, "profit": 0.0}
-        by_signal[sig][r["result"].lower()] += 1
-        by_signal[sig]["profit"] += r["profit"]
+    wins   = sum(1 for r in settled_slips if r["status"] == "win")
+    losses = sum(1 for r in settled_slips if r["status"] == "loss")
+    staked = sum(r["entry"] for r in settled_slips) if settled_slips else 0.0
+    pnl    = sum(r["profit"] for r in settled_slips) if settled_slips else 0.0
+    win_pct = wins / (wins + losses) * 100 if (wins + losses) else 0
+    roi     = pnl / staked * 100 if staked else 0
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M PT")
-    pnl_sign = "+" if net_pnl >= 0 else ""
-    b_sign   = "+" if b_pnl >= 0 else ""
-    s_sign   = "+" if s_pnl >= 0 else ""
+    pnl_sign = "+" if pnl >= 0 else ""
 
     def h2(t):
         return {"object": "block", "type": "heading_2", "heading_2": {"rich_text": [{"type": "text", "text": {"content": t}}]}}
@@ -328,49 +302,35 @@ def post_summary() -> None:
     def callout(t, emoji="📊"):
         return {"object": "block", "type": "callout", "callout": {"rich_text": [{"type": "text", "text": {"content": t}}], "icon": {"type": "emoji", "emoji": emoji}}}
 
-    total_settled = len(settled_bets) + len(settled_slips)
-    total_open    = len(open_bets) + len(open_slips)
-
     blocks = [
-        callout(f"Updated {now}  --  {total_settled} settled  |  {total_open} open"),
-        h2("Overall (Bets + Slips)"),
-        p(f"Record:  {total_wins}W - {total_losses}L  ({win_pct:.0f}% win rate)"),
-        p(f"Staked:  ${total_stake:.2f}"),
-        p(f"Net P&L: {pnl_sign}${net_pnl:.2f}"),
+        callout(f"Updated {now}  --  {len(settled_slips)} settled  |  {len(open_slips)} open"),
+        h2("Overall"),
+        p(f"Record:  {wins}W - {losses}L  ({win_pct:.0f}% win rate)"),
+        p(f"Staked:  ${staked:.2f}"),
+        p(f"Net P&L: {pnl_sign}${pnl:.2f}"),
         p(f"ROI:     {roi:+.1f}%"),
         divider(),
-        h2("Bets"),
-        p(f"Record:  {b_wins}W - {b_losses}L - {b_pushes}P"),
-        p(f"Staked:  ${b_stake:.2f}  |  P&L: {b_sign}${b_pnl:.2f}"),
-        h2("Underdog Slips"),
-        p(f"Record:  {s_wins}W - {s_losses}L"),
-        p(f"Staked:  ${s_stake:.2f}  |  P&L: {s_sign}${s_pnl:.2f}"),
-        divider(),
-        h2("Bets by Signal"),
+        h2("Slips"),
     ]
 
-    if by_signal:
-        for sig, s in sorted(by_signal.items(), key=lambda x: -x[1]["profit"]):
-            total = s["w"] + s["l"]
-            wp = s["w"] / total * 100 if total else 0
-            sign = "+" if s["profit"] >= 0 else ""
-            blocks.append(bullet(f"{sig:<45} {s['w']}W-{s['l']}L  {wp:.0f}%  {sign}${s['profit']:.2f}"))
-    else:
-        blocks.append(p("No settled bets yet."))
+    for r in settled_slips:
+        players = ", ".join(json.loads(r["players"]))
+        sign = "+" if r["profit"] >= 0 else ""
+        mult = r["multiplier"] or f"{r['payout']/r['entry']:.2f}x" if r["entry"] else ""
+        boost = f" [{r['boost']}]" if r["boost"] else ""
+        blocks.append(bullet(
+            f"{r['date']}  {players}{boost}  {mult}  ${r['entry']:.0f} -> "
+            f"{'WIN' if r['status']=='win' else 'LOSS'}  {sign}${r['profit']:.2f}"
+        ))
 
     blocks.append(divider())
     blocks.append(h2("Open"))
 
-    if open_bets:
-        blocks.append(p("Bets:"))
-        for r in open_bets:
-            blocks.append(bullet(f"#{r['id']}  {r['date']}  {r['matchup']}  |  {r['bet_on']}  @{r['line']:+d}  ${r['stake']:.0f}"))
     if open_slips:
-        blocks.append(p("Slips:"))
         for r in open_slips:
             players = ", ".join(json.loads(r["players"]))
             blocks.append(bullet(f"slip#{r['id']}  {r['date']}  {players}  ${r['entry']:.0f}"))
-    if not open_bets and not open_slips:
+    else:
         blocks.append(p("None."))
 
     _clear_page(page_id)
