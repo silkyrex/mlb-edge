@@ -133,6 +133,7 @@ IL return rule: IL-return-today or IL-return-Nd (N ≤ 7) = -10 to score.
 - Never edit picks.db schema without updating `schema/schema.sql` first.
 - betlog.db is append-only -- never delete or update settled rows.
 - All Underdog scraping goes through Claude skills (Playwright). No Python scraping.
+- **Logging split**: `betlog.py` (single bets) pushes to OB1 only. `sliplog.py` (Underdog slips) pushes to OB1 + Notion. Notion is the P&L dashboard and must stay slip-only -- do not re-wire `betlog.py` to Notion, or every multi-leg slip ends up logged twice.
 - Discord webhook must use `"User-Agent": "mlb-edge/1.0"` -- default Python UA gets 403.
 - `cache_stats.py`, `cache_news.py`, `cache_team.py` are idempotent -- safe to re-run same game+date.
 - `cache_news.py --roster` = night-before mode. Plain mode = game-day (uses mlb_game_lines).

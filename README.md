@@ -191,7 +191,17 @@ python pick_lessons.py review --graveyard   # falsified rules
 - **ESPN API** -- unofficial JSON endpoint. Pitcher WAR, FIP, K/BB for qualified starters (75 pitchers, updated after each outing).
 - **Underdog Sports** -- where bets are placed. Requires browser login and Playwright automation.
 - **OB1** -- semantic memory. Every settled bet is captured with full context (lean, picks, FIP flags, result). Queryable: "which stat types win under UNDER lean."
+- **Notion (MLB Edge Bet Log database)** -- visual P&L dashboard. Underdog slips only. Single-bet entries from `betlog.py` are intentionally NOT pushed here -- avoids double-counting when a multi-leg slip would otherwise be logged in both tables.
 - **Discord** -- lean signal arrives here at noon. Morning brief and settlement alerts post here.
+
+### Where each log goes
+
+| Log | OB1 (signal memory) | Notion (P&L dashboard) | Purpose |
+|---|:---:|:---:|---|
+| `betlog.py` (bets table) | yes | no | Single-bet signal capture for AI brain |
+| `sliplog.py` (slips table) | yes | yes | Actual P&L source of truth |
+
+`sliplog` is canonical for P&L; `betlog` is for tracking single American-odds bets and feeding OB1 context. Both still log to OB1 so the brain sees every wager; Notion stays clean.
 
 ---
 
