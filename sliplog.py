@@ -22,6 +22,8 @@ from ob1 import ob1_push as _ob1_push
 
 load_dotenv(Path(__file__).parent / ".env")
 
+DB_PATH = Path(__file__).parent / "betlog.db"
+
 
 def connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
