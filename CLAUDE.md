@@ -12,11 +12,14 @@ For new machine setup, copy `.env.example` → `.env` and fill in `SPORTS_WEBHOO
 ```
 Discord lean signal (12:00 PT)
   └── /playwright-underdog
-         └── /underdog-mlb [game] → picks.db [mlb_game_lines]
-                ├── cache_stats.py → picks.db [player_recent_stats]
-                ├── cache_news.py  → picks.db [player_news]
-                ├── cache_team.py  → picks.db [team_game_stats]
-                └── /underdog-mlb-analyze [game] [lean] → ranked picks → sliplog.py add
+         └── /underdog-mlb [game] → mlb.db [mlb_game_lines]
+                ├── cache_stats.py → mlb.db [player_recent_stats]
+                ├── cache_news.py  → mlb.db [player_news]
+                ├── cache_team.py  → mlb.db [team_game_stats]
+                └── /underdog-mlb-analyze [game] [lean] → ranked picks
+                       └── closer.py → 3-agent debate (Scout/Skeptic/Closer)
+                                        + live Statcast (xFIP/wRC+/arsenal)
+                                        → sliplog.py add --picks (with reason)
 ```
 
 ---
@@ -71,7 +74,7 @@ which also auto-triggers `pick_lessons.observe()` per pick.
 | `cache_team.py` | Bullpen ERA, offense K%, venue roof/dims → team_game_stats. Idempotent. |
 | `cache_tomorrow.py` | Wraps cache_news --roster for all of tomorrow's games. Called by daily.sh. |
 | `player.py` | `pitcher [name]` per-start log / `batter [name]` per-game + splits / `matchup [b] [p]` H2H |
-| `settle.py` | Live box score lookup for open bets. `--post-discord` for Discord notify. |
+| `closer.py` | 3-agent final round critique. Scout finds angles, Skeptic challenges, Closer fetches live Statcast (MLB Stats API: xFIP, wRC+, pitch arsenal) and renders 3-5 picks with reason strings. `--dry-run`, `--game`, `--model haiku`. |
 | `morning_brief.py` | 9am PT launchd -- all games + starter grades + IL returns → Discord |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player |
 | `ob1.py` | Shared OB1 push helper. Import `from ob1 import ob1_push` in any script. Auto-loads creds from `~/.config/credentials/ob1.env`. |
