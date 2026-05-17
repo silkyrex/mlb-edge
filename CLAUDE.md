@@ -81,7 +81,7 @@ which also auto-triggers `pick_lessons.observe()` per pick.
 | `betlog.py` | Bet log -- add, result, list, summary (single-pick American odds bets) |
 | `ob1.py` | Shared OB1 push helper. Import `from ob1 import ob1_push` in any script. Auto-loads creds from `~/.config/credentials/ob1.env`. |
 | `sliplog.py` | Slip log -- add, result, list (--detailed), picks (per-slip), add-picks, summary. Pushes to OB1 on add + result. `--picks` JSON captures per-pick structure; `result --outcomes` auto-triggers pick_lessons.observe per pick. `add-picks` retrofits structure to legacy slips. |
-| `pick_lessons.py` | Auto-generated rule tracker. Each settled pick → rule_key + hypothesis (deterministic classifier). Graduates `watching → confirmed` at 3 same-direction occurrences (game-deduped). Falsifies at 2 counters. Pushes to OB1 + insights.md on promotion. Subcommands: observe, list, review, falsify, resurrect, edit. |
+| `pick_lessons.py` | Auto-generated rule tracker. Each settled pick → rule_key + hypothesis (deterministic classifier). Graduates `watching → confirmed` at 3 same-direction occurrences (game-deduped). Falsifies at 2 counters. Pushes to OB1 + insights.md on promotion. Subcommands: observe, list, stats, review, falsify, resurrect, edit. |
 | `matchup.py` | team_tiers(), pitcher_tiers(), signal() -- early lean read |
 | `fetch.py` | MLB Stats API ingest (Phase 1 -- not yet active against picks.db) |
 | `schema/schema.sql` | Full DB schema. Always update before editing picks.db schema. |

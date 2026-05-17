@@ -459,6 +459,65 @@ def cmd_review(args):
         print()
 
 
+def cmd_stats(args):
+    """Operational overview: counts by status, top watching near graduation, top falsified."""
+    conn = connect()
+    rows = conn.execute("SELECT * FROM pick_lessons").fetchall()
+    conn.close()
+    if not rows:
+        print("No pick lessons yet.")
+        return
+
+    by_status = {}
+    for r in rows:
+        by_status.setdefault(r["status"], []).append(r)
+
+    print(f"\nPICK LESSONS — TOTAL {len(rows)} rule(s)")
+    print(f"  watching:    {len(by_status.get('watching', []))}")
+    print(f"  confirmed:   {len(by_status.get('confirmed', []))}")
+    print(f"  falsified:   {len(by_status.get('falsified', []))}")
+    print(f"  under_review:{len(by_status.get('under_review', []))}")
+
+    watching = by_status.get("watching", [])
+    if watching:
+        near = sorted(
+            watching,
+            key=lambda r: (-(r["occurrences"] - r["counters"]), r["counters"]),
+        )
+        print(f"\nNEAR GRADUATION (need {PROMOTION_THRESHOLD} occ + 0 cnt for confirm, {FALSIFY_THRESHOLD} cnt for falsify):")
+        for r in near[:10]:
+            occ = r["occurrences"]
+            cnt = r["counters"]
+            gap_promote = PROMOTION_THRESHOLD - occ if cnt == 0 else None
+            gap_falsify = FALSIFY_THRESHOLD - cnt if cnt > 0 else None
+            tags = []
+            if gap_promote is not None and gap_promote > 0:
+                tags.append(f"{gap_promote} to promote")
+            elif cnt > 0:
+                tags.append("blocked from promote (cnt>0)")
+            if gap_falsify is not None and gap_falsify > 0:
+                tags.append(f"{gap_falsify} to falsify")
+            tag_str = "  " + ", ".join(tags) if tags else ""
+            print(f"  [{occ}/{PROMOTION_THRESHOLD} occ, {cnt} cnt]  {r['rule_key']}{tag_str}")
+            print(f"      {r['hypothesis']}")
+
+    confirmed = by_status.get("confirmed", [])
+    if confirmed:
+        print(f"\nCONFIRMED RULES (active score modifiers):")
+        for r in sorted(confirmed, key=lambda x: -x["occurrences"])[:10]:
+            print(f"  [{r['occurrences']}/{r['counters']}]  {r['rule_key']}")
+            print(f"      {r['hypothesis']}")
+
+    falsified = by_status.get("falsified", [])
+    if falsified:
+        print(f"\nFALSIFIED RULES (graveyard, {len(falsified)} total):")
+        for r in falsified[:5]:
+            print(f"  {r['rule_key']}")
+        if len(falsified) > 5:
+            print(f"  ... ({len(falsified) - 5} more — see 'review --graveyard')")
+    print()
+
+
 def cmd_falsify(args):
     conn = connect()
     conn.execute(
@@ -513,6 +572,8 @@ def main():
     p_lst = sub.add_parser("list", help="List rules")
     p_lst.add_argument("--status", choices=["watching", "confirmed", "falsified", "under_review"])
 
+    sub.add_parser("stats", help="Operational overview: counts + near-graduation watching rules")
+
     p_rev = sub.add_parser("review", help="Review queue")
     p_rev.add_argument("--graveyard", action="store_true")
     p_rev.add_argument("--confirmed", action="store_true")
@@ -536,6 +597,8 @@ def main():
         cmd_observe(args)
     elif cmd == "list":
         cmd_list(args)
+    elif cmd == "stats":
+        cmd_stats(args)
     elif cmd == "review":
         cmd_review(args)
     elif cmd == "falsify":

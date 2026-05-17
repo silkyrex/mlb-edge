@@ -120,6 +120,7 @@ python sliplog.py list --all --detailed   # all slips with per-pick rows indente
 python sliplog.py picks --slip-id 6       # focused view for one slip
 
 # Browse the auto-generated rule tracker
+python pick_lessons.py stats                # counts + near-graduation overview
 python pick_lessons.py review               # watching queue
 python pick_lessons.py review --confirmed   # active rules (applied as score modifiers)
 python pick_lessons.py review --graveyard   # falsified rules
