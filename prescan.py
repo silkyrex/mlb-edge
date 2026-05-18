@@ -9,7 +9,6 @@ Usage:
     python prescan.py                        # today, top 3
     python prescan.py --date 2026-05-18
     python prescan.py --top 5
-    python prescan.py --refresh              # ignore cached scores, recompute
 """
 
 import argparse
@@ -248,7 +247,6 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--date", default=date_cls.today().isoformat())
     ap.add_argument("--top", type=int, default=3)
-    ap.add_argument("--refresh", action="store_true", help="recompute even if cached")
     args = ap.parse_args()
 
     season = args.date.split("-")[0]
