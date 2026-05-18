@@ -119,11 +119,15 @@ python sliplog.py add \
 python sliplog.py picks --slip-id N
 python sliplog.py list --all --detailed
 
-# Settle (auto-fires pick_lessons.observe per pick)
+# Settle Underdog slip (auto-fires pick_lessons.observe per pick)
 python sliplog.py result --id N --result win/loss \
   --outcomes '{"Aaron Civale": 4, "Matt Chapman": 0}'
-
 # Notion + OB1 update automatically after result
+
+# Settle a moneyline bet (live stats + lesson prompt)
+python settle.py --id N --settle W   # win -- shows stats, prompts for lesson
+python settle.py --id N --settle L   # loss -- shows FIP flags, prompts for lesson
+# Every settle captures type=bet_lesson to OB1. Non-empty lessons write to sports/insights.md.
 
 # Review totals and lessons
 python sliplog.py summary
