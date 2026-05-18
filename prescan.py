@@ -32,7 +32,11 @@ FIP_CONSTANT = 3.1
 PITCHER_FRIENDLY = {"Petco Park", "T-Mobile Park", "loanDepot park", "Tropicana Field", "Oracle Park", "Comerica Park"}
 HITTER_FRIENDLY = {"Coors Field", "Yankee Stadium", "Great American Ball Park", "Citizens Bank Park", "Globe Life Field"}
 
-# Dome / fixed-roof or retractable-roof venues -- weather is irrelevant
+# Dome / fixed-roof or retractable-roof venues -- weather is irrelevant.
+# T-Mobile Park is intentionally listed in BOTH this set AND PITCHER_FRIENDLY:
+# its retractable roof is usually closed for night games, so weather skip + venue
+# bonus is the right call ~90% of the time. Day games with open roof are an
+# accepted edge case we don't model.
 DOME_OR_RETRACTABLE = {
     "Tropicana Field", "Rogers Centre", "Chase Field", "Minute Maid Park",
     "Globe Life Field", "loanDepot park", "American Family Field", "T-Mobile Park",
@@ -93,26 +97,23 @@ def fetch_pitcher_stats(pitcher_id: int, season: str) -> dict:
         return {}
 
 
-def fetch_team_stats(team_id: int, season: str) -> dict:
-    """Return {ops, k_pct, avg} or {} on miss."""
+def fetch_team_k_pct(team_id: int, season: str) -> float | None:
+    """Return team K% (strikeouts / plate appearances * 100) or None on miss."""
+    if not team_id:
+        return None
     url = f"{BASE}/teams/{team_id}/stats?stats=season&group=hitting&season={season}"
     try:
         r = requests.get(url, timeout=8)
         r.raise_for_status()
         splits = r.json().get("stats", [{}])[0].get("splits", [])
         if not splits:
-            return {}
+            return None
         s = splits[0].get("stat", {})
         pa = int(s.get("plateAppearances", 0) or 0)
         so = int(s.get("strikeOuts", 0) or 0)
-        k_pct = (so / pa * 100) if pa else 0.0
-        return {
-            "ops": float(s.get("ops", 0) or 0),
-            "k_pct": k_pct,
-            "avg": float(s.get("avg", 0) or 0),
-        }
+        return (so / pa * 100) if pa else None
     except Exception:
-        return {}
+        return None
 
 
 def fip_proxy(stat: dict) -> float:
@@ -123,8 +124,10 @@ def fip_proxy(stat: dict) -> float:
     return (13 * stat.get("hr", 0) + 3 * stat.get("bb", 0) - 2 * stat.get("k", 0)) / ip + FIP_CONSTANT
 
 
-def fetch_espn_pitchers(season: str) -> dict[str, float]:
-    """Pull all qualified pitchers' FIPs from ESPN. Returns {lowercase_name: fip}."""
+def fetch_espn_pitchers(season: str) -> dict[str, dict]:
+    """Pull all qualified pitchers' stats from ESPN in one call.
+    Returns {lowercase_name: {fip, era, k_per_9, ip, k, bb, hr}}.
+    Saves ~28 redundant per-pitcher MLB-API calls per session when ESPN has the data."""
     try:
         r = requests.get(ESPN_URL.format(season=season), timeout=12)
         r.raise_for_status()
@@ -136,7 +139,7 @@ def fetch_espn_pitchers(season: str) -> dict[str, float]:
     if not pitch_cat:
         return {}
     labels = pitch_cat["labels"]
-    result: dict[str, float] = {}
+    result: dict[str, dict] = {}
     for ath in data.get("athletes", []):
         name = ath.get("athlete", {}).get("displayName", "")
         if not name:
@@ -150,21 +153,32 @@ def fetch_espn_pitchers(season: str) -> dict[str, float]:
         k = row.get("K") or 0
         bb = row.get("BB") or 0
         hr = row.get("HR") or 0
-        result[name.lower()] = round((13 * hr + 3 * bb - 2 * k) / ip + FIP_CONSTANT, 2)
+        era = row.get("ERA") or 0
+        # ESPN labels K/9 as "K/9" usually
+        k_per_9 = row.get("K/9") or (k * 9 / ip if ip else 0)
+        result[name.lower()] = {
+            "fip": round((13 * hr + 3 * bb - 2 * k) / ip + FIP_CONSTANT, 2),
+            "era": float(era),
+            "k_per_9": float(k_per_9),
+            "ip": float(ip),
+            "k": int(k),
+            "bb": int(bb),
+            "hr": int(hr),
+        }
     return result
 
 
-def lookup_espn_fip(pitcher_name: str, espn_map: dict[str, float]) -> float | None:
-    """Match by full name first, then last name. Returns FIP or None."""
+def lookup_espn(pitcher_name: str, espn_map: dict[str, dict]) -> dict | None:
+    """Match by full name first, then last name. Returns full stat dict or None."""
     if not pitcher_name:
         return None
     key = pitcher_name.lower()
     if key in espn_map:
         return espn_map[key]
     last = pitcher_name.split()[-1].lower()
-    for espn_name, fip in espn_map.items():
+    for espn_name, stats in espn_map.items():
         if espn_name.split()[-1] == last:
-            return fip
+            return stats
     return None
 
 
@@ -246,7 +260,7 @@ def fetch_weather(lat: float, lon: float, game_iso: str) -> dict:
         return {}
 
 
-def score_game(game: dict, season: str, espn_fip_map: dict[str, float]) -> dict:
+def score_game(game: dict, season: str, espn_map: dict[str, dict]) -> dict:
     teams = game.get("teams", {})
     away_t = teams.get("away", {}).get("team", {})
     home_t = teams.get("home", {}).get("team", {})
@@ -254,36 +268,43 @@ def score_game(game: dict, season: str, espn_fip_map: dict[str, float]) -> dict:
     home_pp = teams.get("home", {}).get("probablePitcher") or {}
     venue = (game.get("venue") or {}).get("name", "?")
 
-    game_str = f"{away_t.get('abbreviation') or away_t.get('teamCode') or away_t.get('name','?')} @ {home_t.get('abbreviation') or home_t.get('teamCode') or home_t.get('name','?')}"
+    # Always use full team names for cross-table join stability with mlb_game_lines
+    game_str = f"{away_t.get('name', '?')} @ {home_t.get('name', '?')}"
 
-    # Parallel fetch
+    # ESPN-first pitcher lookup; only hit MLB API when ESPN doesn't have the pitcher
+    # (debutants, low-IP swingmen). Saves ~28 redundant API calls per session.
+    away_espn = lookup_espn(away_pp.get("fullName"), espn_map)
+    home_espn = lookup_espn(home_pp.get("fullName"), espn_map)
     away_pid = away_pp.get("id")
     home_pid = home_pp.get("id")
     away_tid = away_t.get("id")
     home_tid = home_t.get("id")
 
     with ThreadPoolExecutor(max_workers=4) as pool:
-        f_ap = pool.submit(fetch_pitcher_stats, away_pid, season)
-        f_hp = pool.submit(fetch_pitcher_stats, home_pid, season)
-        f_at = pool.submit(fetch_team_stats, away_tid, season)
-        f_ht = pool.submit(fetch_team_stats, home_tid, season)
-        ap_stat = f_ap.result()
-        hp_stat = f_hp.result()
-        at_stat = f_at.result()
-        ht_stat = f_ht.result()
+        f_ap = None if away_espn else pool.submit(fetch_pitcher_stats, away_pid, season)
+        f_hp = None if home_espn else pool.submit(fetch_pitcher_stats, home_pid, season)
+        f_at = pool.submit(fetch_team_k_pct, away_tid, season)
+        f_ht = pool.submit(fetch_team_k_pct, home_tid, season)
+        ap_stat = away_espn or (f_ap.result() if f_ap else {})
+        hp_stat = home_espn or (f_hp.result() if f_hp else {})
+        at_k_pct = f_at.result()
+        ht_k_pct = f_ht.result()
 
-    # 1. Pitcher grade asymmetry (35%): max 10 when one elite + one fade
-    ap_fip = lookup_espn_fip(away_pp.get("fullName"), espn_fip_map)
-    hp_fip = lookup_espn_fip(home_pp.get("fullName"), espn_fip_map)
+    # 1. Pitcher edge (35%): rewards both-quality AND asymmetry.
+    # max() drives the base (both elite = high), asymmetry adds bonus for elite-vs-fade.
+    # Old formula (min(...) + asymmetry) penalized two-elite K-shootouts -- fixed in Mark III review.
+    ap_fip = ap_stat.get("fip") if away_espn else None
+    hp_fip = hp_stat.get("fip") if home_espn else None
     g1 = grade_pitcher(ap_stat, ap_fip)
     g2 = grade_pitcher(hp_stat, hp_fip)
-    pitcher_edge = min(10, abs(g1 - g2) + min(g1, g2) * 0.2)  # asymmetry + floor for "both quality"
+    pitcher_edge = min(10, max(g1, g2) * 0.7 + abs(g1 - g2) * 0.5)
 
     # 2. Team K-rate gap (25%): how different the two lineups' K% are
-    k_pct_diff = abs(at_stat.get("k_pct", 22) - ht_stat.get("k_pct", 22))
+    k_pct_diff = abs((at_k_pct or 22) - (ht_k_pct or 22))
     k_gap = min(10, k_pct_diff * 1.5)  # 6.7pp diff -> 10
 
-    # 3. Venue (20%)
+    # 3. Venue (20%): pitcher-friendly = 8 (K Over edges), hitter-friendly = 7 (HRR edges),
+    # neutral = 5. Asymmetric weights reflect that K-prop edges are sharper in pitcher parks.
     if venue in PITCHER_FRIENDLY:
         venue_score = 8
     elif venue in HITTER_FRIENDLY:
@@ -327,8 +348,8 @@ def score_game(game: dict, season: str, espn_fip_map: dict[str, float]) -> dict:
             "home_grade": g2,
             "away_fip_espn": ap_fip,
             "home_fip_espn": hp_fip,
-            "away_team_k_pct": round(at_stat.get("k_pct", 0), 1),
-            "home_team_k_pct": round(ht_stat.get("k_pct", 0), 1),
+            "away_team_k_pct": round(at_k_pct, 1) if at_k_pct is not None else None,
+            "home_team_k_pct": round(ht_k_pct, 1) if ht_k_pct is not None else None,
             "venue": venue,
             "postponed": postponed,
             "weather": weather,
@@ -377,13 +398,13 @@ def run_rank(target_date: str, top_n: int):
         return
 
     print(f"Scoring {len(games)} games for {target_date}...")
-    espn_fip_map = fetch_espn_pitchers(season)
-    if espn_fip_map:
-        print(f"  ESPN FIP loaded for {len(espn_fip_map)} qualified pitchers")
+    espn_map = fetch_espn_pitchers(season)
+    if espn_map:
+        print(f"  ESPN loaded for {len(espn_map)} qualified pitchers (saves per-pitcher MLB API calls)")
     else:
-        print("  ESPN FIP unavailable -- falling back to MLB-API-derived fip_proxy")
+        print("  ESPN unavailable -- falling back to per-pitcher MLB API calls")
     with ThreadPoolExecutor(max_workers=6) as pool:
-        results = list(pool.map(lambda g: score_game(g, season, espn_fip_map), games))
+        results = list(pool.map(lambda g: score_game(g, season, espn_map), games))
 
     ranked = sorted(results, key=lambda r: r["score"], reverse=True)
     persist(target_date, ranked)
@@ -394,9 +415,10 @@ def run_backtest(since: str | None):
     """Rank-vs-survivor correlation. Needs >=7 days of pre_scan_scores history."""
     conn = sqlite3.connect(MLB_DB)
     conn.row_factory = sqlite3.Row
-    where = "" if not since else f"WHERE date >= '{since}'"
+    where_sql = "WHERE date >= ?" if since else ""
+    params = (since,) if since else ()
     dates = [r[0] for r in conn.execute(
-        f"SELECT DISTINCT date FROM pre_scan_scores {where} ORDER BY date"
+        f"SELECT DISTINCT date FROM pre_scan_scores {where_sql} ORDER BY date", params
     ).fetchall()]
     if len(dates) < BACKTEST_MIN_DAYS:
         print(f"Insufficient data: {len(dates)} day(s) in pre_scan_scores, need {BACKTEST_MIN_DAYS}+.")
@@ -409,9 +431,9 @@ def run_backtest(since: str | None):
     # Stub for now: report shape only.
     counts = conn.execute(f"""
         SELECT date, COUNT(*) as games, ROUND(AVG(score),2) as avg_score, ROUND(MAX(score),2) as max_score
-        FROM pre_scan_scores {where}
+        FROM pre_scan_scores {where_sql}
         GROUP BY date ORDER BY date
-    """).fetchall()
+    """, params).fetchall()
     print(f"\nBacktest summary ({len(dates)} days):\n")
     print(f"{'Date':<12} {'Games':>6} {'Avg':>6} {'Max':>6}")
     for r in counts:
