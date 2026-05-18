@@ -15,6 +15,7 @@ import json
 import os
 import re
 import sqlite3
+import sys
 import requests
 from datetime import date as date_cls, timedelta
 from pathlib import Path
@@ -30,6 +31,7 @@ BASE = "https://statsapi.mlb.com/api/v1"
 SEASON = str(date_cls.today().year)
 PICKS_DB = Path(__file__).parent / "mlb.db"
 WEBHOOK_URL = os.getenv("SPORTS_WEBHOOK_URL", "")
+QA_WEBHOOK = os.getenv("DISCORD_QA_WEBHOOK", "")
 
 # ── Notion config ──────────────────────────────────────────────────────────────
 _SETUP_PAGE_ID = "9d23fc7feed448a994c7543ce29a593d"
@@ -322,6 +324,37 @@ def post_to_discord(message: str):
         print(f"Discord post failed: {r.status_code} {r.text}")
 
 
+def _post_qa_status(message: str) -> None:
+    if not QA_WEBHOOK:
+        return
+    try:
+        requests.post(QA_WEBHOOK, json={"content": message},
+                      headers={"User-Agent": "mlb-edge/1.0"}, timeout=10)
+    except Exception as e:
+        print(f"QA webhook post failed: {e}")
+
+
+def validate_brief(brief: str) -> tuple[bool, str, bool]:
+    """Return (hard_fail, reason, soft_warn).
+
+    hard_fail=True means don't post -- output is broken.
+    soft_warn=True means post with a warning prefix.
+    """
+    if len(brief) <= 200:
+        return True, "brief too short -- likely empty output", False
+    if "No games found" in brief:
+        return True, "no games found for date", False
+    if "Away:" not in brief:
+        return True, "no game sections found in brief", False
+
+    lines = brief.splitlines()
+    missing = brief.count("[?]")
+    if lines and missing / len(lines) > 0.30:
+        return False, f"{missing} missing stat markers ({missing / len(lines):.0%} of lines)", True
+
+    return False, "", False
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default=str(date_cls.today() + timedelta(days=1)),
@@ -332,6 +365,19 @@ def main():
 
     brief = build_brief(args.date)
     print(brief)
+
+    hard_fail, reason, soft_warn = validate_brief(brief)
+    if hard_fail:
+        msg = f"[QA FAIL mlb-brief: {reason}]"
+        print(msg)
+        _post_qa_status(msg)
+        if args.post:
+            post_to_discord(msg)
+        sys.exit(1)
+    if soft_warn:
+        warn_msg = f"[QA WARN mlb-brief: {reason}]"
+        print(warn_msg)
+        _post_qa_status(warn_msg)
 
     if args.post:
         post_to_discord(brief)
