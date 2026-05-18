@@ -9,6 +9,7 @@ Usage:
     python prescan.py                        # today, top 3
     python prescan.py --date 2026-05-18
     python prescan.py --top 5
+    python prescan.py backtest               # rank-vs-survivor correlation (needs 7+ days)
 """
 
 import argparse
@@ -30,6 +31,15 @@ FIP_CONSTANT = 3.1
 
 PITCHER_FRIENDLY = {"Petco Park", "T-Mobile Park", "loanDepot park", "Tropicana Field", "Oracle Park", "Comerica Park"}
 HITTER_FRIENDLY = {"Coors Field", "Yankee Stadium", "Great American Ball Park", "Citizens Bank Park", "Globe Life Field"}
+
+# Dome / fixed-roof or retractable-roof venues -- weather is irrelevant
+DOME_OR_RETRACTABLE = {
+    "Tropicana Field", "Rogers Centre", "Chase Field", "Minute Maid Park",
+    "Globe Life Field", "loanDepot park", "American Family Field", "T-Mobile Park",
+}
+
+WEATHER_UA = "mlb-edge/1.0 (raymond@silkyrex.dev)"
+BACKTEST_MIN_DAYS = 7
 
 
 def ensure_table(conn):
@@ -192,6 +202,50 @@ def grade_pitcher(stat: dict, espn_fip: float | None = None) -> int:
     return 5
 
 
+def fetch_venue_coords(venue_id: int) -> tuple[float, float] | None:
+    if not venue_id:
+        return None
+    try:
+        r = requests.get(f"{BASE}/venues/{venue_id}?hydrate=location", timeout=6)
+        r.raise_for_status()
+        v = (r.json().get("venues") or [{}])[0]
+        coords = (v.get("location") or {}).get("defaultCoordinates") or {}
+        lat = coords.get("latitude")
+        lon = coords.get("longitude")
+        if lat is None or lon is None:
+            return None
+        return (round(float(lat), 4), round(float(lon), 4))
+    except Exception:
+        return None
+
+
+def fetch_weather(lat: float, lon: float, game_iso: str) -> dict:
+    """Return {precip_pct, temp_f} for the hour matching game_iso, or {} on miss."""
+    try:
+        pt = requests.get(f"https://api.weather.gov/points/{lat},{lon}",
+                          headers={"User-Agent": WEATHER_UA}, timeout=6)
+        pt.raise_for_status()
+        hourly_url = (pt.json().get("properties") or {}).get("forecastHourly")
+        if not hourly_url:
+            return {}
+        fc = requests.get(hourly_url, headers={"User-Agent": WEATHER_UA}, timeout=8)
+        fc.raise_for_status()
+        periods = ((fc.json().get("properties") or {}).get("periods") or [])
+        if not periods or not game_iso:
+            return {}
+        # Match the period covering game_iso. periods sorted by startTime.
+        game_iso_trim = game_iso[:13]  # YYYY-MM-DDTHH
+        match = next((p for p in periods if (p.get("startTime") or "")[:13] == game_iso_trim), None)
+        if not match:
+            match = periods[0]  # fallback to nearest period
+        return {
+            "precip_pct": int((match.get("probabilityOfPrecipitation") or {}).get("value") or 0),
+            "temp_f": match.get("temperature"),
+        }
+    except Exception:
+        return {}
+
+
 def score_game(game: dict, season: str, espn_fip_map: dict[str, float]) -> dict:
     teams = game.get("teams", {})
     away_t = teams.get("away", {}).get("team", {})
@@ -243,7 +297,21 @@ def score_game(game: dict, season: str, espn_fip_map: dict[str, float]) -> dict:
     postponed = "postponed" in status.lower() or "cancelled" in status.lower()
     certainty = 9 if (has_both and not postponed) else (3 if not has_both else 0)
 
+    # Weather check (Mark III). Skip domes/retractables. Penalize heavy rainout risk.
+    weather = {}
+    if venue not in DOME_OR_RETRACTABLE:
+        venue_id = (game.get("venue") or {}).get("id")
+        coords = fetch_venue_coords(venue_id)
+        if coords:
+            weather = fetch_weather(*coords, game.get("gameDate", ""))
+    precip = weather.get("precip_pct", 0)
+    rainout_risk = precip >= 70
+    if rainout_risk:
+        certainty = min(certainty, 2)  # collapse certainty
+
     total = pitcher_edge * 0.35 + k_gap * 0.25 + venue_score * 0.20 + certainty * 0.20
+    if rainout_risk:
+        total *= 0.3  # rainout dampener -- skip these games
 
     return {
         "game": game_str,
@@ -263,6 +331,8 @@ def score_game(game: dict, season: str, espn_fip_map: dict[str, float]) -> dict:
             "home_team_k_pct": round(ht_stat.get("k_pct", 0), 1),
             "venue": venue,
             "postponed": postponed,
+            "weather": weather,
+            "rainout_risk": rainout_risk,
         },
     }
 
@@ -299,19 +369,14 @@ def print_table(date_str: str, ranked: list[dict], top_n: int):
     print(f"Run: /underdog-mlb {top[0]}    (then repeat for remaining {top_n - 1})\n")
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--date", default=date_cls.today().isoformat())
-    ap.add_argument("--top", type=int, default=3)
-    args = ap.parse_args()
-
-    season = args.date.split("-")[0]
-    games = fetch_schedule(args.date)
+def run_rank(target_date: str, top_n: int):
+    season = target_date.split("-")[0]
+    games = fetch_schedule(target_date)
     if not games:
-        print(f"No games found for {args.date}")
+        print(f"No games found for {target_date}")
         return
 
-    print(f"Scoring {len(games)} games for {args.date}...")
+    print(f"Scoring {len(games)} games for {target_date}...")
     espn_fip_map = fetch_espn_pitchers(season)
     if espn_fip_map:
         print(f"  ESPN FIP loaded for {len(espn_fip_map)} qualified pitchers")
@@ -321,8 +386,55 @@ def main():
         results = list(pool.map(lambda g: score_game(g, season, espn_fip_map), games))
 
     ranked = sorted(results, key=lambda r: r["score"], reverse=True)
-    persist(args.date, ranked)
-    print_table(args.date, ranked, args.top)
+    persist(target_date, ranked)
+    print_table(target_date, ranked, top_n)
+
+
+def run_backtest(since: str | None):
+    """Rank-vs-survivor correlation. Needs >=7 days of pre_scan_scores history."""
+    conn = sqlite3.connect(MLB_DB)
+    conn.row_factory = sqlite3.Row
+    where = "" if not since else f"WHERE date >= '{since}'"
+    dates = [r[0] for r in conn.execute(
+        f"SELECT DISTINCT date FROM pre_scan_scores {where} ORDER BY date"
+    ).fetchall()]
+    if len(dates) < BACKTEST_MIN_DAYS:
+        print(f"Insufficient data: {len(dates)} day(s) in pre_scan_scores, need {BACKTEST_MIN_DAYS}+.")
+        print(f"Run `python prescan.py` daily; backtest unlocks once history reaches {BACKTEST_MIN_DAYS} days.")
+        conn.close()
+        return
+
+    # When data accrues: join pre_scan_scores with sliplog.db slip_picks to find which
+    # games had closer-survivor picks placed, compute avg rank for survivors vs all.
+    # Stub for now: report shape only.
+    counts = conn.execute(f"""
+        SELECT date, COUNT(*) as games, ROUND(AVG(score),2) as avg_score, ROUND(MAX(score),2) as max_score
+        FROM pre_scan_scores {where}
+        GROUP BY date ORDER BY date
+    """).fetchall()
+    print(f"\nBacktest summary ({len(dates)} days):\n")
+    print(f"{'Date':<12} {'Games':>6} {'Avg':>6} {'Max':>6}")
+    for r in counts:
+        print(f"{r['date']:<12} {r['games']:>6} {r['avg_score']:>6} {r['max_score']:>6}")
+    print("\nFull rank-vs-survivor correlation not yet implemented (Mark IV).")
+    conn.close()
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    sub = ap.add_subparsers(dest="cmd")
+
+    bt = sub.add_parser("backtest", help="Rank-vs-survivor analysis (needs 7+ days)")
+    bt.add_argument("--since", default=None, help="YYYY-MM-DD start date")
+
+    ap.add_argument("--date", default=date_cls.today().isoformat())
+    ap.add_argument("--top", type=int, default=3)
+    args = ap.parse_args()
+
+    if args.cmd == "backtest":
+        run_backtest(args.since)
+    else:
+        run_rank(args.date, args.top)
 
 
 if __name__ == "__main__":
