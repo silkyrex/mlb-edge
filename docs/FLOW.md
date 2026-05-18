@@ -85,9 +85,11 @@ Hard stops -- skip regardless of score:
 - Player is on the IL or returned from IL today
 - IL return within 7 days (rust, -10 score penalty)
 - Both Higher and Lower show no multiplier
-- First-inning pitch count Higher on a FADE pitcher
+- First-inning pitch count Higher on a FADE pitcher (only take if opposing lineup has documented high walk rates)
 - Pitcher Ks Higher when line >= recent L5 median Ks
 - Pitcher Ks Lower when L5 sample is from wrong role (relief sample, starting tonight)
+- Check `last15_h_r_rbi` against the line before fading any batter regardless of team grade
+- Check `x_avg` vs `season_avg` -- actual much higher than expected = regression risk
 
 Slip construction rules:
 - Picks from 2+ different teams
@@ -133,43 +135,8 @@ python settle.py --id N --settle L   # loss -- shows FIP flags, prompts for less
 python sliplog.py summary                  # P&L + bankroll (matches Underdog balance)
 python pick_lessons.py review
 python pick_lessons.py review --confirmed
-
-# Track cash movements (deposits/withdrawals) so account_balance reconciles
-python sliplog.py deposit --amount 50 --notes "..."
-python sliplog.py withdrawal --amount 20 --notes "..."
-python sliplog.py txns
 ```
 
 ---
 
-## Pick Direction Quick Reference
-
-| Situation | Stat | Direction |
-|---|---|---|
-| ELITE pitcher | Strikeouts, Pitching Outs | Higher |
-| ELITE pitcher | Hits Allowed, Runs Allowed | Lower |
-| FADE pitcher | Strikeouts, Pitching Outs | Lower |
-| FADE pitcher | Runs Allowed, Hits Allowed | Higher |
-| FADE offense batter | H+R+RBI, Hits, Total Bases | Lower |
-| ELITE offense batter | H+R+RBI | Higher |
-| UNDER lean | Total Runs | Lower |
-
-**Batter split rule:** use vs-RHP or vs-LHP split based on today's starter's arm -- not season average.
-
-**Hot batter rule:** if L15 H+R+RBI average is well above the line, don't fade regardless of team grade.
-
-**Regression rule:** real avg much higher than xAVG = lucky, lean toward fading.
-
-**Ump rule:** high error rate ump = downgrade K Higher props for both starters that game.
-
-**Rest rule:** short rest (<=3d) = downgrade K Higher; extra rest (>=6d) = note first-inning rust risk.
-
----
-
-## Drill Deeper
-
-```bash
-python player.py pitcher "Aaron Civale"
-python player.py batter "Matt Chapman"
-python player.py matchup "Chapman" "Civale"
-```
+See `docs/REFERENCE.md` for the full pick direction table, tier system, and scoring rules.

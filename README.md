@@ -57,6 +57,11 @@ python player.py matchup "Chapman" "Civale"
 python lines_query.py --list-games
 python lines_query.py --game "SF Giants @ Athletics" --type pitcher
 
+# Bankroll
+python sliplog.py deposit --amount 50 --notes "..."
+python sliplog.py withdrawal --amount 20 --notes "..."
+python sliplog.py txns
+
 # Rules and lessons
 python pick_lessons.py stats
 python pick_lessons.py review
@@ -70,9 +75,8 @@ python pick_lessons.py review --confirmed
 - 2-3 picks per slip; picks from 2+ different teams
 - Max $50 Flex, max $20 Standard/Power
 - No IL players; IL return within 7 days = penalty
-- Never take first-inning pitch count Higher on a FADE pitcher
-- Pitcher Ks Higher: skip if line >= L5 median Ks
-- Pitcher Ks Lower: skip if L5 sample is from wrong role
+
+See `docs/FLOW.md` for full hard stops and slip construction rules.
 
 ---
 
@@ -92,8 +96,9 @@ launchctl load ~/Library/LaunchAgents/com.mlb-edge.morning-brief.plist
 
 ## Reference
 
-- `docs/FLOW.md` -- full game day runbook with hard stops and pick direction rules
+- `docs/FLOW.md` -- full game day runbook with hard stops
+- `docs/REFERENCE.md` -- tier system, scoring rules, pick direction table
 - `docs/GLOSSARY.md` -- ERA, FIP, WAR, WHIP, xAVG, multiplier, and more
 - `docs/DATASOURCES.md` -- all APIs and data sources with endpoints
 - `docs/PICK_LESSONS.md` -- auto-generated rule tracker: schema, taxonomy, CLI
-- `CLAUDE.md` -- pipeline diagram, DB schema, hard rules (dev/Claude reference)
+- `CLAUDE.md` -- architecture, DB schema, hard dev rules (Claude/dev reference)

@@ -1,10 +1,10 @@
 # mlb-edge (dev reference)
 
-For the game day runbook see `docs/FLOW.md`. For project overview see `README.md`.
+For the game day runbook see `docs/FLOW.md`. For project overview see `README.md`. For tier system, scoring rules, and pick direction see `docs/REFERENCE.md`.
 
 ---
 
-## Pipeline
+## Architecture
 
 ```
 9am PT  morning_brief.py (launchd) -- pitchers + IL → Discord + mlb.db
@@ -94,31 +94,6 @@ noon PT Discord lean signal (or top-N from prescan)
 
 ---
 
-## Tier System
-
-- **ELITE** -- ERA ≤ ~3.00 (pitchers), top-tier offense
-- **mid** -- average
-- **FADE** -- ERA ≥ ~4.50 (pitchers), weak offense
-
-Signal logic (`matchup.py`): OVER = ELITE offense vs FADE pitcher; UNDER = ELITE pitcher vs FADE offense; AWAY/HOME = ELITE away/home offense vs mid/FADE opponent.
-
----
-
-## Scoring Rules (underdog-mlb-analyze)
-
-```
-base = 50
-lean alignment:    +25 aligned / -25 opposed
-market mult:       +10 if >1.04x / +5 if 1.00-1.04x / -5 if 0.95-1.00x / -10 if <0.90x
-research confirm:  +15 confirmed rule / -15 contradicted
-grade bonus:       +10 for ELITE pitcher K/PO Higher, FADE offense batter Lower, FADE pitcher ERA Higher
-IL return penalty: -10 for IL-return-today or IL-return-Nd (N <= 7)
-```
-
-GREEN >= 65. YELLOW 50-64. SKIP below 50 or IL-flagged.
-
----
-
 ## Hard Rules
 
 - Never edit mlb.db schema without updating `schema/schema.sql` first.
@@ -129,6 +104,3 @@ GREEN >= 65. YELLOW 50-64. SKIP below 50 or IL-flagged.
 - `cache_stats.py`, `cache_news.py`, `cache_team.py`, `cache_espn.py` are idempotent -- safe to re-run.
 - `cache_news.py --roster` = night-before mode. Plain mode = game-day (needs mlb_game_lines).
 - `daily.sh` and `run_morning_brief.sh` source `.env` automatically.
-- First-inning pitch count Higher on FADE pitchers is volatile -- only take when opposing lineup has documented high walk rates.
-- Check `last15_h_r_rbi` against the line before fading any batter regardless of team grade.
-- Check `x_avg` vs `season_avg` -- actual much higher than expected = regression risk.
