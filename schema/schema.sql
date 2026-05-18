@@ -223,3 +223,20 @@ CREATE TABLE IF NOT EXISTS pick_lessons (
     notes        TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_pl_status ON pick_lessons(status);
+
+-- Pre-scan scores (mlb.db, managed by prescan.py)
+-- Per-game edge ranking pulled before any Underdog scrape. Used to pick the top
+-- N games to scrape, avoiding all-you-can-eat geo-locks.
+CREATE TABLE IF NOT EXISTS pre_scan_scores (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    date            TEXT NOT NULL,
+    game            TEXT NOT NULL,
+    score           REAL NOT NULL,
+    pitcher_edge    REAL,
+    k_gap           REAL,
+    venue_score     REAL,
+    certainty       REAL,
+    components_json TEXT,
+    UNIQUE(date, game)
+);
+CREATE INDEX IF NOT EXISTS idx_pss_date ON pre_scan_scores(date);

@@ -22,6 +22,11 @@ import requests
 
 MLB_DB = Path(__file__).parent / "mlb.db"
 BASE = "https://statsapi.mlb.com/api/v1"
+ESPN_URL = (
+    "https://site.web.api.espn.com/apis/common/v3/sports/baseball/mlb"
+    "/statistics/byathlete?category=pitching&season={season}&seasontype=2&limit=300"
+)
+FIP_CONSTANT = 3.1
 
 PITCHER_FRIENDLY = {"Petco Park", "T-Mobile Park", "loanDepot park", "Tropicana Field", "Oracle Park", "Comerica Park"}
 HITTER_FRIENDLY = {"Coors Field", "Yankee Stadium", "Great American Ball Park", "Citizens Bank Park", "Globe Life Field"}
@@ -101,46 +106,93 @@ def fetch_team_stats(team_id: int, season: str) -> dict:
 
 
 def fip_proxy(stat: dict) -> float:
-    """(13*HR + 3*BB - 2*K) / IP + 3.1 -- rough FIP."""
+    """(13*HR + 3*BB - 2*K) / IP + 3.1 -- rough FIP. Fallback when ESPN FIP unavailable."""
     ip = stat.get("ip", 0)
     if ip < 5:
         return 5.0  # not enough innings, conservative middle
-    return (13 * stat.get("hr", 0) + 3 * stat.get("bb", 0) - 2 * stat.get("k", 0)) / ip + 3.1
+    return (13 * stat.get("hr", 0) + 3 * stat.get("bb", 0) - 2 * stat.get("k", 0)) / ip + FIP_CONSTANT
 
 
-def grade_pitcher(stat: dict) -> int:
+def fetch_espn_pitchers(season: str) -> dict[str, float]:
+    """Pull all qualified pitchers' FIPs from ESPN. Returns {lowercase_name: fip}."""
+    try:
+        r = requests.get(ESPN_URL.format(season=season), timeout=12)
+        r.raise_for_status()
+        data = r.json()
+    except Exception:
+        return {}
+    cats = data.get("categories", [])
+    pitch_cat = next((c for c in cats if c["name"] == "pitching"), None)
+    if not pitch_cat:
+        return {}
+    labels = pitch_cat["labels"]
+    result: dict[str, float] = {}
+    for ath in data.get("athletes", []):
+        name = ath.get("athlete", {}).get("displayName", "")
+        if not name:
+            continue
+        stats_cat = next((c for c in ath.get("categories", []) if c.get("name") == "pitching"), {})
+        values = stats_cat.get("values", [])
+        row = dict(zip(labels, values))
+        ip = row.get("IP") or 0
+        if ip <= 0:
+            continue
+        k = row.get("K") or 0
+        bb = row.get("BB") or 0
+        hr = row.get("HR") or 0
+        result[name.lower()] = round((13 * hr + 3 * bb - 2 * k) / ip + FIP_CONSTANT, 2)
+    return result
+
+
+def lookup_espn_fip(pitcher_name: str, espn_map: dict[str, float]) -> float | None:
+    """Match by full name first, then last name. Returns FIP or None."""
+    if not pitcher_name:
+        return None
+    key = pitcher_name.lower()
+    if key in espn_map:
+        return espn_map[key]
+    last = pitcher_name.split()[-1].lower()
+    for espn_name, fip in espn_map.items():
+        if espn_name.split()[-1] == last:
+            return fip
+    return None
+
+
+def grade_pitcher(stat: dict, espn_fip: float | None = None) -> int:
     """0-10 grade. ELITE=9-10, GOOD=7-8, MID=5-6, FADE=2-3, UNKNOWN=4-5.
+    ERA thresholds aligned with ~/mlb-edge/CLAUDE.md: ELITE <= 3.00, FADE >= 4.50.
     Captures three flavors of ELITE: K-stuff (McClanahan), contact-suppression FIP (Valdez),
-    and high-stuff debut (Painter-style prospect with K/9 >= 10 in limited innings)."""
+    high-stuff debut (Painter-style prospect with K/9 >= 10 in limited innings).
+    Uses ESPN FIP if provided (Mark II), else falls back to fip_proxy from MLB API totals."""
     if not stat:
         return 4
     ip = stat.get("ip", 0)
     era = stat.get("era", 0)
     k9 = stat.get("k_per_9", 0)
 
-    # Debut / prospect bucket: <15 IP. If K-stuff is showing up, treat as high-upside.
+    # Debut / prospect bucket: <15 IP. K-stuff shows up early; reward it.
     if ip < 15:
         if k9 >= 10:
             return 8  # high-stuff debut, market mispricing edge
         return 5  # unknown but not dismissed -- volatility itself can be edge
 
-    fip = fip_proxy(stat)
-    # ELITE by K-stuff (high-K aces)
-    if k9 >= 9.5 and era <= 3.30 and fip <= 3.40:
+    fip = espn_fip if espn_fip is not None else fip_proxy(stat)
+    # ELITE by K-stuff (high-K aces like McClanahan)
+    if k9 >= 9.5 and era <= 3.00 and fip <= 3.20:
         return 10
-    # ELITE by FIP (ground-ball / contact-suppression aces like Valdez)
-    if fip <= 3.20 and era <= 3.50:
+    # ELITE by FIP (ground-ball / contact-suppression aces like Valdez when in form)
+    if fip <= 3.00 and era <= 3.20:
         return 9
-    if k9 >= 8.5 and era <= 3.80:
+    if k9 >= 8.5 and era <= 3.60:
         return 8
-    if k9 >= 7.0 and era <= 4.30:
+    if k9 >= 7.0 and era <= 4.20:
         return 6
-    if era >= 5.00 or k9 <= 5.5:
+    if era >= 4.50 or k9 <= 5.5:
         return 2
     return 5
 
 
-def score_game(game: dict, season: str) -> dict:
+def score_game(game: dict, season: str, espn_fip_map: dict[str, float]) -> dict:
     teams = game.get("teams", {})
     away_t = teams.get("away", {}).get("team", {})
     home_t = teams.get("home", {}).get("team", {})
@@ -167,8 +219,10 @@ def score_game(game: dict, season: str) -> dict:
         ht_stat = f_ht.result()
 
     # 1. Pitcher grade asymmetry (35%): max 10 when one elite + one fade
-    g1 = grade_pitcher(ap_stat)
-    g2 = grade_pitcher(hp_stat)
+    ap_fip = lookup_espn_fip(away_pp.get("fullName"), espn_fip_map)
+    hp_fip = lookup_espn_fip(home_pp.get("fullName"), espn_fip_map)
+    g1 = grade_pitcher(ap_stat, ap_fip)
+    g2 = grade_pitcher(hp_stat, hp_fip)
     pitcher_edge = min(10, abs(g1 - g2) + min(g1, g2) * 0.2)  # asymmetry + floor for "both quality"
 
     # 2. Team K-rate gap (25%): how different the two lineups' K% are
@@ -203,6 +257,8 @@ def score_game(game: dict, season: str) -> dict:
             "home_pitcher": home_pp.get("fullName"),
             "away_grade": g1,
             "home_grade": g2,
+            "away_fip_espn": ap_fip,
+            "home_fip_espn": hp_fip,
             "away_team_k_pct": round(at_stat.get("k_pct", 0), 1),
             "home_team_k_pct": round(ht_stat.get("k_pct", 0), 1),
             "venue": venue,
@@ -256,8 +312,13 @@ def main():
         return
 
     print(f"Scoring {len(games)} games for {args.date}...")
+    espn_fip_map = fetch_espn_pitchers(season)
+    if espn_fip_map:
+        print(f"  ESPN FIP loaded for {len(espn_fip_map)} qualified pitchers")
+    else:
+        print("  ESPN FIP unavailable -- falling back to MLB-API-derived fip_proxy")
     with ThreadPoolExecutor(max_workers=6) as pool:
-        results = list(pool.map(lambda g: score_game(g, season), games))
+        results = list(pool.map(lambda g: score_game(g, season, espn_fip_map), games))
 
     ranked = sorted(results, key=lambda r: r["score"], reverse=True)
     persist(args.date, ranked)
