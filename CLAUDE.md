@@ -9,7 +9,11 @@ For the game day runbook see `docs/FLOW.md`. For project overview see `README.md
 ```
 9am PT  morning_brief.py (launchd) -- pitchers + IL → Discord + mlb.db
 
-noon PT Discord lean signal
+session start  prescan.py -- rank today's full slate before any scrape
+  └── pulls MLB Stats API schedule + ESPN FIP, scores 4-factor rubric
+  └── writes mlb.db [pre_scan_scores] + prints top-N games to scrape
+
+noon PT Discord lean signal (or top-N from prescan)
   └── /playwright-underdog
          └── /underdog-mlb [game] → mlb.db [mlb_game_lines]
                 └── prep.py  → runs all 4 cache scripts in parallel per game
@@ -50,6 +54,7 @@ noon PT Discord lean signal
 | `player_recent_stats` | cache_stats.py + cache_espn.py | player, cache_date, mlb_player_id, season_era, season_k9, last5_ks (JSON), espn_fip, espn_war, splits, xStats |
 | `player_news` | cache_news.py | news_date, player, status (active/IL-10/IL-15/IL-60/IL-return-today/IL-return-Nd) |
 | `team_game_stats` | cache_team.py | cache_date, game, team_name, bullpen_era, team_avg, venue_name, venue_roof |
+| `pre_scan_scores` | prescan.py | date, game, score, pitcher_edge, k_gap, venue_score, certainty, components_json |
 
 `sliplog.db` at `./sliplog.db` -- slip log + rule tracker. Append-only on settled rows.
 
@@ -67,6 +72,7 @@ noon PT Discord lean signal
 
 | File | Purpose |
 |---|---|
+| `prescan.py` | Pre-scrape game ranker. Pulls full slate + ESPN FIP + team stats, scores 4-factor rubric, writes `pre_scan_scores`. Run BEFORE Playwright opens to pick top-N games. `--date`, `--top`. |
 | `prep.py` | One-command cache runner. Finds today's scraped games, runs cache_stats → cache_espn (sequential) + cache_news + cache_team (parallel). `--check` for status-only. |
 | `closer.py` | 3-agent final round critique. Scout/Skeptic/Closer + live Statcast + ump + lineup + days rest. `--dry-run`, `--game`, `--model haiku`. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles. |
