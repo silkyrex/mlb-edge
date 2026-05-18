@@ -1,7 +1,0 @@
-[    1999ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://api.underdogfantasy.com/v1/user:0
-[    2000ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://api.underdogfantasy.com/v1/user/profile:0
-[    2001ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://api.underdogfantasy.com/v1/user/bonus_wallet_accounts:0
-[    2005ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://api.underdogfantasy.com/v1/features:0
-[    2006ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://api.underdogfantasy.com/v3/user/features:0
-[    4719ms] [WARNING] WebSocket connection to 'wss://ws-us2.pusher.com/app/038c354984811c43f658?protocol=7&client=js&version=8.3.0&flash=false' failed: WebSocket is closed before the connection is established. @ https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:1
-[    8273ms] [ERROR] Failed to load resource: the server responded with a status of 422 () @ https://api.underdogfantasy.com/v1/user/state_configs:0

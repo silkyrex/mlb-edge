@@ -1,3 +1,0 @@
-[   22347ms] [ERROR] Radar SDK: trackVerified error: Could not determine location. @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0
-[   42445ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://api.underdogfantasy.com/v1/intercom/identity_verification?product=fantasy&product_experience_id=018e1234-5678-9abc-def0-123456789006&state_config_id=725014ef-3570-4e93-871d-d69674ab3521:0
-[   42445ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://api.underdogfantasy.com/v1/user/state_configs?product=fantasy&product_experience_id=018e1234-5678-9abc-def0-123456789006&state_config_id=725014ef-3570-4e93-871d-d69674ab3521:0

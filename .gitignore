@@ -1,4 +1,7 @@
 mlb.db
+sliplog.db
+picks.db
+betlog.db
 *.db-shm
 *.db-wal
 __pycache__/
@@ -6,4 +9,12 @@ __pycache__/
 .env
 .venv/
 venv/
-betlog.db
+.playwright-mcp/
+*_raw.txt
+*_full.txt
+*_ks.txt
+*_po.txt
+*_popular.txt
+current_page.txt
+live_pickem.txt
+mlb_page_raw.txt

@@ -1,6 +1,0 @@
-[   10005ms] [INFO] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://app.underdogsports.com/fonts/S%C3%B6hne-Buch.ttf @ https://app.underdogsports.com/pick-em/higher-lower/all/home:0
-[   20405ms] [ERROR] Radar SDK: trackVerified error: Could not determine location. @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0
-[   56273ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://login.underdogsports.com/oauth/token:0
-[  320408ms] [ERROR] Radar SDK: trackVerified error: Could not determine location. @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0
-[  457939ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://login.underdogsports.com/oauth/token:0
-[  472333ms] [WARNING] WARNING: Ampli is already intialized. Ampli.load() should be called once at application startup. @ https://app.underdogsports.com/9412.48b340aac4e31ca7.js:0
