@@ -241,6 +241,10 @@ def post_summary() -> None:
     conn = connect()
     settled = conn.execute("SELECT * FROM slips WHERE status IN ('win','loss') ORDER BY date").fetchall()
     open_s  = conn.execute("SELECT * FROM slips WHERE status = 'open' ORDER BY date").fetchall()
+    try:
+        txns = conn.execute("SELECT * FROM cash_txns ORDER BY date").fetchall()
+    except sqlite3.OperationalError:
+        txns = []  # table not yet created (old sliplog.db)
     conn.close()
 
     wins    = sum(1 for r in settled if r["status"] == "win")
@@ -252,6 +256,12 @@ def post_summary() -> None:
     now     = datetime.now().strftime("%Y-%m-%d %H:%M PT")
     pnl_sign = "+" if pnl >= 0 else ""
 
+    deposits = sum(t["amount"] for t in txns if t["kind"] == "deposit")
+    withdrawals = sum(t["amount"] for t in txns if t["kind"] == "withdrawal")
+    net_deposited = deposits - withdrawals
+    open_stakes = sum(r["entry"] for r in open_s)
+    account_balance = net_deposited + pnl - open_stakes
+
     lines = [
         f"Updated {now} -- {len(settled)} settled | {len(open_s)} open",
         "",
@@ -260,6 +270,19 @@ def post_summary() -> None:
         f"Staked: ${staked:.2f}",
         f"Net P&L: {pnl_sign}${pnl:.2f}",
         f"ROI: {roi:+.1f}%",
+    ]
+    if txns:
+        lines += [
+            "",
+            "## Bankroll",
+            f"Deposits: ${deposits:.2f} ({sum(1 for t in txns if t['kind']=='deposit')} events)",
+            f"Withdrawals: ${withdrawals:.2f} ({sum(1 for t in txns if t['kind']=='withdrawal')} events)",
+            f"Net deposited: ${net_deposited:.2f}",
+            f"Bet P&L (settled): {pnl_sign}${pnl:.2f}",
+            f"Open stakes (escrowed): -${open_stakes:.2f}",
+            f"**Account balance: ${account_balance:.2f}**  (matches Underdog when all deposits/withdrawals tracked)",
+        ]
+    lines += [
         "",
         "---",
         "",
@@ -282,6 +305,13 @@ def post_summary() -> None:
             lines.append(f"- slip#{r['id']}  {r['date']}  {players}  ${r['entry']:.0f}")
     else:
         lines.append("None.")
+
+    if txns:
+        lines += ["", "---", "", "## Deposits / Withdrawals"]
+        for t in txns:
+            sign = "+" if t["kind"] == "deposit" else "-"
+            note = f"  -- {t['notes']}" if t["notes"] else ""
+            lines.append(f"- {t['date']}  {t['kind']}  {sign}${t['amount']:.2f}{note}")
 
     ntn_update(page_id, "\n".join(lines))
     print(f"Summary updated -> {page_id[:8]}...")

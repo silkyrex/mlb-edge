@@ -68,6 +68,15 @@ CREATE TABLE IF NOT EXISTS slip_picks (
     UNIQUE(slip_id, player, stat)
 );
 CREATE INDEX IF NOT EXISTS idx_slip_picks_slip ON slip_picks(slip_id);
+
+CREATE TABLE IF NOT EXISTS cash_txns (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    date        TEXT NOT NULL,
+    kind        TEXT NOT NULL CHECK(kind IN ('deposit','withdrawal')),
+    amount      REAL NOT NULL,
+    notes       TEXT,
+    logged_at   TEXT DEFAULT (datetime('now'))
+);
 """
 
 
@@ -371,24 +380,79 @@ def cmd_picks(args):
         print(f"  {sp['player']:<28} {sp['player_type']:<8} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}{reason_tag}")
 
 
+def cmd_txn(args):
+    """Dispatched by main() for both 'deposit' and 'withdrawal' subcommands."""
+    kind = args.cmd  # 'deposit' or 'withdrawal'
+    if args.amount <= 0:
+        raise SystemExit(f"--amount must be positive (got {args.amount})")
+    txn_date = args.date or date.today().isoformat()
+    conn = connect()
+    cur = conn.execute(
+        "INSERT INTO cash_txns (date, kind, amount, notes) VALUES (?, ?, ?, ?)",
+        (txn_date, kind, args.amount, args.notes),
+    )
+    conn.commit()
+    txn_id = cur.lastrowid
+    conn.close()
+    print(f"Logged {kind} #{txn_id}  |  {txn_date}  |  ${args.amount:.2f}"
+          + (f"  -- {args.notes}" if args.notes else ""))
+    _ob1_push(
+        f"underdog {kind}: ${args.amount:.2f} | date={txn_date} txn_id={txn_id}"
+        + (f" notes={args.notes}" if args.notes else ""),
+        {"type": "cash_txn", "kind": kind, "amount": args.amount,
+         "date": txn_date, "txn_id": txn_id, "agent": "sliplog"},
+    )
+
+
+def cmd_txns(args):
+    conn = connect()
+    rows = conn.execute("SELECT * FROM cash_txns ORDER BY date DESC, id DESC").fetchall()
+    conn.close()
+    if not rows:
+        print("No cash transactions.")
+        return
+    print(f"\n{'ID':<4} {'Date':<12} {'Kind':<12} {'Amount':>10}  Notes")
+    print("-" * 70)
+    for r in rows:
+        sign = "+" if r["kind"] == "deposit" else "-"
+        notes = r["notes"] or ""
+        print(f"{r['id']:<4} {r['date']:<12} {r['kind']:<12} {sign}${r['amount']:>7.2f}  {notes}")
+
+
 def cmd_summary(args):
     conn = connect()
     rows = conn.execute("SELECT * FROM slips ORDER BY date").fetchall()
+    txns = conn.execute("SELECT * FROM cash_txns ORDER BY date").fetchall()
     conn.close()
-    if not rows:
-        print("No slips.")
+    if not rows and not txns:
+        print("No slips or transactions.")
         return
     wins = [r for r in rows if r["status"] == "win"]
     losses = [r for r in rows if r["status"] == "loss"]
     open_slips = [r for r in rows if r["status"] == "open"]
     total_staked = sum(r["entry"] for r in rows if r["status"] != "open")
     total_profit = sum(r["profit"] for r in rows if r["profit"] is not None)
+    deposits = sum(t["amount"] for t in txns if t["kind"] == "deposit")
+    withdrawals = sum(t["amount"] for t in txns if t["kind"] == "withdrawal")
+    net_deposited = deposits - withdrawals
+    open_stakes = sum(r["entry"] for r in open_slips)
+    # Account balance = deposits in - withdrawals out - all stakes placed + winning payouts collected.
+    # Equivalent: net_deposited + settled_profit (already counts loss stakes) - open_stakes.
+    account_balance = net_deposited + total_profit - open_stakes
+
     print(f"\nUNDERDOG SLIP SUMMARY")
     print(f"  Total slips: {len(rows)}  ({len(wins)}W / {len(losses)}L / {len(open_slips)} open)")
     if total_staked:
         roi = (total_profit / total_staked) * 100
         sign = "+" if total_profit >= 0 else ""
         print(f"  Staked: ${total_staked:.2f}  |  P&L: {sign}${total_profit:.2f}  |  ROI: {sign}{roi:.1f}%")
+    if txns:
+        pnl_sign = "+" if total_profit >= 0 else ""
+        print(f"\n  BANKROLL")
+        print(f"    Deposits: ${deposits:.2f}  |  Withdrawals: ${withdrawals:.2f}  |  Net deposited: ${net_deposited:.2f}")
+        print(f"    Bet P&L (settled): {pnl_sign}${total_profit:.2f}")
+        print(f"    Open stakes (escrowed): -${open_stakes:.2f}")
+        print(f"    Account balance: ${account_balance:.2f}  (matches Underdog when all deposits/withdrawals tracked)")
     if open_slips:
         print(f"\n  OPEN ({len(open_slips)}):")
         for r in open_slips:
@@ -432,6 +496,14 @@ def main():
 
     sub.add_parser("summary", help="P&L summary")
 
+    for kind in ("deposit", "withdrawal"):
+        p_t = sub.add_parser(kind, help=f"Log a {kind}")
+        p_t.add_argument("--amount", type=float, required=True, help="Dollars (positive)")
+        p_t.add_argument("--date", default=None, help="YYYY-MM-DD (default: today)")
+        p_t.add_argument("--notes", default=None)
+
+    sub.add_parser("txns", help="List cash deposits / withdrawals")
+
     args = parser.parse_args()
     if args.cmd == "add":
         cmd_add(args)
@@ -445,6 +517,10 @@ def main():
         cmd_picks(args)
     elif args.cmd == "summary":
         cmd_summary(args)
+    elif args.cmd in ("deposit", "withdrawal"):
+        cmd_txn(args)
+    elif args.cmd == "txns":
+        cmd_txns(args)
     else:
         parser.print_help()
 

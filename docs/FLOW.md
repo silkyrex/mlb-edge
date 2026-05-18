@@ -130,9 +130,14 @@ python settle.py --id N --settle L   # loss -- shows FIP flags, prompts for less
 # Every settle captures type=bet_lesson to OB1. Non-empty lessons write to sports/insights.md.
 
 # Review totals and lessons
-python sliplog.py summary
+python sliplog.py summary                  # P&L + bankroll (matches Underdog balance)
 python pick_lessons.py review
 python pick_lessons.py review --confirmed
+
+# Track cash movements (deposits/withdrawals) so account_balance reconciles
+python sliplog.py deposit --amount 50 --notes "..."
+python sliplog.py withdrawal --amount 20 --notes "..."
+python sliplog.py txns
 ```
 
 ---

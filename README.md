@@ -42,7 +42,12 @@ python sliplog.py add --entry 20 --payout TBD --picks '[{...}]'
 python sliplog.py result --id N --result win/loss --outcomes '{"Player": actual}'
 python sliplog.py list --all --detailed
 python sliplog.py picks --slip-id N
-python sliplog.py summary
+python sliplog.py summary                                    # includes bankroll math
+
+# Bankroll
+python sliplog.py deposit --amount 50 --notes "..."          # log deposit
+python sliplog.py withdrawal --amount 20 --notes "..."       # log withdrawal
+python sliplog.py txns                                       # list all cash movements
 
 # Research
 python dive.py --game "SF Giants @ Athletics"

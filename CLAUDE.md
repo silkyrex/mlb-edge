@@ -63,6 +63,7 @@ noon PT Discord lean signal (or top-N from prescan)
 | `slips` | sliplog.py | date, picks_count, players (JSON), entry, payout, status, profit |
 | `slip_picks` | sliplog.py add --picks | slip_id, player, player_type, stat, line, side, game, actual, hit, reason |
 | `pick_lessons` | pick_lessons.py observe | rule_key, hypothesis, direction, occurrences, counters, status, evidence (JSON) |
+| `cash_txns` | sliplog.py deposit / withdrawal | date, kind ('deposit'/'withdrawal'), amount, notes |
 
 `~/sports/dfs/picks.db` -- NBA only. MLB scripts never touch it.
 
@@ -81,7 +82,7 @@ noon PT Discord lean signal (or top-N from prescan)
 | `cache_news.py` | IL status → player_news. `--roster` = night-before mode (no mlb_game_lines needed). |
 | `cache_team.py` | Bullpen ERA, offense stats, venue → team_game_stats. Idempotent. |
 | `cache_tomorrow.py` | Night-before IL pre-cache for all tomorrow's games. Called by daily.sh. |
-| `sliplog.py` | Slip log. `add --picks JSON` (with reason), `result --outcomes JSON` (auto-triggers pick_lessons), `add-picks` retrofit, `list --detailed`, `picks`, `summary`. OB1 + Notion on add + result. |
+| `sliplog.py` | Slip log + bankroll. `add --picks JSON` (with reason), `result --outcomes JSON` (auto-triggers pick_lessons), `add-picks` retrofit, `list --detailed`, `picks`, `summary` (includes bankroll), `deposit --amount`, `withdrawal --amount`, `txns`. OB1 + Notion on add + result. |
 | `pick_lessons.py` | Auto-generated rule tracker. `observe`, `list`, `stats`, `review`, `falsify`, `resurrect`, `edit`. Graduates watching → confirmed at 3 occurrences. Pushes OB1 + insights.md on promotion. |
 | `morning_brief.py` | 9am pitcher grades + IL flags → Discord. Caches all starter stats in mlb.db. |
 | `matchup.py` | Team + pitcher tier rankings. Early lean read. |
