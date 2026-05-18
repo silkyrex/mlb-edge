@@ -1,0 +1,609 @@
+- generic [ref=e1]:
+  - link "Skip to content" [ref=e3] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=e7]:
+    - generic [ref=e9]:
+      - navigation "Sidebar":
+        - generic:
+          - generic:
+            - generic:
+              - button "Open sidebar":
+                - img
+        - generic:
+          - generic:
+            - link "New chat":
+              - /url: /
+              - generic:
+                - img
+              - generic: New chat
+          - generic:
+            - button "Search chats":
+              - generic:
+                - img
+              - generic: Search chats
+          - generic:
+            - button "Recents":
+              - generic:
+                - img
+              - generic: Recents
+        - generic:
+          - generic:
+            - button "Open profile menu"
+      - generic [ref=e10]:
+        - heading "Chat history" [level=2] [ref=e11]
+        - generic [ref=e12]:
+          - navigation "Chat history" [ref=e13]:
+            - generic [ref=e16]:
+              - link "Home" [ref=e17] [cursor=pointer]:
+                - /url: /
+                - generic [ref=e18]: ChatGPT
+              - button "Close sidebar" [expanded] [ref=e20]:
+                - img [ref=e21]
+            - list [ref=e24]:
+              - listitem [ref=e25]:
+                - link "New chat Shift Command O" [ref=e123] [cursor=pointer]:
+                  - /url: /
+                  - generic [ref=e27]:
+                    - img [ref=e125]
+                    - generic [ref=e128]: New chat
+                  - generic [ref=e129]:
+                    - generic "Shift" [ref=e130]:
+                      - generic [ref=e131]: ⇧
+                    - generic "Command" [ref=e132]:
+                      - generic [ref=e133]: ⌘
+                    - generic [ref=e135]: O
+              - listitem [ref=e32]:
+                - button "Search chats Command K" [ref=e136] [cursor=pointer]:
+                  - generic [ref=e34]:
+                    - img [ref=e138]
+                    - generic [ref=e141]: Search chats
+                  - generic [ref=e142]:
+                    - generic "Command" [ref=e143]:
+                      - generic [ref=e144]: ⌘
+                    - generic [ref=e146]: K
+            - link "Codex" [ref=e39] [cursor=pointer]:
+              - /url: /codex/cloud
+              - generic [ref=e40]:
+                - img [ref=e42]
+                - generic [ref=e45]: Codex
+              - img [ref=e47]
+            - generic [ref=e50] [cursor=pointer]:
+              - img [ref=e52]
+              - generic [ref=e55]: More
+            - generic [ref=e147]:
+              - button "GPTs" [expanded] [ref=e149] [cursor=pointer]:
+                - heading "GPTs" [level=2] [ref=e150]
+              - list [ref=e151]:
+                - listitem [ref=e152]:
+                  - link "MomoEdge" [ref=e153] [cursor=pointer]:
+                    - /url: /g/g-69b0aeac6f108191b19c5b68bd0dbcbf-momoedge
+                    - generic [ref=e154]:
+                      - img [ref=e156]
+                      - generic [ref=e159]: MomoEdge
+                    - button [ref=e161]:
+                      - img [ref=e163]
+                - listitem [ref=e165]:
+                  - link "Image 2 Image" [ref=e166] [cursor=pointer]:
+                    - /url: /g/g-x2X1uC2lW-image-2-image
+                    - generic [ref=e171]: Image 2 Image
+                    - button [ref=e173]:
+                      - img [ref=e175]
+                - listitem [ref=e177]:
+                  - link "Fitness, Workout & Diet - PhD Coach" [ref=e178] [cursor=pointer]:
+                    - /url: /g/g-ipOIcM229-fitness-workout-diet-phd-coach
+                    - generic "Fitness, Workout & Diet - PhD Coach" [ref=e183]
+                    - button [ref=e185]:
+                      - img [ref=e187]
+                - listitem [ref=e189]:
+                  - link "Scholar GPT" [ref=e190] [cursor=pointer]:
+                    - /url: /g/g-kZ0eYXlJe-scholar-gpt
+                    - generic [ref=e195]: Scholar GPT
+                    - button [ref=e197]:
+                      - img [ref=e199]
+              - link "Explore GPTs" [ref=e201] [cursor=pointer]:
+                - /url: /gpts
+                - img [ref=e203]
+                - generic [ref=e206]: Explore GPTs
+            - generic [ref=e207]:
+              - button "Projects" [expanded] [ref=e209] [cursor=pointer]:
+                - heading "Projects" [level=2] [ref=e210]
+              - list [ref=e211]:
+                - listitem [ref=e212]:
+                  - button "New project" [ref=e213] [cursor=pointer]:
+                    - img [ref=e215]
+                    - generic [ref=e218]: New project
+                - listitem [ref=e219]:
+                  - link "Show chats Alex Hormozi Open project options for Alex Hormozi" [ref=e220] [cursor=pointer]:
+                    - /url: /g/g-p-69c987f709488191956e4ce19b4ca57c-alex-hormozi/project
+                    - generic [ref=e221]:
+                      - button "Show chats" [ref=e223]:
+                        - generic [ref=e224]:
+                          - img [ref=e228]
+                          - img [ref=e238]
+                      - generic [ref=e241]: Alex Hormozi
+                    - button "Open project options for Alex Hormozi" [ref=e243]:
+                      - img [ref=e245]
+                - listitem [ref=e247]:
+                  - link "Show chats Lean game plan Open project options for Lean game plan" [ref=e248] [cursor=pointer]:
+                    - /url: /g/g-p-69a13e07261c8191abe3d513c4928f77-lean-game-plan/project
+                    - generic [ref=e249]:
+                      - button "Show chats" [ref=e251]:
+                        - generic [ref=e252]:
+                          - img [ref=e256]
+                          - img [ref=e266]
+                      - generic [ref=e269]: Lean game plan
+                    - button "Open project options for Lean game plan" [ref=e271]:
+                      - img [ref=e273]
+                - listitem [ref=e275]:
+                  - link "Show chats Story I tell myself Open project options for Story I tell myself" [ref=e276] [cursor=pointer]:
+                    - /url: /g/g-p-698ac44581988191b065b994f6d4a002-story-i-tell-myself/project
+                    - generic [ref=e277]:
+                      - button "Show chats" [ref=e279]:
+                        - generic [ref=e280]:
+                          - img [ref=e284]
+                          - img [ref=e294]
+                      - generic [ref=e297]: Story I tell myself
+                    - button "Open project options for Story I tell myself" [ref=e299]:
+                      - img [ref=e301]
+                - listitem [ref=e303]:
+                  - link "Show chats Side Hustle Open project options for Side Hustle" [ref=e304] [cursor=pointer]:
+                    - /url: /g/g-p-69b327626ae881919c51828902c40968-side-hustle/project
+                    - generic [ref=e305]:
+                      - button "Show chats" [ref=e307]:
+                        - generic [ref=e308]:
+                          - img [ref=e312]
+                          - img [ref=e322]
+                      - generic [ref=e325]: Side Hustle
+                    - button "Open project options for Side Hustle" [ref=e327]:
+                      - img [ref=e329]
+                - listitem [ref=e331]:
+                  - link "Show chats Time tracker Open project options for Time tracker" [ref=e332] [cursor=pointer]:
+                    - /url: /g/g-p-69c415bdfe648191ad98ddf327034ba8-time-tracker/project
+                    - generic [ref=e333]:
+                      - button "Show chats" [ref=e335]:
+                        - generic [ref=e336]:
+                          - img [ref=e340]
+                          - img [ref=e350]
+                      - generic [ref=e353]: Time tracker
+                    - button "Open project options for Time tracker" [ref=e355]:
+                      - img [ref=e357]
+                - listitem [ref=e359]:
+                  - generic [ref=e360] [cursor=pointer]:
+                    - img [ref=e362]
+                    - generic [ref=e365]: More
+            - generic [ref=e366]:
+              - button "Recents" [expanded] [ref=e368] [cursor=pointer]:
+                - heading "Recents" [level=2] [ref=e369]
+              - generic [ref=e370]:
+                - list [ref=e371]:
+                  - listitem [ref=e372]:
+                    - link "Momentum Trading Workflow, pinned conversation" [ref=e373] [cursor=pointer]:
+                      - /url: /c/69c3550b-b034-83e8-9ea1-4d2907944775
+                      - generic [ref=e375]:
+                        - text: Momentum Trading Workflow
+                        - generic [ref=e376]: Pinned
+                      - generic [ref=e377]:
+                        - generic [ref=e379]:
+                          - img [ref=e381]
+                          - button "Open conversation options for Momentum Trading Workflow" [ref=e383]:
+                            - img [ref=e385]
+                        - img [ref=e389]
+                - list [ref=e391]:
+                  - listitem [ref=e392]:
+                    - link "JGB Impact on US Equities" [ref=e393] [cursor=pointer]:
+                      - /url: /c/6a08ddf9-89e4-83e8-b7cb-d14e835ece3c
+                      - generic [ref=e395]: JGB Impact on US Equities
+                      - button "Open conversation options for JGB Impact on US Equities" [ref=e398]:
+                        - img [ref=e400]
+                  - listitem [ref=e402]:
+                    - link "Weekly Review Reminder, unread" [ref=e403] [cursor=pointer]:
+                      - /url: /c/69dcbe78-8df0-83e8-9221-5ecdfba5bc3d
+                      - generic [ref=e405]: Weekly Review Reminder
+                      - button "Open conversation options for Weekly Review Reminder" [ref=e409]:
+                        - img [ref=e411]
+                  - listitem [ref=e415]:
+                    - link "Substack banner design" [ref=e416] [cursor=pointer]:
+                      - /url: /c/6a0132e0-2a34-83e8-8e71-48f3826f334b
+                      - generic [ref=e418]: Substack banner design
+                      - button "Open conversation options for Substack banner design" [ref=e421]:
+                        - img [ref=e423]
+                  - listitem [ref=e425]:
+                    - link "New chat" [ref=e426] [cursor=pointer]:
+                      - /url: /c/69fe2c46-c9a8-83e8-bf09-d171201ddfa1
+                      - generic [ref=e428]: New chat
+                      - button "Open conversation options for New chat" [ref=e431]:
+                        - img [ref=e433]
+                  - listitem [ref=e435]:
+                    - link "Menu Redesign Request" [ref=e436] [cursor=pointer]:
+                      - /url: /c/69fe28a9-2294-83e8-a395-11fa342a2b82
+                      - generic [ref=e438]: Menu Redesign Request
+                      - button "Open conversation options for Menu Redesign Request" [ref=e441]:
+                        - img [ref=e443]
+                  - listitem [ref=e445]:
+                    - link "Canva Editable Design" [ref=e446] [cursor=pointer]:
+                      - /url: /c/69fbb8af-7f30-83e8-9d03-bfd5ef60bc11
+                      - generic [ref=e448]: Canva Editable Design
+                      - button "Open conversation options for Canva Editable Design" [ref=e451]:
+                        - img [ref=e453]
+                  - listitem [ref=e455]:
+                    - link "Menu Design Help" [ref=e456] [cursor=pointer]:
+                      - /url: /c/69faa6ff-4c58-83e8-83a0-fe9043345698
+                      - generic [ref=e458]: Menu Design Help
+                      - button "Open conversation options for Menu Design Help" [ref=e461]:
+                        - img [ref=e463]
+                  - listitem [ref=e465]:
+                    - link "The Third Naming" [ref=e466] [cursor=pointer]:
+                      - /url: /c/69fadbf4-c118-83e8-9814-38f713e1a43a
+                      - generic [ref=e468]: The Third Naming
+                      - button "Open conversation options for The Third Naming" [ref=e471]:
+                        - img [ref=e473]
+                  - listitem [ref=e475]:
+                    - link "Menu Creation Assistance" [ref=e476] [cursor=pointer]:
+                      - /url: /g/g-x2X1uC2lW-image-2-image/c/69faa5be-2c04-83e8-b80a-ea0a718a0e9b
+                      - generic [ref=e478]: Menu Creation Assistance
+                      - button "Open conversation options for Menu Creation Assistance" [ref=e481]:
+                        - img [ref=e483]
+                  - listitem [ref=e485]:
+                    - link "Strip Club Money" [ref=e486] [cursor=pointer]:
+                      - /url: /c/69f948fd-4784-8329-9054-a8a471f3c019
+                      - generic [ref=e488]: Strip Club Money
+                      - button "Open conversation options for Strip Club Money" [ref=e491]:
+                        - img [ref=e493]
+                  - listitem [ref=e495]:
+                    - link "Sovereign Operator Persona" [ref=e496] [cursor=pointer]:
+                      - /url: /c/69f6b062-e4a4-83e8-9b35-dcadc06e0bfe
+                      - generic [ref=e498]: Sovereign Operator Persona
+                      - button "Open conversation options for Sovereign Operator Persona" [ref=e501]:
+                        - img [ref=e503]
+                  - listitem [ref=e505]:
+                    - link "4 EMA vs 5 SMA" [ref=e506] [cursor=pointer]:
+                      - /url: /c/69f6a7fc-3788-83e8-a41e-d58648d6bffd
+                      - generic [ref=e508]: 4 EMA vs 5 SMA
+                      - button "Open conversation options for 4 EMA vs 5 SMA" [ref=e511]:
+                        - img [ref=e513]
+                  - listitem [ref=e515]:
+                    - link "Instagram Boba Shop Marketing" [ref=e516] [cursor=pointer]:
+                      - /url: /c/69f14bfb-e944-83e8-8e7e-89bddefb53bc
+                      - generic [ref=e518]: Instagram Boba Shop Marketing
+                      - button "Open conversation options for Instagram Boba Shop Marketing" [ref=e521]:
+                        - img [ref=e523]
+                  - listitem [ref=e525]:
+                    - link "Sports Betting Mockup Design" [ref=e526] [cursor=pointer]:
+                      - /url: /g/g-x2X1uC2lW-image-2-image/c/69f13d90-5e34-83e8-8dcc-7993cf2f9af0
+                      - generic [ref=e528]: Sports Betting Mockup Design
+                      - button "Open conversation options for Sports Betting Mockup Design" [ref=e531]:
+                        - img [ref=e533]
+                  - listitem [ref=e535]:
+                    - link "Manga Page Layout" [ref=e536] [cursor=pointer]:
+                      - /url: /c/69f0f91c-91f4-83e8-96cb-5fa1d1499f8c
+                      - generic [ref=e538]: Manga Page Layout
+                      - button "Open conversation options for Manga Page Layout" [ref=e541]:
+                        - img [ref=e543]
+                  - listitem [ref=e545]:
+                    - link "Action Button ChatGPT Setup" [ref=e546] [cursor=pointer]:
+                      - /url: /c/69ed1730-a38c-83e8-b8e0-79c09b4c7b20
+                      - generic [ref=e548]: Action Button ChatGPT Setup
+                      - button "Open conversation options for Action Button ChatGPT Setup" [ref=e551]:
+                        - img [ref=e553]
+                  - listitem [ref=e555]:
+                    - link "Waymo LiDAR Spinning Explained" [ref=e556] [cursor=pointer]:
+                      - /url: /c/69ec2f12-6630-83e8-9934-c5b5cc76a68b
+                      - generic [ref=e558]: Waymo LiDAR Spinning Explained
+                      - button "Open conversation options for Waymo LiDAR Spinning Explained" [ref=e561]:
+                        - img [ref=e563]
+                  - listitem [ref=e565]:
+                    - link "Using Hermes AI" [ref=e566] [cursor=pointer]:
+                      - /url: /c/69ea24a1-0b44-83e8-92d5-863b49c9251d
+                      - generic [ref=e568]: Using Hermes AI
+                      - button "Open conversation options for Using Hermes AI" [ref=e571]:
+                        - img [ref=e573]
+                  - listitem [ref=e575]:
+                    - link "Harness vs Playwright" [ref=e576] [cursor=pointer]:
+                      - /url: /c/69e9e312-91dc-83e8-8c7b-2f63725cf14a
+                      - generic [ref=e578]: Harness vs Playwright
+                      - button "Open conversation options for Harness vs Playwright" [ref=e581]:
+                        - img [ref=e583]
+                  - listitem [ref=e585]:
+                    - link "Momentum Stock Scan Setup" [ref=e586] [cursor=pointer]:
+                      - /url: /c/69cb2745-4db8-83e8-95b2-b1e10ef41ceb
+                      - generic [ref=e588]: Momentum Stock Scan Setup
+                      - button "Open conversation options for Momentum Stock Scan Setup" [ref=e591]:
+                        - img [ref=e593]
+                  - listitem [ref=e595]:
+                    - link "Evening routine suggestions" [ref=e596] [cursor=pointer]:
+                      - /url: /c/69df03b8-4574-83e8-8ccd-88359696be58
+                      - generic [ref=e598]: Evening routine suggestions
+                      - button "Open conversation options for Evening routine suggestions" [ref=e601]:
+                        - img [ref=e603]
+                  - listitem [ref=e605]:
+                    - link "Raymond Zhu's Operating Context" [ref=e606] [cursor=pointer]:
+                      - /url: /c/69defd5b-63e0-83e8-90da-796d67f5e40e
+                      - generic [ref=e608]: Raymond Zhu's Operating Context
+                      - button "Open conversation options for Raymond Zhu's Operating Context" [ref=e611]:
+                        - img [ref=e613]
+                  - listitem [ref=e615]:
+                    - link "Elite Performance Mindset" [ref=e616] [cursor=pointer]:
+                      - /url: /c/69db1d32-2e04-83e8-b58f-427c06e04953
+                      - generic [ref=e618]: Elite Performance Mindset
+                      - button "Open conversation options for Elite Performance Mindset" [ref=e621]:
+                        - img [ref=e623]
+                  - listitem [ref=e625]:
+                    - link "Recent Momentum Stocks" [ref=e626] [cursor=pointer]:
+                      - /url: /c/69d9c6d6-c220-83e8-8444-2a4524355472
+                      - generic [ref=e628]: Recent Momentum Stocks
+                      - button "Open conversation options for Recent Momentum Stocks" [ref=e631]:
+                        - img [ref=e633]
+                  - listitem [ref=e635]:
+                    - link "Alex Hormozi Insights" [ref=e636] [cursor=pointer]:
+                      - /url: /c/69d9abd9-23f4-83e8-8b04-010bec7d05be
+                      - generic [ref=e638]: Alex Hormozi Insights
+                      - button "Open conversation options for Alex Hormozi Insights" [ref=e641]:
+                        - img [ref=e643]
+                  - listitem [ref=e645]:
+                    - link "Public Visibility and Criticism" [ref=e646] [cursor=pointer]:
+                      - /url: /c/69d99ec9-0378-83e8-810c-673c709de4b4
+                      - generic [ref=e648]: Public Visibility and Criticism
+                      - button "Open conversation options for Public Visibility and Criticism" [ref=e651]:
+                        - img [ref=e653]
+                  - listitem [ref=e655]:
+                    - link "Heart Rate Interpretation" [ref=e656] [cursor=pointer]:
+                      - /url: /c/69d91f83-2a78-83e8-8be5-ebc6dc91e407
+                      - generic [ref=e658]: Heart Rate Interpretation
+                      - button "Open conversation options for Heart Rate Interpretation" [ref=e661]:
+                        - img [ref=e663]
+                  - listitem [ref=e665]:
+                    - link "Trading Edge Development" [ref=e666] [cursor=pointer]:
+                      - /url: /c/69d88921-54cc-83e8-ac06-b929d735cf51
+                      - generic [ref=e668]: Trading Edge Development
+                      - button "Open conversation options for Trading Edge Development" [ref=e671]:
+                        - img [ref=e673]
+          - button "Raymond Zhu Plus, open profile menu" [ref=e59] [cursor=pointer]:
+            - generic [ref=e63]:
+              - generic [ref=e65]: Raymond Zhu
+              - generic [ref=e68]: Plus
+            - button "Download apps" [ref=e71]:
+              - img [ref=e73]
+    - generic [ref=e76]:
+      - banner:
+        - button "Turn on temporary chat" [ref=e82] [cursor=pointer]:
+          - img [ref=e83]
+      - main [ref=e85]:
+        - generic [ref=e86]:
+          - heading "Where should we begin?" [level=1] [ref=e94]:
+            - generic [ref=e95]: Where should we begin?
+          - generic [ref=e96]:
+            - generic [ref=e102]:
+              - generic [ref=e106]:
+                - button "Add files and more" [ref=e109] [cursor=pointer]:
+                  - img
+                - textbox "Chat with ChatGPT" [active] [ref=e676]:
+                  - paragraph [ref=e677]: Describe or edit an image
+                - generic [ref=e716]:
+                  - button "Image, click to remove" [ref=e719] [cursor=pointer]:
+                    - generic:
+                      - img
+                    - generic [ref=e720]: Image
+                    - generic:
+                      - img
+                  - button "Choose image aspect ratio" [ref=e721] [cursor=pointer]:
+                    - img
+                    - generic: Auto
+                    - img
+                - generic [ref=e113]:
+                  - button "Thinking" [ref=e681] [cursor=pointer]:
+                    - generic [ref=e682]: Thinking
+                    - img
+                  - generic [ref=e114]:
+                    - button "Start dictation" [ref=e683] [cursor=pointer]:
+                      - img
+                    - button "Start Voice" [ref=e686] [cursor=pointer]:
+                      - img [ref=e687]
+              - button [ref=e119]
+              - button [ref=e120]
+            - generic [ref=e691]:
+              - button [ref=e722]
+              - button [ref=e723]
+              - generic [ref=e724]:
+                - generic [ref=e725]:
+                  - heading "Explore ideas" [level=2] [ref=e727]
+                  - generic [ref=e728]:
+                    - button "What's new" [ref=e729] [cursor=pointer]
+                    - generic [ref=e730]:
+                      - button "Previous page" [disabled] [ref=e731]:
+                        - img [ref=e732]
+                      - button "Next page" [ref=e734] [cursor=pointer]:
+                        - img [ref=e735]
+                - generic [ref=e738]:
+                  - button "Upload a photo" [ref=e739] [cursor=pointer]:
+                    - generic [ref=e740]:
+                      - img [ref=e742]
+                      - generic:
+                        - generic: Upload a photo
+                  - button "Create a visual-first, editorial-style infographic auditing the desk setup in the attached photo. Show a side-by-side of current vs. optimized setup with annotations on monitor height, chair position, lighting, cable management, and clutter. Rate each issue with symbols like Top Fix, (working), (acceptable), (costing energy), and (actively hurting), tying each to a consequence like back pain, eye strain, or focus loss. Rank fixes by impact and group them into free fixes, under $50, and worth the investment. Include a Focus Forecast gauge predicting daily deep work hours possible with the current setup vs. after the top 3 fixes. Keep it clean, minimal text, no paragraphs. Improve Your Desk Setup" [ref=e744] [cursor=pointer]:
+                    - generic [ref=e745]:
+                      - img "Create a visual-first, editorial-style infographic auditing the desk setup in the attached photo. Show a side-by-side of current vs. optimized setup with annotations on monitor height, chair position, lighting, cable management, and clutter. Rate each issue with symbols like Top Fix, (working), (acceptable), (costing energy), and (actively hurting), tying each to a consequence like back pain, eye strain, or focus loss. Rank fixes by impact and group them into free fixes, under $50, and worth the investment. Include a Focus Forecast gauge predicting daily deep work hours possible with the current setup vs. after the top 3 fixes. Keep it clean, minimal text, no paragraphs." [ref=e747]
+                      - generic:
+                        - generic: Improve Your Desk Setup
+                  - button "Use this image to create a travel collage by placing the main subject of the original image in a travel destination location with location appropriate styling as an instant photo with instant photo style lighting, color and quality. Include a postcard from a random less traveled destination in blue ink pen inspiring me to travel to new places. It should feel intimate, personal, and cleanly curated. Add souvenirs and small details that create a sense of a memento in a balanced layout with natural lighting. Wanderlust" [ref=e748] [cursor=pointer]:
+                    - generic [ref=e749]:
+                      - img "Use this image to create a travel collage by placing the main subject of the original image in a travel destination location with location appropriate styling as an instant photo with instant photo style lighting, color and quality. Include a postcard from a random less traveled destination in blue ink pen inspiring me to travel to new places. It should feel intimate, personal, and cleanly curated. Add souvenirs and small details that create a sense of a memento in a balanced layout with natural lighting." [ref=e751]
+                      - generic:
+                        - generic: Wanderlust
+                  - button "Redraw the attached image in the most clumsy, scribbly, and utterly pathetic way possible. Use a white background, and make it look like it was drawn in an old computer painting program with a mouse. It should be vaguely similar but also not really, kind of matching but also off in a confusing, awkward way, with that low-quality pixel-by-pixel feel that really emphasizes how ridiculously bad it is. Actually, you know what, whatever, just draw it however you want. Scribble" [ref=e752] [cursor=pointer]:
+                    - generic [ref=e753]:
+                      - img "Redraw the attached image in the most clumsy, scribbly, and utterly pathetic way possible. Use a white background, and make it look like it was drawn in an old computer painting program with a mouse. It should be vaguely similar but also not really, kind of matching but also off in a confusing, awkward way, with that low-quality pixel-by-pixel feel that really emphasizes how ridiculously bad it is. Actually, you know what, whatever, just draw it however you want." [ref=e755]
+                      - generic:
+                        - generic: Scribble
+                  - 'button "Create a visually rich infographic about an endangered animal. Start by finding one online, research its habitat, diet, and unique traits. Present information through annotated visuals and structured callouts, not generic sections. Style it like a bold graphic illustration: a detailed, photorealistic central animal as the focal point, supported by diagrams, callouts, and concise text elements. Use clean backgrounds and a mix of photorealism with strong graphic elements (shapes, icons, color blocking) in a layered composition. Make it dense, tactile, and professionally authored. Thinking Animal infographic" [ref=e756] [cursor=pointer]':
+                    - generic [ref=e757]:
+                      - 'img "Create a visually rich infographic about an endangered animal. Start by finding one online, research its habitat, diet, and unique traits. Present information through annotated visuals and structured callouts, not generic sections. Style it like a bold graphic illustration: a detailed, photorealistic central animal as the focal point, supported by diagrams, callouts, and concise text elements. Use clean backgrounds and a mix of photorealism with strong graphic elements (shapes, icons, color blocking) in a layered composition. Make it dense, tactile, and professionally authored." [ref=e759]'
+                      - generic:
+                        - generic: Thinking
+                      - generic:
+                        - generic: Animal infographic
+                  - 'button "Using the uploaded photograph, create a cute illustrated chibi sticker-pack. Clean, white background, vertical output with a thick white border. Create diverse cute expressions: laughing, crying, sleepy, surprised, confused, eating, grumpy, cute expressions… Each expression should include cute text, for example: Good morning! Whattt? / Huh? / I’m reminding you! / So sleepy / Wow! Approved! / Nice! / Hey you! Achoo! / Angry! / Huh??? / Good night :3 / Too cuteee / Am I cool yet?! Chibi stickers" [ref=e760] [cursor=pointer]':
+                    - generic [ref=e761]:
+                      - 'img "Using the uploaded photograph, create a cute illustrated chibi sticker-pack. Clean, white background, vertical output with a thick white border. Create diverse cute expressions: laughing, crying, sleepy, surprised, confused, eating, grumpy, cute expressions… Each expression should include cute text, for example: Good morning! Whattt? / Huh? / I’m reminding you! / So sleepy / Wow! Approved! / Nice! / Hey you! Achoo! / Angry! / Huh??? / Good night :3 / Too cuteee / Am I cool yet?!" [ref=e763]'
+                      - generic:
+                        - generic: Chibi stickers
+                  - button "Create a high-quality “Makeup Analysis Guide” infographic based on the portrait photo I uploaded. Make it feel professional and clean, like a modern beauty-magazine feature. Use the uploaded photo as the foundation, preserving the person’s real facial features and recognizability without excessive retouching. Prioritize visuals that highlight the key points, with minimal text and no long paragraphs. Use a 9:16 aspect ratio. Makeup guide" [ref=e764] [cursor=pointer]:
+                    - generic [ref=e765]:
+                      - img "Create a high-quality “Makeup Analysis Guide” infographic based on the portrait photo I uploaded. Make it feel professional and clean, like a modern beauty-magazine feature. Use the uploaded photo as the foundation, preserving the person’s real facial features and recognizability without excessive retouching. Prioritize visuals that highlight the key points, with minimal text and no long paragraphs. Use a 9:16 aspect ratio." [ref=e767]
+                      - generic:
+                        - generic: Makeup guide
+                  - button "Transform the main subject of the uploaded image into a clean educational cutaway diagram on a white background. Keep the subject’s distinctive features from the original image, show a believable cross-section or layered interior, and add clear labeled callouts. Make it look like a textbook or museum science graphic, with clarity and accuracy prioritized over dramatic or artistic styling. Cross-section" [ref=e768] [cursor=pointer]:
+                    - generic [ref=e769]:
+                      - img "Transform the main subject of the uploaded image into a clean educational cutaway diagram on a white background. Keep the subject’s distinctive features from the original image, show a believable cross-section or layered interior, and add clear labeled callouts. Make it look like a textbook or museum science graphic, with clarity and accuracy prioritized over dramatic or artistic styling." [ref=e771]
+                      - generic:
+                        - generic: Cross-section
+                  - button "Create a 5.5x3 mockup image of a new design-forward app with a cohesive design system. Show one mobile welcome screen with no photography, one mobile home-page screen, and two product or service pages. Include nothing else in the mockup image. Before generating, ask me the name of my app, what it is for, and the aesthetic I want. App design" [ref=e772] [cursor=pointer]:
+                    - generic [ref=e773]:
+                      - img "Create a 5.5x3 mockup image of a new design-forward app with a cohesive design system. Show one mobile welcome screen with no photography, one mobile home-page screen, and two product or service pages. Include nothing else in the mockup image. Before generating, ask me the name of my app, what it is for, and the aesthetic I want." [ref=e775]
+                      - generic:
+                        - generic: App design
+                  - 'button "Create a wholly original, simple black-and-white comic strip in a retro hand-inked manga style. Use 2-3 horizontal panels. Treat the uploaded image as the character reference; redraw the character entirely in manga form with consistent line work and shading across every panel. Interpret the person as the main character and, based on their appearance, generate an uplifting encounter with a clear “setup-reinforce-turnaround” structure: the first panel establishes context, the second develops the situation, and the third delivers a surprise twist. Keep the dialogue short, natural, and upbeat. No technology. Anime comic" [ref=e776] [cursor=pointer]':
+                    - generic [ref=e777]:
+                      - 'img "Create a wholly original, simple black-and-white comic strip in a retro hand-inked manga style. Use 2-3 horizontal panels. Treat the uploaded image as the character reference; redraw the character entirely in manga form with consistent line work and shading across every panel. Interpret the person as the main character and, based on their appearance, generate an uplifting encounter with a clear “setup-reinforce-turnaround” structure: the first panel establishes context, the second develops the situation, and the third delivers a surprise twist. Keep the dialogue short, natural, and upbeat. No technology." [ref=e779]'
+                      - generic:
+                        - generic: Anime comic
+                  - button "Turn this photo into a magical “Mini Me” world where tiny animated versions of yourself come to life around you. These cute 3D-style mini characters interact with your everyday surroundings — climbing onto your shoulders, sitting on your bag, waving, playing, and copying your poses — creating a playful yet emotional social media story-worthy scene full of personality and story. The original photo remains untouched while the tiny characters bring the image to life with depth, movement, realistic shadows, and a soft aesthetic vibe. Mini me" [ref=e780] [cursor=pointer]:
+                    - generic [ref=e781]:
+                      - img "Turn this photo into a magical “Mini Me” world where tiny animated versions of yourself come to life around you. These cute 3D-style mini characters interact with your everyday surroundings — climbing onto your shoulders, sitting on your bag, waving, playing, and copying your poses — creating a playful yet emotional social media story-worthy scene full of personality and story. The original photo remains untouched while the tiny characters bring the image to life with depth, movement, realistic shadows, and a soft aesthetic vibe." [ref=e783]
+                      - generic:
+                        - generic: Mini me
+                  - 'button "Create a deeply researched editorial-style infographic that transforms a highly complex topic into something understandable. Use premium visual design: a clean grid layout, bold typography, subtle gradients, a refined color palette, elegant icons, data visualizations, layered diagrams, and clear hierarchy. Prioritize peer-reviewed articles and respected publications as references. Before generating, ask me what topic I have always wanted to understand better. Thinking Research visual" [ref=e784] [cursor=pointer]':
+                    - generic [ref=e785]:
+                      - 'img "Create a deeply researched editorial-style infographic that transforms a highly complex topic into something understandable. Use premium visual design: a clean grid layout, bold typography, subtle gradients, a refined color palette, elegant icons, data visualizations, layered diagrams, and clear hierarchy. Prioritize peer-reviewed articles and respected publications as references. Before generating, ask me what topic I have always wanted to understand better." [ref=e787]'
+                      - generic:
+                        - generic: Thinking
+                      - generic:
+                        - generic: Research visual
+                  - button "Create a 3-page color mixed media food zine for an international recipe. First, look online for recent trendy recipes, then choose one based on what you know about me. Include necessary step-by-step visuals, diagrams, and explainers. Include any health or environmental context of the dish. Thinking Illustrated recipe" [ref=e788] [cursor=pointer]:
+                    - generic [ref=e789]:
+                      - img "Create a 3-page color mixed media food zine for an international recipe. First, look online for recent trendy recipes, then choose one based on what you know about me. Include necessary step-by-step visuals, diagrams, and explainers. Include any health or environmental context of the dish." [ref=e791]
+                      - generic:
+                        - generic: Thinking
+                      - generic:
+                        - generic: Illustrated recipe
+                  - button "Transform this photo into an elevated fashion studio portrait. Choose a complementing-color background that enhances the subject's skin tone. Keep a tight head-and-shoulder composition with the subject centered and facing the camera straight with an optimistic expression. Apply directional lighting with subtle shadows. Preserve natural skin tones while making the image polished, minimal, and editorial—like a magazine photoshoot. Studio headshot" [ref=e792] [cursor=pointer]:
+                    - generic [ref=e793]:
+                      - img "Transform this photo into an elevated fashion studio portrait. Choose a complementing-color background that enhances the subject's skin tone. Keep a tight head-and-shoulder composition with the subject centered and facing the camera straight with an optimistic expression. Apply directional lighting with subtle shadows. Preserve natural skin tones while making the image polished, minimal, and editorial—like a magazine photoshoot." [ref=e795]
+                      - generic:
+                        - generic: Studio headshot
+                  - button "Create a single-subject blueprint poster using only the main subject from the uploaded image. Render it as a clean white technical line drawing on a deep cobalt-blue blueprint background with a subtle grid. Use flat 2D schematic linework, orthographic contours, construction lines, measurement ticks, arrows, and minimal technical labels. The composition may also include 2-3 smaller inset studies or alternate views. Keep the layout simple and balanced with no shading, no 3D, no lighting, no extra objects. Blueprint poster" [ref=e796] [cursor=pointer]:
+                    - generic [ref=e797]:
+                      - img "Create a single-subject blueprint poster using only the main subject from the uploaded image. Render it as a clean white technical line drawing on a deep cobalt-blue blueprint background with a subtle grid. Use flat 2D schematic linework, orthographic contours, construction lines, measurement ticks, arrows, and minimal technical labels. The composition may also include 2-3 smaller inset studies or alternate views. Keep the layout simple and balanced with no shading, no 3D, no lighting, no extra objects." [ref=e799]
+                      - generic:
+                        - generic: Blueprint poster
+                  - button "Create a personal color analysis graphic using this portrait. Show side-by-side clothing color comparisons to highlight which colors suit the subject best. Make it visual-first, with short labels only and no paragraphs. Color analysis" [ref=e800] [cursor=pointer]:
+                    - generic [ref=e801]:
+                      - img "Create a personal color analysis graphic using this portrait. Show side-by-side clothing color comparisons to highlight which colors suit the subject best. Make it visual-first, with short labels only and no paragraphs." [ref=e803]
+                      - generic:
+                        - generic: Color analysis
+                  - button "Transform the photo into nighttime chic flash photography. Use harsh direct on-camera flash with strong highlights, deep shadows, and slight overexposure on the subject. Set the scene at night with a dark, moody background while keeping realistic colors and textures. Add a candid, editorial feel, slightly imperfect framing, motion energy, and spontaneous expression. Emphasize high contrast, glossy skin highlights, and subtle film grain for a raw, fashion-nightlife aesthetic. Nighttime flash" [ref=e804] [cursor=pointer]:
+                    - generic [ref=e805]:
+                      - img "Transform the photo into nighttime chic flash photography. Use harsh direct on-camera flash with strong highlights, deep shadows, and slight overexposure on the subject. Set the scene at night with a dark, moody background while keeping realistic colors and textures. Add a candid, editorial feel, slightly imperfect framing, motion energy, and spontaneous expression. Emphasize high contrast, glossy skin highlights, and subtle film grain for a raw, fashion-nightlife aesthetic." [ref=e807]
+                      - generic:
+                        - generic: Nighttime flash
+                  - button "Create a trending anime art style image from the uploaded subject. Use confident line-work with slight variation and minimal cel shading using flat shadow shapes. Use bright, saturated colors and clean graphic lighting. The style is defined by exaggerated, cartoonish character proportions featuring highly expressive, simplistic facial features that allow for immense emotional range, with highly varied stretched anatomy. Transform the environment into a slightly warped space with playful perspective distortion and simplified objects. Composition and tone should be energetic, lively, and comedic in a fully stylized, non-realistic world. Anime" [ref=e808] [cursor=pointer]:
+                    - generic [ref=e809]:
+                      - img "Create a trending anime art style image from the uploaded subject. Use confident line-work with slight variation and minimal cel shading using flat shadow shapes. Use bright, saturated colors and clean graphic lighting. The style is defined by exaggerated, cartoonish character proportions featuring highly expressive, simplistic facial features that allow for immense emotional range, with highly varied stretched anatomy. Transform the environment into a slightly warped space with playful perspective distortion and simplified objects. Composition and tone should be energetic, lively, and comedic in a fully stylized, non-realistic world." [ref=e811]
+                      - generic:
+                        - generic: Anime
+                  - button "Create a comic strip using the subject from the uploaded image. Style the comic strip in a bold Sunday funnies style with thick outlines, halftone textures, and bright 1980s colors. Pick one clear, exaggerated visual element from the photo and build the story around it, leading to a funny or unexpected payoff. Keep the dialogue short, natural, and easy to read, and make sure the joke lands clearly at a glance with no randomness or confusion. Comic" [ref=e812] [cursor=pointer]:
+                    - generic [ref=e813]:
+                      - img "Create a comic strip using the subject from the uploaded image. Style the comic strip in a bold Sunday funnies style with thick outlines, halftone textures, and bright 1980s colors. Pick one clear, exaggerated visual element from the photo and build the story around it, leading to a funny or unexpected payoff. Keep the dialogue short, natural, and easy to read, and make sure the joke lands clearly at a glance with no randomness or confusion." [ref=e815]
+                      - generic:
+                        - generic: Comic
+                  - button "Transform this image into a grid of minimalist logos using the main subject as the core icon. Abstract and simplify the primary element into multiple unique vector-style logo marks. Each variation should reinterpret the same subject in different ways (geometric, line art, negative space, emblem, badge, monogram). Arrange 16-20 logos evenly on a light background. Keep designs clean, modern, with balanced spacing. Maintain consistency while exploring creative variations of the original subject as a cohesive branding logo collection. Icon designs" [ref=e816] [cursor=pointer]:
+                    - generic [ref=e817]:
+                      - img "Transform this image into a grid of minimalist logos using the main subject as the core icon. Abstract and simplify the primary element into multiple unique vector-style logo marks. Each variation should reinterpret the same subject in different ways (geometric, line art, negative space, emblem, badge, monogram). Arrange 16-20 logos evenly on a light background. Keep designs clean, modern, with balanced spacing. Maintain consistency while exploring creative variations of the original subject as a cohesive branding logo collection." [ref=e819]
+                      - generic:
+                        - generic: Icon designs
+                  - button "Transform the person in the uploaded photo into a whimsical black-and-white vintage newspaper front page. Place them as the main portrait in the center, styled like an old engraved photograph. Surround them with bold, exaggerated headline text, narrow newspaper columns, and playful subheadings. Use high-contrast black ink on pure white background, subtle paper texture, and classic serif fonts. Add quirky, magical or humorous headlines to create a charming, slightly surreal tone. Keep the layout dense, editorial, and reminiscent of an old fantasy newspaper. Ensure the subject's face remains recognizable but stylized to match the printed newspaper aesthetic. Fantasy newspaper" [ref=e820] [cursor=pointer]:
+                    - generic [ref=e821]:
+                      - img "Transform the person in the uploaded photo into a whimsical black-and-white vintage newspaper front page. Place them as the main portrait in the center, styled like an old engraved photograph. Surround them with bold, exaggerated headline text, narrow newspaper columns, and playful subheadings. Use high-contrast black ink on pure white background, subtle paper texture, and classic serif fonts. Add quirky, magical or humorous headlines to create a charming, slightly surreal tone. Keep the layout dense, editorial, and reminiscent of an old fantasy newspaper. Ensure the subject's face remains recognizable but stylized to match the printed newspaper aesthetic." [ref=e823]
+                      - generic:
+                        - generic: Fantasy newspaper
+                  - button "Create a vintage botanical illustration poster that reinterprets the main subject as if it were studied in a 19th-century scientific atlas, using only visible details. Use fine ink linework, delicate cross-hatching, and a realistic yet idealized illustration style. Style illustration with bright colors from the uploaded image on a white background. Lay out a central primary illustration supported by smaller inset studies, guide lines, and diagram callouts that analyze form and structure with annotated text. Include understated labels and markers. Annotated text should be in plain English and easy to read. Infographic poster" [ref=e824] [cursor=pointer]:
+                    - generic [ref=e825]:
+                      - img "Create a vintage botanical illustration poster that reinterprets the main subject as if it were studied in a 19th-century scientific atlas, using only visible details. Use fine ink linework, delicate cross-hatching, and a realistic yet idealized illustration style. Style illustration with bright colors from the uploaded image on a white background. Lay out a central primary illustration supported by smaller inset studies, guide lines, and diagram callouts that analyze form and structure with annotated text. Include understated labels and markers. Annotated text should be in plain English and easy to read." [ref=e827]
+                      - generic:
+                        - generic: Infographic poster
+                  - 'button "Transform the uploaded image into cinematic 3-frame sequential film stills (horizontal frames stacked vertically), full bleed edge-to-edge. Each frame should show a different moment from the same scene, with clear progression. Vary the composition, camera angle, and distances to create a sense of movement and storytelling. Use a cinematic, cooler-toned, high-contrast, deep-space blacks film with a natural color grade. Add subtle film grain, slight motion blur, and natural imperfections to emulate analog photography. Keep the composition candid and emotionally grounded, with a sense of movement and quiet storytelling. Overall aesthetic: cinematic, nostalgic, and organic, like raw film stills. Film strip" [ref=e828] [cursor=pointer]':
+                    - generic [ref=e829]:
+                      - 'img "Transform the uploaded image into cinematic 3-frame sequential film stills (horizontal frames stacked vertically), full bleed edge-to-edge. Each frame should show a different moment from the same scene, with clear progression. Vary the composition, camera angle, and distances to create a sense of movement and storytelling. Use a cinematic, cooler-toned, high-contrast, deep-space blacks film with a natural color grade. Add subtle film grain, slight motion blur, and natural imperfections to emulate analog photography. Keep the composition candid and emotionally grounded, with a sense of movement and quiet storytelling. Overall aesthetic: cinematic, nostalgic, and organic, like raw film stills." [ref=e831]'
+                      - generic:
+                        - generic: Film strip
+                  - button "Create a tarot card based off of what you know about me in the classic Rider-Waite style. Style me in a hand-drawn figure using bold but imperfect black ink linework with wobble and variation, flat colors with no shading. Layer subtle tarot visual elements around the figure. Add paper texture and print feel. Tarot card" [ref=e832] [cursor=pointer]:
+                    - generic [ref=e833]:
+                      - img "Create a tarot card based off of what you know about me in the classic Rider-Waite style. Style me in a hand-drawn figure using bold but imperfect black ink linework with wobble and variation, flat colors with no shading. Layer subtle tarot visual elements around the figure. Add paper texture and print feel." [ref=e835]
+                      - generic:
+                        - generic: Tarot card
+                  - button "Improve the quality of my photo and make it clearer. Enhance photos" [ref=e836] [cursor=pointer]:
+                    - generic [ref=e837]:
+                      - img "Improve the quality of my photo and make it clearer." [ref=e839]
+                      - generic:
+                        - generic: Enhance photos
+                  - button "Transform this image into a realistic mid-century modern interior with clean lines, warm natural materials, sculptural furniture, bright natural cinematic lighting, that highlights textures of the room. Keep the space photorealistic, like a high-end editorial interior photograph. Interior design" [ref=e840] [cursor=pointer]:
+                    - generic [ref=e841]:
+                      - img "Transform this image into a realistic mid-century modern interior with clean lines, warm natural materials, sculptural furniture, bright natural cinematic lighting, that highlights textures of the room. Keep the space photorealistic, like a high-end editorial interior photograph." [ref=e843]
+                      - generic:
+                        - generic: Interior design
+                  - 'button "Create a premium glossy 3D \"designer toy\" render of the subject(s) using the uploaded image as the only reference. Render one floating head per person (no duplication), cropped cleanly below the jaw with a visible neck and full head comfortably framed. Style: high-quality vinyl figure with ultra-smooth, simplified forms, rounded volumes, and strong glossy reflections across key facial areas. Hair should be sculpted, glossy, and stylized, with embedded playful accessories. Include oversized retro wraparound sunglasses with vibrant, matching frame/lens colors. Use strong studio lighting with pronounced highlights. Background: blue sky with soft clouds. 3D avatar" [ref=e844] [cursor=pointer]':
+                    - generic [ref=e845]:
+                      - 'img "Create a premium glossy 3D \"designer toy\" render of the subject(s) using the uploaded image as the only reference. Render one floating head per person (no duplication), cropped cleanly below the jaw with a visible neck and full head comfortably framed. Style: high-quality vinyl figure with ultra-smooth, simplified forms, rounded volumes, and strong glossy reflections across key facial areas. Hair should be sculpted, glossy, and stylized, with embedded playful accessories. Include oversized retro wraparound sunglasses with vibrant, matching frame/lens colors. Use strong studio lighting with pronounced highlights. Background: blue sky with soft clouds." [ref=e847]'
+                      - generic:
+                        - generic: 3D avatar
+                  - button "Improve the lighting while keeping everything else exactly the same. Do not change the person, pose, expression, background, or composition. Fix issues like back lighting, harsh shadows, underexposure or uneven lighting. Transform the original lighting into soft, natural, flattering light coming from slightly above eye level and facing the subject, so the face is evenly lit with realistic skin tones. Keep the result photorealistic and consistent with the original scene. Fix lighting" [ref=e848] [cursor=pointer]:
+                    - generic [ref=e849]:
+                      - img "Improve the lighting while keeping everything else exactly the same. Do not change the person, pose, expression, background, or composition. Fix issues like back lighting, harsh shadows, underexposure or uneven lighting. Transform the original lighting into soft, natural, flattering light coming from slightly above eye level and facing the subject, so the face is evenly lit with realistic skin tones. Keep the result photorealistic and consistent with the original scene." [ref=e851]
+                      - generic:
+                        - generic: Fix lighting
+                  - button "Turn this simple, childlike drawing or photo into a photo-realistic scene. Use it as an exact blueprint; keep all the proportions, shapes, and quirks as-is. Translate it into real materials, textures, and lighting. Place it in a believable environment with depth and shadows so it feels like a real photo of the drawing brought to life. Drawing" [ref=e852] [cursor=pointer]:
+                    - generic [ref=e853]:
+                      - img "Turn this simple, childlike drawing or photo into a photo-realistic scene. Use it as an exact blueprint; keep all the proportions, shapes, and quirks as-is. Translate it into real materials, textures, and lighting. Place it in a believable environment with depth and shadows so it feels like a real photo of the drawing brought to life." [ref=e855]
+                      - generic:
+                        - generic: Drawing
+                  - button "Create a macro nature image of a scene with realistic textures, shallow depth of field with creamy bokeh, in a natural outdoor setting. The image has an analog, imperfect, wabi sabi, 35mm film-like quality—grain, natural color rendering, and a soft contrast curve. Ultra-realistic detail, macro photography, 9:16 aspect ratio. Before creating the image, ask me a follow up question giving a numbered list of a few unexpected options for subject matter and then render the image. Hyperreal wallpaper" [ref=e856] [cursor=pointer]:
+                    - generic [ref=e857]:
+                      - img "Create a macro nature image of a scene with realistic textures, shallow depth of field with creamy bokeh, in a natural outdoor setting. The image has an analog, imperfect, wabi sabi, 35mm film-like quality—grain, natural color rendering, and a soft contrast curve. Ultra-realistic detail, macro photography, 9:16 aspect ratio. Before creating the image, ask me a follow up question giving a numbered list of a few unexpected options for subject matter and then render the image." [ref=e859]
+                      - generic:
+                        - generic: Hyperreal wallpaper
+                  - button "Using the subject(s) in the uploaded image as inspiration, create a single frame image from a story-driven 2D side-scrolling pixel art game. Translate the image's themes, colors, or subjects into the game world. The scene should capture a climactic, victorious moment in a non-violent, uplifting, or humorous way. Style should be detailed retro pixel art (16-bit), with clear silhouettes and a cohesive color palette. The image should be vertical and show the full game screen. Include a classic HUD at the top with a funny, original game title inspired by the image. The frame should feel like gameplay in progress, with a character, environment, and a clear sense of action or objective. All elements must be contained within the game screen. 8-bit game" [ref=e860] [cursor=pointer]:
+                    - generic [ref=e861]:
+                      - img "Using the subject(s) in the uploaded image as inspiration, create a single frame image from a story-driven 2D side-scrolling pixel art game. Translate the image's themes, colors, or subjects into the game world. The scene should capture a climactic, victorious moment in a non-violent, uplifting, or humorous way. Style should be detailed retro pixel art (16-bit), with clear silhouettes and a cohesive color palette. The image should be vertical and show the full game screen. Include a classic HUD at the top with a funny, original game title inspired by the image. The frame should feel like gameplay in progress, with a character, environment, and a clear sense of action or objective. All elements must be contained within the game screen." [ref=e863]
+                      - generic:
+                        - generic: 8-bit game
+                  - button "Create a cinematic, ultra-realistic landscape with a softly blurred foreground, bokeh, and layered depth. Composition should have a lot of negative space. The image has an analog, imperfect, 35mm film-like quality—grain, natural color rendering, and a soft contrast curve. No people or structures. Before generating, ask me a follow-up question giving a numbered list of a few choices of landscape. Landscape" [ref=e864] [cursor=pointer]:
+                    - generic [ref=e865]:
+                      - img "Create a cinematic, ultra-realistic landscape with a softly blurred foreground, bokeh, and layered depth. Composition should have a lot of negative space. The image has an analog, imperfect, 35mm film-like quality—grain, natural color rendering, and a soft contrast curve. No people or structures. Before generating, ask me a follow-up question giving a numbered list of a few choices of landscape." [ref=e867]
+                      - generic:
+                        - generic: Landscape
+                  - button "Create an extreme close-up underwater portrait after the subject has just jumped into a swimming pool or clear shallow water. Keep the mood calm, weightless, and ethereal, emphasizing light reflections. No struggle or urgency. Underwater" [ref=e868] [cursor=pointer]:
+                    - generic [ref=e869]:
+                      - img "Create an extreme close-up underwater portrait after the subject has just jumped into a swimming pool or clear shallow water. Keep the mood calm, weightless, and ethereal, emphasizing light reflections. No struggle or urgency." [ref=e871]
+                      - generic:
+                        - generic: Underwater
+                  - button "Create a detailed neoclassical Greek white Carrara marble statue honoring the uploaded image. If the image has a person, depict the person in the statue as a powerful allegorical figure in motion, with flowing garments, a confident pose, and a serious expression. If it is not a person, do not add a person. Include elements from the photo to give the statue personality and non-generic historical artifacts based on what you know about me. Set in a museum hall. Photorealistic with medium depth of field, natural perspective, and warm museum lighting casting dramatic, realistic shadows. Statue" [ref=e872] [cursor=pointer]:
+                    - generic [ref=e873]:
+                      - img "Create a detailed neoclassical Greek white Carrara marble statue honoring the uploaded image. If the image has a person, depict the person in the statue as a powerful allegorical figure in motion, with flowing garments, a confident pose, and a serious expression. If it is not a person, do not add a person. Include elements from the photo to give the statue personality and non-generic historical artifacts based on what you know about me. Set in a museum hall. Photorealistic with medium depth of field, natural perspective, and warm museum lighting casting dramatic, realistic shadows." [ref=e875]
+                      - generic:
+                        - generic: Statue
+                  - button "Create an image where one element of the subject or scene transforms into a whimsical, silly surreal phenomenon that reimagines a conceptual rule (causality, identity, perception, or spatial logic), avoiding natural effects. The transformation should be intrinsically tied to the subject, blending the absurd with everyday reality to produce a striking, imaginative, and eccentric scene. The boundary between subject and transformation should feel merged or in tension. The subject's reaction should enhance cohesion. Surreal" [ref=e876] [cursor=pointer]:
+                    - generic [ref=e877]:
+                      - img "Create an image where one element of the subject or scene transforms into a whimsical, silly surreal phenomenon that reimagines a conceptual rule (causality, identity, perception, or spatial logic), avoiding natural effects. The transformation should be intrinsically tied to the subject, blending the absurd with everyday reality to produce a striking, imaginative, and eccentric scene. The boundary between subject and transformation should feel merged or in tension. The subject's reaction should enhance cohesion." [ref=e879]
+                      - generic:
+                        - generic: Surreal
+                  - 'button "Add a hand drawn overlay on top of the image. Final output should be stylish, relaxed and effortlessly casual. Drawing rules: Use thin, hand-drawn lines as if drawn with a white pen. Keep it in a single-stroke style: rough and slightly uneven. Add outlines tracing around the outer edges of objects. Use arrows or dotted lines to guide the viewer’s eye. Text rules: Handwritten text. Keep it short, like a casual inner monologue. Tone: diary-like, brief, and emotion-focused. Commentary should be positive and sweet. Decorations: Add steam, sparkles, hearts, small emoticon-like faces sparingly. Avoid overdoing it; leave some “negative space”. Handwritten style" [ref=e880] [cursor=pointer]':
+                    - generic [ref=e881]:
+                      - 'img "Add a hand drawn overlay on top of the image. Final output should be stylish, relaxed and effortlessly casual. Drawing rules: Use thin, hand-drawn lines as if drawn with a white pen. Keep it in a single-stroke style: rough and slightly uneven. Add outlines tracing around the outer edges of objects. Use arrows or dotted lines to guide the viewer’s eye. Text rules: Handwritten text. Keep it short, like a casual inner monologue. Tone: diary-like, brief, and emotion-focused. Commentary should be positive and sweet. Decorations: Add steam, sparkles, hearts, small emoticon-like faces sparingly. Avoid overdoing it; leave some “negative space”." [ref=e883]'
+                      - generic:
+                        - generic: Handwritten style
+                  - 'button "Create a clean, modern hairstyle analysis graphic using this portrait. Show side-by-side hairstyles comparisons to highlight which hairstyles suit the subject best. Make it visual-first, with short labels only and no paragraphs. Use a minimal, premium style: neutral background. Hairstyles" [ref=e884] [cursor=pointer]':
+                    - generic [ref=e885]:
+                      - 'img "Create a clean, modern hairstyle analysis graphic using this portrait. Show side-by-side hairstyles comparisons to highlight which hairstyles suit the subject best. Make it visual-first, with short labels only and no paragraphs. Use a minimal, premium style: neutral background." [ref=e887]'
+                      - generic:
+                        - generic: Hairstyles
+  - alert [ref=e121]
+  - status [ref=e122]

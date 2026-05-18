@@ -1,0 +1,372 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - navigation "Sidebar navigation" [ref=e7]:
+        - button "Paper's Substack Paper's Substack" [ref=e9] [cursor=pointer]:
+          - generic [ref=e10]:
+            - img "Paper's Substack" [ref=e15]
+            - generic [ref=e16]: Paper's Substack
+            - img [ref=e18]
+        - generic [ref=e21]:
+          - generic [ref=e23]:
+            - link "Home" [ref=e24] [cursor=pointer]:
+              - /url: /publish/home
+              - img [ref=e26]
+              - generic [ref=e29]: Home
+            - link "Website" [ref=e30] [cursor=pointer]:
+              - /url: https://paperreceipt.substack.com
+              - img [ref=e32]
+              - generic [ref=e34]: Website
+              - img [ref=e36]
+          - button "Create" [expanded] [ref=e40] [cursor=pointer]:
+            - text: Create
+            - img [ref=e41]
+          - generic [ref=e44]:
+            - heading "Content" [ref=e45]
+            - generic [ref=e46]:
+              - link "Posts" [ref=e47] [cursor=pointer]:
+                - /url: /publish/posts
+                - img [ref=e49]
+                - generic [ref=e52]: Posts
+              - link "Podcast" [ref=e53] [cursor=pointer]:
+                - /url: /publish/podcasting
+                - img [ref=e55]
+                - generic [ref=e58]: Podcast
+              - link "Chat" [ref=e59] [cursor=pointer]:
+                - /url: /publish/chat
+                - img [ref=e61]
+                - generic [ref=e63]: Chat
+              - link "Live video" [ref=e64] [cursor=pointer]:
+                - /url: /publish/live-videos
+                - img [ref=e66]
+                - generic [ref=e72]: Live video
+          - generic [ref=e73]:
+            - heading "Audience" [ref=e74]
+            - generic [ref=e75]:
+              - link "Subscribers" [ref=e76] [cursor=pointer]:
+                - /url: /publish/subscribers
+                - img [ref=e78]
+                - generic [ref=e82]: Subscribers
+              - link "Growth" [ref=e83] [cursor=pointer]:
+                - /url: /publish/growth
+                - img [ref=e85]
+                - generic [ref=e90]: Growth
+              - link "Stats" [ref=e91] [cursor=pointer]:
+                - /url: /publish/stats
+                - img [ref=e93]
+                - generic [ref=e96]: Stats
+          - generic [ref=e97]:
+            - heading "Creator tools" [ref=e98]
+            - generic [ref=e99]:
+              - link "Payments" [ref=e100] [cursor=pointer]:
+                - /url: /publish/payments
+                - img [ref=e102]
+                - generic [ref=e104]: Payments
+              - link "Recommendations" [ref=e105] [cursor=pointer]:
+                - /url: /publish/recommendations
+                - img [ref=e107]
+                - generic [ref=e109]: Recommendations
+              - link "Website editor" [ref=e110] [cursor=pointer]:
+                - /url: /publish/website-editor/home
+                - img [ref=e112]
+                - generic [ref=e116]: Website editor
+        - generic [ref=e119]:
+          - button "Help" [ref=e120] [cursor=pointer]:
+            - img [ref=e122]
+            - generic [ref=e125]: Help
+          - link "Settings" [ref=e126] [cursor=pointer]:
+            - /url: /publish/settings
+            - img [ref=e128]
+            - generic [ref=e131]: Settings
+      - generic [ref=e134]:
+        - generic [ref=e137]:
+          - generic [ref=e138]:
+            - heading "Home" [level=3] [ref=e140]
+            - generic [ref=e141]:
+              - button "Switch to dark mode" [ref=e143] [cursor=pointer]:
+                - img [ref=e145]
+                - img [ref=e148]
+              - button "Search" [ref=e155] [cursor=pointer]:
+                - img [ref=e156]
+              - button "View chats" [ref=e160] [cursor=pointer]:
+                - img [ref=e161]
+              - button "View activity" [ref=e164] [cursor=pointer]:
+                - img [ref=e165]
+              - button "Paper Receipt's avatar" [ref=e168] [cursor=pointer]:
+                - generic [ref=e169]:
+                  - generic "Paper Receipt" [ref=e171]:
+                    - img "Paper Receipt's avatar" [ref=e173]
+                  - img [ref=e175]
+          - separator [ref=e178]
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - generic [ref=e183]:
+              - generic [ref=e186]: Overview
+              - generic [ref=e187]:
+                - generic [ref=e189]:
+                  - combobox [ref=e190] [cursor=pointer]:
+                    - option "7 days" [selected]
+                    - option "14 days"
+                    - option "30 days"
+                    - option "90 days"
+                    - option "180 days"
+                    - option "1 year"
+                    - option "All time"
+                  - generic:
+                    - img
+                - button "Ellipsis" [ref=e191] [cursor=pointer]:
+                  - img [ref=e192]
+            - generic [ref=e199]:
+              - generic [ref=e200]:
+                - generic [ref=e203] [cursor=pointer]:
+                  - generic [ref=e204]:
+                    - generic [ref=e205]: Total subscribers
+                    - button "Info" [ref=e208]:
+                      - img [ref=e209]
+                  - heading "1" [level=3] [ref=e213]
+                - generic [ref=e218] [cursor=pointer]:
+                  - generic [ref=e219]:
+                    - generic [ref=e220]: Pledged annualized revenue
+                    - button "Info" [ref=e223]:
+                      - img [ref=e224]
+                  - heading "-" [level=3] [ref=e228]
+                - generic [ref=e232] [cursor=pointer]:
+                  - generic [ref=e233]:
+                    - generic [ref=e234]: 7d views
+                    - button "Info" [ref=e237]:
+                      - img [ref=e238]
+                  - heading "25" [level=3] [ref=e242]
+              - separator [ref=e243]
+              - generic [ref=e245]:
+                - img [ref=e248]:
+                  - generic [ref=e252]:
+                    - generic [ref=e255]: May 11
+                    - generic [ref=e258]: May 15
+                  - generic [ref=e263]: "1"
+                - generic:
+                  - img
+                  - generic: PAPERRECEIPT.SUBSTACK.COM
+          - generic [ref=e264]:
+            - generic [ref=e266]:
+              - generic [ref=e267]:
+                - generic [ref=e269]: Latest post
+                - button "View stats" [ref=e271] [cursor=pointer]
+              - separator [ref=e272]
+              - generic [ref=e273]:
+                - link "IONQ -- Locker Room Research Brief May 12 • Paper Receipt 0 0 Ellipsis" [ref=e274] [cursor=pointer]:
+                  - /url: /publish/posts/detail/197411949?referrer=%2Fpublish%2Fhome
+                  - generic [ref=e275]:
+                    - generic [ref=e276]:
+                      - img [ref=e279]
+                      - generic [ref=e280]:
+                        - generic [ref=e282]: IONQ -- Locker Room Research Brief
+                        - generic [ref=e283]: May 12 • Paper Receipt
+                        - generic [ref=e284]:
+                          - generic [ref=e285]:
+                            - img [ref=e286]
+                            - text: "0"
+                          - generic [ref=e289]:
+                            - img [ref=e290]
+                            - text: "0"
+                    - button "Ellipsis" [ref=e295]:
+                      - img [ref=e296]
+                - generic [ref=e300]:
+                  - generic [ref=e302]:
+                    - generic [ref=e303]: Total views
+                    - generic [ref=e304]: "1"
+                  - generic [ref=e306]:
+                    - generic [ref=e307]: New subscribers
+                    - generic [ref=e308]: "-"
+                  - generic [ref=e310]:
+                    - generic [ref=e311]: Open rate
+                    - generic [ref=e312]: 100%
+                - button "Share post" [ref=e314] [cursor=pointer]:
+                  - img [ref=e315]
+                  - text: Share post
+            - generic [ref=e319]:
+              - generic [ref=e320]:
+                - generic [ref=e322]: Drafts
+                - button "View all" [ref=e324] [cursor=pointer]
+              - separator [ref=e325]
+              - generic [ref=e327]:
+                - link "MU -- Momentum Thesis Edited May 11, 6:28 PM Draft Ellipsis" [ref=e328] [cursor=pointer]:
+                  - /url: /publish/post/197293150
+                  - generic [ref=e329]:
+                    - generic [ref=e331]: MU -- Momentum Thesis
+                    - generic [ref=e333]: Edited May 11, 6:28 PM
+                  - generic [ref=e334]:
+                    - button "Draft" [ref=e335]
+                    - button "Ellipsis" [ref=e336]:
+                      - img [ref=e337]
+                - link "How to use the Substack editor Edited May 10, 6:29 PM Draft Ellipsis" [ref=e341] [cursor=pointer]:
+                  - /url: /publish/post/197163693
+                  - generic [ref=e342]:
+                    - generic [ref=e344]: How to use the Substack editor
+                    - generic [ref=e346]: Edited May 10, 6:29 PM
+                  - generic [ref=e347]:
+                    - button "Draft" [ref=e348]
+                    - button "Ellipsis" [ref=e349]:
+                      - img [ref=e350]
+          - generic [ref=e355]:
+            - generic [ref=e356]:
+              - generic [ref=e358]: Recent posts
+              - button "View all" [ref=e360] [cursor=pointer]
+            - separator [ref=e361]
+            - generic [ref=e362]:
+              - link "IONQ -- Locker Room Research Brief May 12 • Paper Receipt 0 0 0 Subs 1 Views 100% Opened Arrow Up Right Ellipsis" [ref=e363] [cursor=pointer]:
+                - /url: /publish/posts/detail/197411949?referrer=%2Fpublish%2Fhome%3Futm_source%3Dmenu
+                - generic [ref=e364]:
+                  - generic [ref=e365]:
+                    - img [ref=e368]
+                    - generic [ref=e369]:
+                      - generic [ref=e371]: IONQ -- Locker Room Research Brief
+                      - generic [ref=e372]: May 12 • Paper Receipt
+                      - generic [ref=e373]:
+                        - generic [ref=e374]:
+                          - img [ref=e375]
+                          - text: "0"
+                        - generic [ref=e378]:
+                          - img [ref=e379]
+                          - text: "0"
+                  - generic [ref=e382]:
+                    - generic [ref=e383]:
+                      - generic [ref=e384]:
+                        - generic [ref=e385]: "0"
+                        - generic [ref=e386]: Subs
+                      - generic [ref=e387]:
+                        - generic [ref=e388]: "1"
+                        - generic [ref=e389]: Views
+                      - generic [ref=e390]:
+                        - generic [ref=e391]: 100%
+                        - generic [ref=e392]: Opened
+                    - generic [ref=e393]:
+                      - button "Arrow Up Right" [ref=e395]:
+                        - img [ref=e396]
+                      - button "Ellipsis" [ref=e399]:
+                        - img [ref=e400]
+              - link "QUBT -- Locker Room Research Brief May 12 • Paper Receipt 0 0 0 Subs 2 Views 100% Opened Arrow Up Right Ellipsis" [ref=e404] [cursor=pointer]:
+                - /url: /publish/posts/detail/197412275?referrer=%2Fpublish%2Fhome%3Futm_source%3Dmenu
+                - generic [ref=e405]:
+                  - generic [ref=e406]:
+                    - img [ref=e409]
+                    - generic [ref=e410]:
+                      - generic [ref=e412]: QUBT -- Locker Room Research Brief
+                      - generic [ref=e413]: May 12 • Paper Receipt
+                      - generic [ref=e414]:
+                        - generic [ref=e415]:
+                          - img [ref=e416]
+                          - text: "0"
+                        - generic [ref=e419]:
+                          - img [ref=e420]
+                          - text: "0"
+                  - generic [ref=e423]:
+                    - generic [ref=e424]:
+                      - generic [ref=e425]:
+                        - generic [ref=e426]: "0"
+                        - generic [ref=e427]: Subs
+                      - generic [ref=e428]:
+                        - generic [ref=e429]: "2"
+                        - generic [ref=e430]: Views
+                      - generic [ref=e431]:
+                        - generic [ref=e432]: 100%
+                        - generic [ref=e433]: Opened
+                    - generic [ref=e434]:
+                      - button "Arrow Up Right" [ref=e436]:
+                        - img [ref=e437]
+                      - button "Ellipsis" [ref=e440]:
+                        - img [ref=e441]
+              - link "AXTI -- Locker Room Research Brief May 12 • Paper Receipt 0 0 0 Subs 4 Views 100% Opened Arrow Up Right Ellipsis" [ref=e445] [cursor=pointer]:
+                - /url: /publish/posts/detail/197319244?referrer=%2Fpublish%2Fhome%3Futm_source%3Dmenu
+                - generic [ref=e446]:
+                  - generic [ref=e447]:
+                    - img [ref=e450]
+                    - generic [ref=e451]:
+                      - generic [ref=e453]: AXTI -- Locker Room Research Brief
+                      - generic [ref=e454]: May 12 • Paper Receipt
+                      - generic [ref=e455]:
+                        - generic [ref=e456]:
+                          - img [ref=e457]
+                          - text: "0"
+                        - generic [ref=e460]:
+                          - img [ref=e461]
+                          - text: "0"
+                  - generic [ref=e464]:
+                    - generic [ref=e465]:
+                      - generic [ref=e466]:
+                        - generic [ref=e467]: "0"
+                        - generic [ref=e468]: Subs
+                      - generic [ref=e469]:
+                        - generic [ref=e470]: "4"
+                        - generic [ref=e471]: Views
+                      - generic [ref=e472]:
+                        - generic [ref=e473]: 100%
+                        - generic [ref=e474]: Opened
+                    - generic [ref=e475]:
+                      - button "Arrow Up Right" [ref=e477]:
+                        - img [ref=e478]
+                      - button "Ellipsis" [ref=e481]:
+                        - img [ref=e482]
+          - generic [ref=e488]:
+            - generic [ref=e491]: Suggestions
+            - separator [ref=e492]
+            - generic [ref=e494]:
+              - img [ref=e496]
+              - generic [ref=e498]:
+                - generic [ref=e499]:
+                  - generic [ref=e500]: Edit your unfinished subscription email
+                  - generic [ref=e501]: This email goes out to readers who have signed up for a free subscription, but chose not to select a paid plan. Filling it out with compelling reasons to upgrade is a great way to convert free subscribers to paid subscribers.
+                - button "Edit welcome email" [ref=e502] [cursor=pointer]
+          - generic [ref=e504]:
+            - generic [ref=e505]:
+              - generic [ref=e507]: Resources
+              - button "View all" [ref=e509] [cursor=pointer]
+            - separator [ref=e510]
+            - generic [ref=e512]:
+              - link "When should I turn on paid subscriptions? An easy guide to earning money for your work" [ref=e514] [cursor=pointer]:
+                - /url: https://on.substack.com/p/turn-on-paid
+                - generic [ref=e519]:
+                  - generic [ref=e520]: When should I turn on paid subscriptions?
+                  - generic [ref=e521]: An easy guide to earning money for your work
+              - link "How do I publish my first post? Post types, formatting tips, settings, and more" [ref=e523] [cursor=pointer]:
+                - /url: https://on.substack.com/p/first-post
+                - generic [ref=e528]:
+                  - generic [ref=e529]: How do I publish my first post?
+                  - generic [ref=e530]: Post types, formatting tips, settings, and more
+              - link "How can I customize my Substack? Themes and options to add a personal touch" [ref=e532] [cursor=pointer]:
+                - /url: https://on.substack.com/p/customize
+                - generic [ref=e537]:
+                  - generic [ref=e538]: How can I customize my Substack?
+                  - generic [ref=e539]: Themes and options to add a personal touch
+              - link "How do I find my first subscribers? Simple strategies to build an audience from scratch" [ref=e541] [cursor=pointer]:
+                - /url: https://on.substack.com/p/first-subscribers
+                - generic [ref=e546]:
+                  - generic [ref=e547]: How do I find my first subscribers?
+                  - generic [ref=e548]: Simple strategies to build an audience from scratch
+    - region "Notifications (F8)":
+      - list
+  - generic [ref=e549]: 2026/05/17
+  - menu "Create" [active] [ref=e551]:
+    - generic [ref=e553]:
+      - menuitem "Article" [ref=e554] [cursor=pointer]:
+        - img [ref=e556]
+        - generic [ref=e559]: Article
+      - menuitem "Video" [ref=e560] [cursor=pointer]:
+        - img [ref=e562]
+        - generic [ref=e565]: Video
+      - menuitem "Podcast" [ref=e566] [cursor=pointer]:
+        - img [ref=e568]
+        - generic [ref=e571]: Podcast
+      - generic [ref=e572]:
+        - separator [ref=e573]
+        - menuitem "Note" [ref=e574] [cursor=pointer]:
+          - img [ref=e576]
+          - generic [ref=e579]: Note
+        - menuitem "Chat thread" [ref=e580] [cursor=pointer]:
+          - img [ref=e582]
+          - generic [ref=e585]: Chat thread
+        - menuitem "Live video" [ref=e586] [cursor=pointer]:
+          - img [ref=e588]
+          - generic [ref=e594]: Live video
+        - menuitem "Recording studio" [ref=e595] [cursor=pointer]:
+          - img [ref=e597]
+          - generic [ref=e600]: Recording studio

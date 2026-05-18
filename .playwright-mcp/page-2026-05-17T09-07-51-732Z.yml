@@ -1,0 +1,32 @@
+- generic [ref=e3]:
+  - button "Chevron Left" [ref=e6] [cursor=pointer]:
+    - img [ref=e7]
+  - generic [ref=e11]:
+    - generic [ref=e12]:
+      - link [ref=e13] [cursor=pointer]:
+        - /url: https://substack.com
+        - img [ref=e14]
+      - heading "Sign in to Substack" [level=2] [ref=e19]
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - textbox "Email" [active] [ref=e23]
+        - link "Sign in with password" [ref=e26] [cursor=pointer]:
+          - /url: javascript:void(0)
+        - button "Continue" [ref=e27] [cursor=pointer]
+      - generic [ref=e29]:
+        - text: First time here?
+        - link "Create an account" [ref=e30] [cursor=pointer]:
+          - /url: https://substack.com/explore?action=signup&redirect=%2Fdashboard
+  - generic [ref=e32] [cursor=pointer]:
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - heading "Stay signed in" [level=3] [ref=e35]
+        - generic [ref=e36]: Download the Substack app for Android or iOS
+      - generic [ref=e42]:
+        - link [ref=e43]:
+          - /url: https://substack.com/app/app-store-redirect?utm_campaign=app-marketing&utm_content=sign-in-page&utm_source=badge&force=ios
+          - img [ref=e44]
+        - link [ref=e45]:
+          - /url: https://substack.com/app/app-store-redirect?utm_campaign=app-marketing&utm_content=sign-in-page&utm_source=badge&force=android
+          - img [ref=e46]
+    - img [ref=e48]

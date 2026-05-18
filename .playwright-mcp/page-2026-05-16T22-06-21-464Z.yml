@@ -1,0 +1,724 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - link "home" [ref=e5] [cursor=pointer]:
+        - /url: /pick-em/higher-lower/all/featured
+        - img [ref=e7]
+      - generic [ref=e10]:
+        - link "Champions" [ref=e11] [cursor=pointer]:
+          - /url: /pick-em
+        - link "Drafts" [ref=e12] [cursor=pointer]:
+          - /url: /lobby
+        - link "Live" [ref=e13] [cursor=pointer]:
+          - /url: /live
+        - link "Results" [ref=e14] [cursor=pointer]:
+          - /url: /results
+        - link "Rankings" [ref=e15] [cursor=pointer]:
+          - /url: /rankings
+        - link "News feed" [ref=e16] [cursor=pointer]:
+          - /url: /news-feed
+      - generic [ref=e17]:
+        - button [ref=e18] [cursor=pointer]:
+          - img [ref=e22]
+        - button [ref=e24] [cursor=pointer]:
+          - img [ref=e28]
+        - link [ref=e30] [cursor=pointer]:
+          - /url: /account
+          - img [ref=e33]
+        - link "$87.55" [ref=e35] [cursor=pointer]:
+          - /url: /deposit
+          - generic [ref=e36]:
+            - generic [ref=e37]: $87.55
+            - img [ref=e40]
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e52]:
+          - search [ref=e55]:
+            - button [ref=e56] [cursor=pointer]:
+              - img [ref=e58]
+            - textbox "Find teams, players and stats" [ref=e2001]
+          - button "Champions tips" [ref=e61] [cursor=pointer]:
+            - paragraph [ref=e62]: Champions tips
+            - img [ref=e64]
+        - generic [ref=e66]:
+          - generic [ref=e2007]:
+            - generic [ref=e2008]:
+              - img "athlete or team avatar" [ref=e2010]
+              - generic [ref=e2011]:
+                - generic [ref=e2012]: TEX
+                - generic [ref=e2013]: 21-23
+            - generic [ref=e2014]:
+              - generic [ref=e2015]: 4:10pm
+              - generic [ref=e2017]: Partly Cloudy 84
+            - generic [ref=e2018]:
+              - img "athlete or team avatar" [ref=e2020]
+              - generic [ref=e2021]:
+                - generic [ref=e2022]: HOU
+                - generic [ref=e2023]: 18-28
+          - generic [ref=e2025]:
+            - generic [ref=e2026]:
+              - button "Popular" [ref=e2028] [cursor=pointer]
+              - button "Team Picks" [ref=e2030] [cursor=pointer]
+              - button "Strikeouts" [ref=e2032] [cursor=pointer]
+              - button "Hits + Runs + RBIs" [ref=e2034] [cursor=pointer]
+              - button "Home Runs" [ref=e2036] [cursor=pointer]
+              - button "Total Bases" [ref=e2038] [cursor=pointer]
+              - button "Fantasy Points" [ref=e2040] [cursor=pointer]
+              - button "Pitching Outs" [ref=e2042] [cursor=pointer]
+              - button "Hits Allowed" [ref=e2044] [cursor=pointer]
+              - button "Earned Runs Allowed" [ref=e2046] [cursor=pointer]
+              - button "Walks Allowed" [ref=e2048] [cursor=pointer]
+              - button "Hits" [ref=e2050] [cursor=pointer]
+              - button "Runs" [ref=e2052] [cursor=pointer]
+              - button "RBIs" [ref=e2054] [cursor=pointer]
+              - button "Singles" [ref=e2056] [cursor=pointer]
+              - button "Batter Strikeouts" [ref=e2058] [cursor=pointer]
+              - button "Batter Walks" [ref=e2060] [cursor=pointer]
+              - button "Stolen Bases" [ref=e2062] [cursor=pointer]
+              - button "1st Inn. Strikeouts" [ref=e2064] [cursor=pointer]
+              - button "1st Inn. Runs Allowed" [ref=e2066] [cursor=pointer]
+              - button "1st Inn. Batters Faced" [ref=e2068] [cursor=pointer]
+              - button "1st Inn. Hits Allowed" [ref=e2070] [cursor=pointer]
+              - button "1-3 Inn. Runs Allowed" [ref=e2072] [cursor=pointer]
+              - button "Doubles" [ref=e2074] [cursor=pointer]
+            - button [ref=e2076] [cursor=pointer]:
+              - img [ref=e2078]
+          - generic [ref=e2080]:
+            - generic [ref=e2081]:
+              - generic [ref=e2082]: 57%
+              - generic [ref=e2083]: Texas Rangers
+            - img [ref=e2086]:
+              - generic [ref=e2087]:
+                - generic [ref=e2088]: 65%
+                - generic [ref=e2089]: 50%
+                - generic [ref=e2090]: 65%
+            - generic [ref=e2103]:
+              - generic [ref=e2104]: 43%
+              - generic [ref=e2105]: Houston Astros
+            - generic [ref=e2106]:
+              - button "1H" [ref=e2107] [cursor=pointer]
+              - button "1D" [ref=e2108] [cursor=pointer]
+              - button "ALL" [ref=e2109] [cursor=pointer]
+          - generic [ref=e2115]:
+            - link "athlete or team avatar TEX 21-23 4:10pm Partly Cloudy 84 athlete or team avatar HOU 18-28" [ref=e2116] [cursor=pointer]:
+              - generic [ref=e2121]:
+                - generic [ref=e2122]:
+                  - img "athlete or team avatar" [ref=e2124]
+                  - generic [ref=e2125]:
+                    - generic [ref=e2126]: TEX
+                    - generic [ref=e2127]: 21-23
+                - generic [ref=e2128]:
+                  - generic [ref=e2129]: 4:10pm
+                  - generic [ref=e2131]: Partly Cloudy 84
+                - generic [ref=e2132]:
+                  - img "athlete or team avatar" [ref=e2134]
+                  - generic [ref=e2135]:
+                    - generic [ref=e2136]: HOU
+                    - generic [ref=e2137]: 18-28
+            - generic [ref=e2139]:
+              - button "Rangers to win -150" [ref=e2140] [cursor=pointer]:
+                - generic [ref=e2141]:
+                  - paragraph [ref=e2142]: Rangers to win
+                  - paragraph [ref=e2143]: "-150"
+              - button "Astros to win +122" [ref=e2144] [cursor=pointer]:
+                - generic [ref=e2145]:
+                  - paragraph [ref=e2146]: Astros to win
+                  - paragraph [ref=e2147]: "+122"
+              - generic [ref=e2148]: "@"
+            - generic [ref=e2150]:
+              - generic [ref=e2151]:
+                - paragraph [ref=e2152]: Spread
+                - paragraph [ref=e2153]: Spread
+              - generic [ref=e2154]:
+                - button "TEX -1.5 +113" [ref=e2155] [cursor=pointer]:
+                  - generic [ref=e2156]: TEX -1.5
+                  - generic [ref=e2157]: "+113"
+                - button "HOU +1.5 -139" [ref=e2158] [cursor=pointer]:
+                  - generic [ref=e2159]: HOU +1.5
+                  - generic [ref=e2160]: "-139"
+            - generic [ref=e2162]:
+              - generic [ref=e2163]:
+                - paragraph [ref=e2164]: "7.5"
+                - paragraph [ref=e2165]: Total Runs
+              - generic [ref=e2166]:
+                - button "Higher -118" [ref=e2167] [cursor=pointer]:
+                  - generic [ref=e2168]: Higher
+                  - generic [ref=e2169]: "-118"
+                - button "Lower +100" [ref=e2170] [cursor=pointer]:
+                  - generic [ref=e2171]: Lower
+                  - generic [ref=e2172]: "+100"
+            - img "prediction" [ref=e2175]
+          - generic [ref=e2177]:
+            - heading "Popular Picks" [level=2] [ref=e2179]
+            - generic [ref=e2180]:
+              - generic [ref=e2181]:
+                - button "athlete or team avatar Jacob deGrom TEX @ HOU - 4:10PM PDT 7.5 Strikeouts Higher 1.07x Lower 0.8x" [ref=e2182] [cursor=pointer]:
+                  - generic [ref=e2184]:
+                    - img "athlete or team avatar" [ref=e2191]
+                    - generic [ref=e2192]:
+                      - generic [ref=e2195]: Jacob deGrom
+                      - generic [ref=e2196]:
+                        - img [ref=e2198]
+                        - paragraph [ref=e2200]:
+                          - strong [ref=e2201]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2202]:
+                    - generic [ref=e2203]:
+                      - button [ref=e2204]:
+                        - img [ref=e2206]
+                        - img [ref=e2209]
+                      - generic [ref=e2214]:
+                        - generic [ref=e2216]: "7.5"
+                        - generic [ref=e2217]: Strikeouts
+                    - generic [ref=e2220]:
+                      - button "Higher 1.07x" [ref=e2221]:
+                        - generic [ref=e2222]:
+                          - generic [ref=e2223]: Higher
+                          - generic [ref=e2224]: 1.07x
+                      - button "Lower 0.8x" [ref=e2225]:
+                        - generic [ref=e2226]:
+                          - generic [ref=e2227]: Lower
+                          - generic [ref=e2228]: 0.8x
+                - button "athlete or team avatar Kai-Wei Teng HOU vs TEX - 4:10PM PDT 3.5 Strikeouts Higher 0.78x Lower 1.04x" [ref=e2229] [cursor=pointer]:
+                  - generic [ref=e2231]:
+                    - img "athlete or team avatar" [ref=e2238]
+                    - generic [ref=e2239]:
+                      - generic [ref=e2242]: Kai-Wei Teng
+                      - generic [ref=e2243]:
+                        - img [ref=e2245]
+                        - paragraph [ref=e2247]:
+                          - strong [ref=e2248]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2249]:
+                    - generic [ref=e2250]:
+                      - button [ref=e2251]:
+                        - img [ref=e2253]
+                        - img [ref=e2256]
+                      - generic [ref=e2261]:
+                        - generic [ref=e2263]: "3.5"
+                        - generic [ref=e2264]: Strikeouts
+                    - generic [ref=e2267]:
+                      - button "Higher 0.78x" [ref=e2268]:
+                        - generic [ref=e2269]:
+                          - generic [ref=e2270]: Higher
+                          - generic [ref=e2271]: 0.78x
+                      - button "Lower 1.04x" [ref=e2272]:
+                        - generic [ref=e2273]:
+                          - generic [ref=e2274]: Lower
+                          - generic [ref=e2275]: 1.04x
+                - button "athlete or team avatar Josh Jung TEX @ HOU - 4:10PM PDT 1.5 Hits + Runs + RBIs Higher 0.88x Lower 1.03x" [ref=e2276] [cursor=pointer]:
+                  - generic [ref=e2278]:
+                    - img "athlete or team avatar" [ref=e2285]
+                    - generic [ref=e2286]:
+                      - generic [ref=e2289]: Josh Jung
+                      - generic [ref=e2290]:
+                        - img [ref=e2292]
+                        - paragraph [ref=e2294]:
+                          - strong [ref=e2295]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2296]:
+                    - generic [ref=e2297]:
+                      - button [ref=e2298]:
+                        - img [ref=e2300]
+                        - img [ref=e2303]
+                      - generic [ref=e2308]:
+                        - generic [ref=e2310]: "1.5"
+                        - generic [ref=e2311]: Hits + Runs + RBIs
+                    - generic [ref=e2314]:
+                      - button "Higher 0.88x" [ref=e2315]:
+                        - generic [ref=e2316]:
+                          - generic [ref=e2317]: Higher
+                          - generic [ref=e2318]: 0.88x
+                      - button "Lower 1.03x" [ref=e2319]:
+                        - generic [ref=e2320]:
+                          - generic [ref=e2321]: Lower
+                          - generic [ref=e2322]: 1.03x
+                - button "athlete or team avatar Brandon Nimmo TEX @ HOU - 4:10PM PDT 1.5 Hits + Runs + RBIs Higher 0.86x Lower 1.06x" [ref=e2323] [cursor=pointer]:
+                  - generic [ref=e2325]:
+                    - img "athlete or team avatar" [ref=e2332]
+                    - generic [ref=e2333]:
+                      - generic [ref=e2336]: Brandon Nimmo
+                      - generic [ref=e2337]:
+                        - img [ref=e2339]
+                        - paragraph [ref=e2341]:
+                          - strong [ref=e2342]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2343]:
+                    - generic [ref=e2344]:
+                      - button [ref=e2345]:
+                        - img [ref=e2347]
+                        - img [ref=e2350]
+                      - generic [ref=e2355]:
+                        - generic [ref=e2357]: "1.5"
+                        - generic [ref=e2358]: Hits + Runs + RBIs
+                    - generic [ref=e2361]:
+                      - button "Higher 0.86x" [ref=e2362]:
+                        - generic [ref=e2363]:
+                          - generic [ref=e2364]: Higher
+                          - generic [ref=e2365]: 0.86x
+                      - button "Lower 1.06x" [ref=e2366]:
+                        - generic [ref=e2367]:
+                          - generic [ref=e2368]: Lower
+                          - generic [ref=e2369]: 1.06x
+                - button "athlete or team avatar Joc Pederson TEX @ HOU - 4:10PM PDT 0.5 Home Runs Higher 2.44x" [ref=e2370] [cursor=pointer]:
+                  - generic [ref=e2372]:
+                    - img "athlete or team avatar" [ref=e2379]
+                    - generic [ref=e2380]:
+                      - generic [ref=e2383]: Joc Pederson
+                      - generic [ref=e2384]:
+                        - img [ref=e2386]
+                        - paragraph [ref=e2388]:
+                          - strong [ref=e2389]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2390]:
+                    - generic [ref=e2395]:
+                      - generic [ref=e2397]: "0.5"
+                      - generic [ref=e2398]: Home Runs
+                    - button "Higher 2.44x" [ref=e2402]:
+                      - generic [ref=e2403]:
+                        - generic [ref=e2404]: Higher
+                        - generic [ref=e2405]: 2.44x
+                - button "athlete or team avatar Jake Burger TEX @ HOU - 4:10PM PDT 0.5 Home Runs Higher 2.2x" [ref=e2406] [cursor=pointer]:
+                  - generic [ref=e2408]:
+                    - img "athlete or team avatar" [ref=e2415]
+                    - generic [ref=e2416]:
+                      - generic [ref=e2419]: Jake Burger
+                      - generic [ref=e2420]:
+                        - img [ref=e2422]
+                        - paragraph [ref=e2424]:
+                          - strong [ref=e2425]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2426]:
+                    - generic [ref=e2431]:
+                      - generic [ref=e2433]: "0.5"
+                      - generic [ref=e2434]: Home Runs
+                    - button "Higher 2.2x" [ref=e2438]:
+                      - generic [ref=e2439]:
+                        - generic [ref=e2440]: Higher
+                        - generic [ref=e2441]: 2.2x
+                - button "athlete or team avatar Ezequiel Duran TEX @ HOU - 4:10PM PDT 1.5 Hits + Runs + RBIs Higher 1.04x Lower 0.89x" [ref=e2442] [cursor=pointer]:
+                  - generic [ref=e2444]:
+                    - img "athlete or team avatar" [ref=e2451]
+                    - generic [ref=e2452]:
+                      - generic [ref=e2455]: Ezequiel Duran
+                      - generic [ref=e2456]:
+                        - img [ref=e2458]
+                        - paragraph [ref=e2460]:
+                          - strong [ref=e2461]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2462]:
+                    - generic [ref=e2463]:
+                      - button [ref=e2464]:
+                        - img [ref=e2466]
+                        - img [ref=e2469]
+                      - generic [ref=e2474]:
+                        - generic [ref=e2476]: "1.5"
+                        - generic [ref=e2477]: Hits + Runs + RBIs
+                    - generic [ref=e2480]:
+                      - button "Higher 1.04x" [ref=e2481]:
+                        - generic [ref=e2482]:
+                          - generic [ref=e2483]: Higher
+                          - generic [ref=e2484]: 1.04x
+                      - button "Lower 0.89x" [ref=e2485]:
+                        - generic [ref=e2486]:
+                          - generic [ref=e2487]: Lower
+                          - generic [ref=e2488]: 0.89x
+                - button "athlete or team avatar Zach Cole HOU vs TEX - 4:10PM PDT 0.5 Hits + Runs + RBIs Higher Lower" [ref=e2489] [cursor=pointer]:
+                  - generic [ref=e2491]:
+                    - img "athlete or team avatar" [ref=e2498]
+                    - generic [ref=e2499]:
+                      - generic [ref=e2502]: Zach Cole
+                      - generic [ref=e2503]:
+                        - img [ref=e2505]
+                        - paragraph [ref=e2507]:
+                          - strong [ref=e2508]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2509]:
+                    - generic [ref=e2510]:
+                      - button [ref=e2511]:
+                        - img [ref=e2513]
+                        - img [ref=e2516]
+                      - generic [ref=e2521]:
+                        - generic [ref=e2523]: "0.5"
+                        - generic [ref=e2524]: Hits + Runs + RBIs
+                    - generic [ref=e2527]:
+                      - button "Higher" [ref=e2528]:
+                        - generic [ref=e2530]: Higher
+                      - button "Lower" [ref=e2531]:
+                        - generic [ref=e2533]: Lower
+                - button "athlete or team avatar Danny Jansen TEX @ HOU - 4:10PM PDT 0.5 Hits Higher 0.86x Lower 1.06x" [ref=e2534] [cursor=pointer]:
+                  - generic [ref=e2536]:
+                    - img "athlete or team avatar" [ref=e2543]
+                    - generic [ref=e2544]:
+                      - generic [ref=e2547]: Danny Jansen
+                      - generic [ref=e2548]:
+                        - img [ref=e2550]
+                        - paragraph [ref=e2552]:
+                          - strong [ref=e2553]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2554]:
+                    - generic [ref=e2555]:
+                      - button [ref=e2556]:
+                        - img [ref=e2558]
+                        - img [ref=e2561]
+                      - generic [ref=e2566]:
+                        - generic [ref=e2568]: "0.5"
+                        - generic [ref=e2569]: Hits
+                    - generic [ref=e2572]:
+                      - button "Higher 0.86x" [ref=e2573]:
+                        - generic [ref=e2574]:
+                          - generic [ref=e2575]: Higher
+                          - generic [ref=e2576]: 0.86x
+                      - button "Lower 1.06x" [ref=e2577]:
+                        - generic [ref=e2578]:
+                          - generic [ref=e2579]: Lower
+                          - generic [ref=e2580]: 1.06x
+                - button "athlete or team avatar Justin Foscue TEX @ HOU - 4:10PM PDT 0.5 Hits Higher 0.82x Lower 1.03x" [ref=e2581] [cursor=pointer]:
+                  - generic [ref=e2583]:
+                    - img "athlete or team avatar" [ref=e2590]
+                    - generic [ref=e2591]:
+                      - generic [ref=e2594]: Justin Foscue
+                      - generic [ref=e2595]:
+                        - img [ref=e2597]
+                        - paragraph [ref=e2599]:
+                          - strong [ref=e2600]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2601]:
+                    - generic [ref=e2602]:
+                      - button [ref=e2603]:
+                        - img [ref=e2605]
+                        - img [ref=e2608]
+                      - generic [ref=e2613]:
+                        - generic [ref=e2615]: "0.5"
+                        - generic [ref=e2616]: Hits
+                    - generic [ref=e2619]:
+                      - button "Higher 0.82x" [ref=e2620]:
+                        - generic [ref=e2621]:
+                          - generic [ref=e2622]: Higher
+                          - generic [ref=e2623]: 0.82x
+                      - button "Lower 1.03x" [ref=e2624]:
+                        - generic [ref=e2625]:
+                          - generic [ref=e2626]: Lower
+                          - generic [ref=e2627]: 1.03x
+              - generic [ref=e2628]:
+                - button "athlete or team avatar Yordan Alvarez HOU vs TEX - 4:10PM PDT 0.5 Home Runs Higher 1.47x" [ref=e2629] [cursor=pointer]:
+                  - generic [ref=e2631]:
+                    - img "athlete or team avatar" [ref=e2638]
+                    - generic [ref=e2639]:
+                      - generic [ref=e2642]: Yordan Alvarez
+                      - generic [ref=e2643]:
+                        - img [ref=e2645]
+                        - paragraph [ref=e2647]:
+                          - strong [ref=e2648]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2649]:
+                    - generic [ref=e2650]:
+                      - button [ref=e2651]:
+                        - img [ref=e2653]
+                        - img [ref=e2656]
+                      - generic [ref=e2661]:
+                        - generic [ref=e2663]: "0.5"
+                        - generic [ref=e2664]: Home Runs
+                    - button "Higher 1.47x" [ref=e2668]:
+                      - generic [ref=e2669]:
+                        - generic [ref=e2670]: Higher
+                        - generic [ref=e2671]: 1.47x
+                - button "athlete or team avatar Braden Shewmake HOU vs TEX - 4:10PM PDT 0.5 Hits + Runs + RBIs Higher 0.78x Lower 1.03x" [ref=e2672] [cursor=pointer]:
+                  - generic [ref=e2674]:
+                    - img "athlete or team avatar" [ref=e2681]
+                    - generic [ref=e2682]:
+                      - generic [ref=e2685]: Braden Shewmake
+                      - generic [ref=e2686]:
+                        - img [ref=e2688]
+                        - paragraph [ref=e2690]:
+                          - strong [ref=e2691]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2692]:
+                    - generic [ref=e2693]:
+                      - button [ref=e2694]:
+                        - img [ref=e2696]
+                        - img [ref=e2699]
+                      - generic [ref=e2704]:
+                        - generic [ref=e2706]: "0.5"
+                        - generic [ref=e2707]: Hits + Runs + RBIs
+                    - generic [ref=e2710]:
+                      - button "Higher 0.78x" [ref=e2711]:
+                        - generic [ref=e2712]:
+                          - generic [ref=e2713]: Higher
+                          - generic [ref=e2714]: 0.78x
+                      - button "Lower 1.03x" [ref=e2715]:
+                        - generic [ref=e2716]:
+                          - generic [ref=e2717]: Lower
+                          - generic [ref=e2718]: 1.03x
+                - button "athlete or team avatar Jose Altuve HOU vs TEX - 4:10PM PDT 1.5 Hits + Runs + RBIs Higher 1.04x Lower 0.87x" [ref=e2719] [cursor=pointer]:
+                  - generic [ref=e2721]:
+                    - img "athlete or team avatar" [ref=e2728]
+                    - generic [ref=e2729]:
+                      - generic [ref=e2732]: Jose Altuve
+                      - generic [ref=e2733]:
+                        - img [ref=e2735]
+                        - paragraph [ref=e2737]:
+                          - strong [ref=e2738]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2739]:
+                    - generic [ref=e2740]:
+                      - button [ref=e2741]:
+                        - img [ref=e2743]
+                        - img [ref=e2746]
+                      - generic [ref=e2751]:
+                        - generic [ref=e2753]: "1.5"
+                        - generic [ref=e2754]: Hits + Runs + RBIs
+                    - generic [ref=e2757]:
+                      - button "Higher 1.04x" [ref=e2758]:
+                        - generic [ref=e2759]:
+                          - generic [ref=e2760]: Higher
+                          - generic [ref=e2761]: 1.04x
+                      - button "Lower 0.87x" [ref=e2762]:
+                        - generic [ref=e2763]:
+                          - generic [ref=e2764]: Lower
+                          - generic [ref=e2765]: 0.87x
+                - button "athlete or team avatar Christian Walker HOU vs TEX - 4:10PM PDT 0.5 Home Runs Higher 2.04x" [ref=e2766] [cursor=pointer]:
+                  - generic [ref=e2768]:
+                    - img "athlete or team avatar" [ref=e2775]
+                    - generic [ref=e2776]:
+                      - generic [ref=e2779]: Christian Walker
+                      - generic [ref=e2780]:
+                        - img [ref=e2782]
+                        - paragraph [ref=e2784]:
+                          - strong [ref=e2785]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2786]:
+                    - generic [ref=e2791]:
+                      - generic [ref=e2793]: "0.5"
+                      - generic [ref=e2794]: Home Runs
+                    - button "Higher 2.04x" [ref=e2798]:
+                      - generic [ref=e2799]:
+                        - generic [ref=e2800]: Higher
+                        - generic [ref=e2801]: 2.04x
+                - button "athlete or team avatar Alejandro Osuna TEX @ HOU - 4:10PM PDT 1.5 Hits + Runs + RBIs Higher 1.08x Lower 0.81x" [ref=e2802] [cursor=pointer]:
+                  - generic [ref=e2804]:
+                    - img "athlete or team avatar" [ref=e2811]
+                    - generic [ref=e2812]:
+                      - generic [ref=e2815]: Alejandro Osuna
+                      - generic [ref=e2816]:
+                        - img [ref=e2818]
+                        - paragraph [ref=e2820]:
+                          - strong [ref=e2821]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2822]:
+                    - generic [ref=e2823]:
+                      - button [ref=e2824]:
+                        - img [ref=e2826]
+                        - img [ref=e2829]
+                      - generic [ref=e2834]:
+                        - generic [ref=e2836]: "1.5"
+                        - generic [ref=e2837]: Hits + Runs + RBIs
+                    - generic [ref=e2840]:
+                      - button "Higher 1.08x" [ref=e2841]:
+                        - generic [ref=e2842]:
+                          - generic [ref=e2843]: Higher
+                          - generic [ref=e2844]: 1.08x
+                      - button "Lower 0.81x" [ref=e2845]:
+                        - generic [ref=e2846]:
+                          - generic [ref=e2847]: Lower
+                          - generic [ref=e2848]: 0.81x
+                - button "athlete or team avatar Brice Matthews HOU vs TEX - 4:10PM PDT 0.5 Hits + Runs + RBIs Higher 0.86x Lower 1.06x" [ref=e2849] [cursor=pointer]:
+                  - generic [ref=e2851]:
+                    - img "athlete or team avatar" [ref=e2858]
+                    - generic [ref=e2859]:
+                      - generic [ref=e2862]: Brice Matthews
+                      - generic [ref=e2863]:
+                        - img [ref=e2865]
+                        - paragraph [ref=e2867]:
+                          - strong [ref=e2868]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2869]:
+                    - generic [ref=e2870]:
+                      - button [ref=e2871]:
+                        - img [ref=e2873]
+                        - img [ref=e2876]
+                      - generic [ref=e2881]:
+                        - generic [ref=e2883]: "0.5"
+                        - generic [ref=e2884]: Hits + Runs + RBIs
+                    - generic [ref=e2887]:
+                      - button "Higher 0.86x" [ref=e2888]:
+                        - generic [ref=e2889]:
+                          - generic [ref=e2890]: Higher
+                          - generic [ref=e2891]: 0.86x
+                      - button "Lower 1.06x" [ref=e2892]:
+                        - generic [ref=e2893]:
+                          - generic [ref=e2894]: Lower
+                          - generic [ref=e2895]: 1.06x
+                - button "athlete or team avatar Evan Carter TEX @ HOU - 4:10PM PDT 0.5 Home Runs Higher 3.11x" [ref=e2896] [cursor=pointer]:
+                  - generic [ref=e2898]:
+                    - img "athlete or team avatar" [ref=e2905]
+                    - generic [ref=e2906]:
+                      - generic [ref=e2909]: Evan Carter
+                      - generic [ref=e2910]:
+                        - img [ref=e2912]
+                        - paragraph [ref=e2914]:
+                          - strong [ref=e2915]: TEX
+                          - text: "@ HOU - 4:10PM PDT"
+                  - generic [ref=e2916]:
+                    - generic [ref=e2921]:
+                      - generic [ref=e2923]: "0.5"
+                      - generic [ref=e2924]: Home Runs
+                    - button "Higher 3.11x" [ref=e2928]:
+                      - generic [ref=e2929]:
+                        - generic [ref=e2930]: Higher
+                        - generic [ref=e2931]: 3.11x
+                - button "athlete or team avatar Isaac Paredes HOU vs TEX - 4:10PM PDT 1.5 Hits + Runs + RBIs Higher 1.09x Lower 0.83x" [ref=e2932] [cursor=pointer]:
+                  - generic [ref=e2934]:
+                    - img "athlete or team avatar" [ref=e2941]
+                    - generic [ref=e2942]:
+                      - generic [ref=e2945]: Isaac Paredes
+                      - generic [ref=e2946]:
+                        - img [ref=e2948]
+                        - paragraph [ref=e2950]:
+                          - strong [ref=e2951]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2952]:
+                    - generic [ref=e2953]:
+                      - button [ref=e2954]:
+                        - img [ref=e2956]
+                        - img [ref=e2959]
+                      - generic [ref=e2964]:
+                        - generic [ref=e2966]: "1.5"
+                        - generic [ref=e2967]: Hits + Runs + RBIs
+                    - generic [ref=e2970]:
+                      - button "Higher 1.09x" [ref=e2971]:
+                        - generic [ref=e2972]:
+                          - generic [ref=e2973]: Higher
+                          - generic [ref=e2974]: 1.09x
+                      - button "Lower 0.83x" [ref=e2975]:
+                        - generic [ref=e2976]:
+                          - generic [ref=e2977]: Lower
+                          - generic [ref=e2978]: 0.83x
+                - button "athlete or team avatar Christian Vázquez HOU vs TEX - 4:10PM PDT 0.5 Hits Higher Lower" [ref=e2979] [cursor=pointer]:
+                  - generic [ref=e2981]:
+                    - img "athlete or team avatar" [ref=e2988]
+                    - generic [ref=e2989]:
+                      - generic [ref=e2992]: Christian Vázquez
+                      - generic [ref=e2993]:
+                        - img [ref=e2995]
+                        - paragraph [ref=e2997]:
+                          - strong [ref=e2998]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e2999]:
+                    - generic [ref=e3000]:
+                      - button [ref=e3001]:
+                        - img [ref=e3003]
+                        - img [ref=e3006]
+                      - generic [ref=e3011]:
+                        - generic [ref=e3013]: "0.5"
+                        - generic [ref=e3014]: Hits
+                    - generic [ref=e3017]:
+                      - button "Higher" [ref=e3018]:
+                        - generic [ref=e3020]: Higher
+                      - button "Lower" [ref=e3021]:
+                        - generic [ref=e3023]: Lower
+                - button "athlete or team avatar Zach Dezenzo HOU vs TEX - 4:10PM PDT 0.5 Hits Higher 0.94x Lower 1.03x" [ref=e3024] [cursor=pointer]:
+                  - generic [ref=e3026]:
+                    - img "athlete or team avatar" [ref=e3033]
+                    - generic [ref=e3034]:
+                      - generic [ref=e3037]: Zach Dezenzo
+                      - generic [ref=e3038]:
+                        - img [ref=e3040]
+                        - paragraph [ref=e3042]:
+                          - strong [ref=e3043]: HOU
+                          - text: vs TEX - 4:10PM PDT
+                  - generic [ref=e3044]:
+                    - generic [ref=e3045]:
+                      - button [ref=e3046]:
+                        - img [ref=e3048]
+                        - img [ref=e3051]
+                      - generic [ref=e3056]:
+                        - generic [ref=e3058]: "0.5"
+                        - generic [ref=e3059]: Hits
+                    - generic [ref=e3062]:
+                      - button "Higher 0.94x" [ref=e3063]:
+                        - generic [ref=e3064]:
+                          - generic [ref=e3065]: Higher
+                          - generic [ref=e3066]: 0.94x
+                      - button "Lower 1.03x" [ref=e3067]:
+                        - generic [ref=e3068]:
+                          - generic [ref=e3069]: Lower
+                          - generic [ref=e3070]: 1.03x
+      - generic [ref=e652]:
+        - button [ref=e654] [cursor=pointer]:
+          - img [ref=e658]
+        - generic [ref=e660]:
+          - heading "Add picks" [level=2] [ref=e661]
+          - paragraph [ref=e662]: Add picks to start playing.
+        - generic [ref=e664]:
+          - generic [ref=e666]:
+            - generic [ref=e667]:
+              - img [ref=e669]
+              - heading "Champions entry amount" [level=3] [ref=e671]
+              - button [ref=e672] [cursor=pointer]:
+                - img [ref=e676]
+            - button [ref=e679] [cursor=pointer]:
+              - img [ref=e683]
+          - generic [ref=e685]:
+            - paragraph [ref=e688]: Rewards
+            - generic [ref=e690]:
+              - generic [ref=e691]:
+                - button "New Customer Gimme 🎁" [ref=e693] [cursor=pointer]:
+                  - generic [ref=e694]:
+                    - img [ref=e697]
+                    - paragraph [ref=e700]: New Customer Gimme 🎁
+                - button "Extender 20% Boost" [ref=e702] [cursor=pointer]:
+                  - generic [ref=e703]:
+                    - img [ref=e706]
+                    - paragraph [ref=e709]: Extender 20% Boost
+                - button "40% Boost" [ref=e711] [cursor=pointer]:
+                  - generic [ref=e712]:
+                    - img [ref=e715]
+                    - paragraph [ref=e718]: 40% Boost
+                - button "30% MMA Boost" [ref=e720] [cursor=pointer]:
+                  - generic [ref=e721]:
+                    - img [ref=e724]
+                    - paragraph [ref=e727]: 30% MMA Boost
+                - button "30% Soccer Boost" [ref=e729] [cursor=pointer]:
+                  - generic [ref=e730]:
+                    - img [ref=e733]
+                    - paragraph [ref=e736]: 30% Soccer Boost
+                - button "30% MLB Boost" [ref=e738] [cursor=pointer]:
+                  - generic [ref=e739]:
+                    - img [ref=e742]
+                    - paragraph [ref=e745]: 30% MLB Boost
+              - button [ref=e747] [cursor=pointer]:
+                - img [ref=e749]
+            - generic [ref=e752]:
+              - generic [ref=e754]: Predictions powered by UDM Services, LLC | Crypto.com
+              - paragraph [ref=e755]: Sports Event Trading is a derivatives product offered by Crypto.com | Derivatives North America, a CFTC-regulated exchange. Trading on CDNA involves risk and may not be appropriate for all. By trading you risk losing your cost to enter any transaction, including fees. You should carefully consider whether trading on CDNA is appropriate for you in light of your investment experience and financial resources. Any trading decisions you make are solely your responsibility and at your own risk. The Event Contract has not been endorsed by any Association, any Association Participant that is part of such Association, or any Individual in any Association. The use of the name of any Association, Association Participant or Individual in any Association does not indicate any endorsement of this tradeable financial instrument. For Crypto.com Predictions, "pick" refers to a product traded on CDNA.
+              - paragraph [ref=e756]:
+                - text: The Sports Event Trading contract specifications are available
+                - link "here" [ref=e758] [cursor=pointer]:
+                  - /url: https://www.nadex.com/rules/
+                - text: . Rules are available
+                - link "here" [ref=e760] [cursor=pointer]:
+                  - /url: https://www.cftc.gov/sites/default/files/filings/ptc/25/05/ptc05072520850.pdf
+                - text: .
+            - button "Show more" [ref=e762] [cursor=pointer]:
+              - generic [ref=e764]: Show more
+            - generic [ref=e769]:
+              - img [ref=e771]
+              - textbox "Enter amount" [ref=e773]
+          - generic [ref=e775]:
+            - paragraph [ref=e778]: Standard
+            - generic [ref=e780] [cursor=pointer]:
+              - paragraph [ref=e781]: Flex
+              - button [ref=e782]:
+                - img [ref=e786]
+          - button "Play" [disabled] [ref=e789]:
+            - generic [ref=e792]: Play
+  - generic:
+    - img:
+      - generic:
+        - generic "basketball-icon"
+  - iframe [ref=e46]:
+    
+  - button "Open Intercom Messenger" [ref=e47] [cursor=pointer]:
+    - generic:
+      - img

@@ -1,209 +1,93 @@
-# Pick Lessons — Auto-Generated Rule Discovery
+# Pick Lessons -- Auto-Generated Rule Tracker
 
-Design doc. Status: **v1 shipped** (2026-05-16). See [Build status](#build-status-v1-shipped) at bottom.
-
----
-
-## Goal
-
-Every settled pick (win or loss) automatically generates a one-line hypothesis tagged with a normalized rule_key. Hypotheses graduate from `watching → confirmed` after 3 same-direction occurrences, or `→ falsified` after 2 counterexamples. Confirmed rules push to OB1 + `~/second-brain/sports/insights.md`. Watching rules live in a local review queue.
-
-Solves: today we only capture lessons when Raymond and the agent both happen to notice the pattern. Most picks settle and the signal is lost.
-
-## Non-goals
-
-- Replacing manual `/insight` capture. Auto-gen runs alongside it; manual captures still graduate faster.
-- Cross-sport generalization. MLB only in v1. Underdog pick'em legs first; single-pick bets second.
-- Automated bet placement based on confirmed rules. Confirmed rules surface as recommendations; placement stays human.
+Every settled pick auto-generates a hypothesis keyed to a normalized `rule_key`. Rules graduate `watching → confirmed` at 3 same-direction occurrences (game-deduped), or `→ falsified` at 2 counters. Confirmed rules push to OB1 + `~/second-brain/sports/insights.md`.
 
 ---
 
-## Data model
-
-New table in `betlog.db`:
+## Schema (`sliplog.db`)
 
 ```sql
 CREATE TABLE pick_lessons (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    rule_key TEXT NOT NULL,                  -- normalized pattern (see taxonomy)
-    hypothesis TEXT NOT NULL,                -- one-line plain-talk rule
-    direction TEXT NOT NULL,                 -- 'fail' | 'hit' (does this pattern miss or hit?)
-    occurrences INTEGER NOT NULL DEFAULT 1,  -- count of same-direction confirmations
-    counters INTEGER NOT NULL DEFAULT 0,     -- count of opposite-direction outcomes
-    status TEXT NOT NULL DEFAULT 'watching', -- 'watching' | 'confirmed' | 'falsified'
-    first_seen DATE NOT NULL,
-    last_seen DATE NOT NULL,
-    evidence TEXT NOT NULL,                  -- JSON: [{bet_id, slip_id, pick, outcome, score_delta, date}, ...]
-    promoted_at DATETIME,                    -- when status flipped to confirmed
-    notes TEXT                               -- free-form, manual edits allowed
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    rule_key      TEXT NOT NULL UNIQUE,   -- e.g. pitcher_strikeouts_higher_line_ge_l5_median
+    hypothesis    TEXT NOT NULL,          -- one-line plain-talk rule (frozen on first-seen)
+    direction     TEXT NOT NULL,          -- 'hit' | 'fail'
+    occurrences   INTEGER DEFAULT 1,      -- same-direction confirmations
+    counters      INTEGER DEFAULT 0,      -- opposite-direction outcomes
+    status        TEXT DEFAULT 'watching',-- watching | confirmed | falsified | under_review
+    first_seen    DATE NOT NULL,
+    last_seen     DATE NOT NULL,
+    evidence      TEXT NOT NULL,          -- JSON array of observations
+    promoted_at   DATETIME,
+    notes         TEXT
 );
-CREATE UNIQUE INDEX idx_pick_lessons_rule_key ON pick_lessons(rule_key);
 ```
 
-Append-only on evidence array (never delete past observations). Status transitions:
-- `watching` → `confirmed` when `occurrences >= 3 AND counters == 0`
-- `watching` → `falsified` when `counters >= 2`
-- `confirmed` → `falsified` when 3 counters arrive after promotion (rare; warrants review)
+Status transitions:
+- `watching → confirmed` when `occurrences >= 3 AND counters == 0`
+- `watching → falsified` when `counters >= 2`
+- `confirmed → under_review` when 3 counters arrive post-promotion
 
 ---
 
-## Rule-key taxonomy
+## Rule-Key Taxonomy
 
-The hard part. Keys must be:
-- **Narrow enough** that confirmations are real (not spurious co-occurrence)
-- **Broad enough** that the same pattern recurs within ~10 picks
+Format: `{player_type}_{stat}_{side}_{context}`
 
-v1 key format: `{player_type}_{stat}_{side}_{context}`
+**Context tokens** (controlled list -- add new ones in `pick_lessons.py`):
 
-Context vocabulary (controlled list, extend as needed):
-- `line_ge_l5_median` — line ≥ player's last-5 median for the stat
-- `line_lt_l5_median` — line < player's last-5 median
-- `line_ge_season_avg` / `line_lt_season_avg` — vs season average
-- `elite_vs_fade` / `fade_vs_elite` / `elite_vs_elite` / `fade_vs_fade` — tier matchup (pitchers only)
-- `lhb_vs_lhp` / `rhb_vs_rhp` / `lhb_vs_rhp` / `rhb_vs_lhp` — handedness
-- `home_split_strong` / `away_split_strong` — venue split tier
-- `il_return_le_7d` — coming off IL within 7 days
-- `pitcher_role_mismatch` — sample from wrong role (relief sample, starting tonight)
+| Token | Meaning |
+|---|---|
+| `line_ge_l5_median` | Line >= player's last-5 median for this stat |
+| `line_lt_l5_median` | Line < last-5 median |
+| `line_ge_season_avg` | Line >= season average |
+| `line_lt_season_avg` | Line < season average |
+| `elite_vs_fade` | ELITE pitcher vs FADE offense (or vice versa) |
+| `fade_vs_elite` | FADE pitcher vs ELITE offense |
+| `lhb_vs_lhp` / `rhb_vs_rhp` | Same-hand matchup |
+| `lhb_vs_rhp` / `rhb_vs_lhp` | Cross-hand matchup |
+| `home_split_strong` / `away_split_strong` | Venue split advantage |
+| `il_return_le_7d` | Returned from IL within 7 days |
+| `pitcher_role_mismatch` | L5 sample from wrong role (relief sample, starting tonight) |
+| `unspecified_context` | Fallback when no token matches |
 
 Examples:
-- `pitcher_ks_higher_line_ge_l5_median` (deGrom today)
-- `pitcher_pos_higher_line_ge_l5_median` (pitching outs)
-- `batter_hits_higher_lhb_vs_rhp_line_ge_season_avg`
-- `pitcher_ks_lower_pitcher_role_mismatch` (Teng today)
-
-The generator must pick from this controlled list. New context tokens require manual addition to the vocab. This bounds rule_key cardinality.
+- `pitcher_strikeouts_higher_line_ge_l5_median`
+- `batter_hits_plus_runs_plus_rbis_higher_line_ge_season_avg`
+- `pitcher_strikeouts_lower_pitcher_role_mismatch`
 
 ---
 
-## Generator flow
+## Auto-Trigger Flow
 
-Triggered after `sliplog.py result` or `betlog.py result` writes a final status.
+Triggered by `sliplog.py result --outcomes JSON`. For each pick:
 
-```
-for each pick in settled slip/bet:
-    context = {
-        player, stat, side, line, outcome,
-        pitcher_role, l5_values, l5_median, season_avg,
-        handedness_matchup, venue_split, il_status,
-        tier_matchup, score_delta = abs(actual - line),
-    }
-    # generator call: gives 1 hypothesis + 1 rule_key from controlled vocab
-    rule_key, hypothesis, direction = generate_hypothesis(context, outcome)
-
-    existing = SELECT * FROM pick_lessons WHERE rule_key = ?
-    if existing:
-        if direction matches existing.direction:
-            occurrences += 1
-            evidence.append(new_observation)
-            if occurrences >= 3 and counters == 0 and status == 'watching':
-                status = 'confirmed'; push_to_ob1(); append_to_insights_md()
-        else:
-            counters += 1
-            evidence.append(new_observation)
-            if counters >= 2 and status == 'watching':
-                status = 'falsified'
-            elif counters >= 3 and status == 'confirmed':
-                status = 'under_review'  # surface for manual call
-    else:
-        INSERT new row with status='watching', occurrences=1
-```
-
-Generator implementation **(v1)**: deterministic classifier. `_classify_context()` in `pick_lessons.py` walks a priority cascade — pitcher_role_mismatch → il_return_le_7d → line_vs_l5_median (K stats) → handedness matchup → tier matchup → line_vs_season_avg → unspecified. No LLM, no API cost, no failure mode. Hypothesis text is templated from `CONTEXT_DESCRIPTIONS` constant.
-
-Trade-off: deterministic classifier can only pick from the cascade order. Adding new context tokens means a code change. Accepted — bounded keyspace beats free-form expansion.
-
-LLM generator is a v1.5 candidate if the deterministic classifier proves too coarse after 30 days of data.
+1. Classifier determines context token from player stats in `mlb.db`
+2. `rule_key` generated deterministically; hypothesis templated from `CONTEXT_DESCRIPTIONS`
+3. If rule exists: same-direction → `occurrences++`; opposite → `counters++`
+4. If `occurrences >= 3`: promote to confirmed, push OB1, append `insights.md`
+5. Same-game observations dedup to 1 occurrence (prevents correlated legs inflating count)
 
 ---
 
-## Review surfaces
+## CLI
 
-**Watching queue** — new skill `/lessons-review`:
-- Lists all `watching` rules with occurrences ≥ 2 (close to graduation)
-- For each: hypothesis, evidence dates, gap to confirmation
-- Manual confirm/refute/edit-hypothesis options
-
-**Confirmed rules feed** — read by scoring + analyze flows:
-- `underdog-mlb-analyze` reads confirmed rules and applies as score modifiers
-- e.g. `pitcher_ks_higher_line_ge_l5_median` (confirmed, direction=fail) → -10 penalty on any matching pick
-
-**Insights.md sync** — only on `watching → confirmed` promotion:
-- Append entry with `## YYYY-MM-DD — [hypothesis]` + evidence summary
-- Same format as existing manual insights so they read uniformly
-
-**OB1 sync** — on promotion only:
-- `ob1_push(content, {type: 'rule_confirmed', agent: 'mlb-edge', rule_key, evidence_count})`
+```bash
+python pick_lessons.py stats                         # counts + near-graduation overview
+python pick_lessons.py list                          # all rules with status
+python pick_lessons.py list --status confirmed       # confirmed only
+python pick_lessons.py review                        # watching queue (near-graduation)
+python pick_lessons.py review --confirmed            # active rules
+python pick_lessons.py review --graveyard            # falsified rules
+python pick_lessons.py falsify --rule-key K --reason "no longer works"
+python pick_lessons.py resurrect --rule-key K
+python pick_lessons.py edit --rule-key K --hypothesis "revised text"
+```
 
 ---
 
-## Open questions
+## How Confirmed Rules Feed Back
 
-1. **Threshold tuning.** Is 3 confirmations enough? With 5-10 picks per night, 3 takes 1-3 days for common patterns. Too fast = false positives. Too slow = stale by the time we trust it. Proposal: 3 for v1, revisit after 30 days.
+`closer.py` passes all confirmed rules to Scout in the data brief. Scout uses them as positive evidence for matching picks; Skeptic can challenge if the rule is thin. Closer includes rule confirmation in the `reason` string.
 
-2. **Same-game overlap.** If a slip has 2 picks both matching the same rule_key, count as 1 or 2 occurrences? Proposal: 1, to avoid double-counting correlated outcomes from the same matchup.
-
-3. **Generator drift.** Different LLM calls might generate slightly different hypothesis wording for the same rule_key. Proposal: the rule_key is the dedup primary; hypothesis text on existing rows stays frozen at first-seen wording, never rewritten.
-
-4. **Falsified rules** — should they remain queryable so we don't re-investigate them? Proposal: yes. Keep falsified rows; `underdog-mlb-analyze` ignores them; `/lessons-review` shows them in a separate "graveyard" section.
-
-5. **Confidence score.** Should confirmed rules carry a strength score (e.g. occurrences / (occurrences + counters))? Proposal: skip for v1. Boolean confirmed/falsified is enough until we have >50 rules.
-
-6. **Backfill.** Do we run the generator over historical settled bets/slips? Proposal: yes, one-time pass over all settled rows in `betlog.db` after v1 ships. Seeds the watching queue with real history.
-
----
-
-## Build steps (v1)
-
-Locked decisions (wu wei recommendations, all confirmed):
-1. Threshold = hardcoded 3 occurrences (commit now, tune later)
-2. Count by game, not by pick (same-game observations dedup to 1)
-3. Hypothesis text freezes on first-seen, manual `edit` subcommand for revisions
-4. Falsified rules → graveyard (same table, partition by status, scoring layer ignores)
-5. No confidence scores in v1 (boolean confirmed/falsified only)
-6. Backfill is deferred to v1.5 once `slip_picks` capture exists
-
-## Build status (v1 shipped)
-
-Shipped 2026-05-16:
-- [x] `pick_lessons` table added to `schema/schema.sql` and applied to `betlog.db`
-- [x] `pick_lessons.py` with `observe()`, `_classify_context()`, `_on_promotion()`
-- [x] `CONTEXT_TOKENS` controlled vocab + `CONTEXT_DESCRIPTIONS` for hypothesis templating
-- [x] CLI subcommands: `observe`, `list`, `review`, `falsify`, `resurrect`, `edit`
-- [x] OB1 + insights.md push on `watching → confirmed` promotion
-- [x] Two real seed observations (Teng Lower role-mismatch, deGrom Higher line_ge_median)
-- [x] Smoke test verified promotion + insights.md prepend + OB1 push (then reverted)
-
-Shipped 2026-05-16 (v1.5 — sliplog auto-trigger):
-- [x] `slip_picks` table added to `betlog.db` and `schema/schema.sql`
-- [x] `sliplog.py add --picks` JSON arg captures per-pick structure on slip log
-- [x] `sliplog.py add-picks --slip-id N --picks JSON` retrofits structure to legacy slips
-- [x] `sliplog.py result --outcomes` JSON arg settles per-pick (computes hit/miss) and auto-triggers `pick_lessons.observe()` for each pick
-- [x] Backwards compat: legacy `--players` csv flow still works (no slip_picks rows, no auto-trigger)
-- [x] Graceful warnings for `--outcomes` without `slip_picks` rows, name mismatches, JSON parse failures
-- [x] Smoke test: 4 picks across 3 games verified add → settle → observe → same-game dedup → promotion flow → OB1 push → insights.md prepend; all test data rolled back
-
-Daily flow going forward:
-```
-# Log slip with full structure
-python sliplog.py add --entry 20 --payout 77.80 --multiplier "3.89x" \
-  --picks '[{"player":"...","player_type":"pitcher","stat":"Strikeouts","line":7.5,"side":"Higher","game":"TEX @ HOU"},...]'
-
-# Settle with per-pick outcomes -- triggers pick_lessons.observe automatically
-python sliplog.py result --id 6 --result loss \
-  --outcomes '{"player one":4,"player two":15}'
-```
-
-Shipped post-v1.5 follow-up (e5abc92):
-- [x] `sliplog.py list --detailed` and `sliplog.py picks --slip-id N` for per-pick visibility
-
-Shipped 2026-05-16 (v1.6 -- reason capture + Notion sync):
-- [x] `reason` column added to `slip_picks` table -- captures why each pick was made
-- [x] `sliplog.py add --picks` JSON now accepts `reason` field per pick
-- [x] `sliplog.py result` auto-syncs to Notion (sync_slip + post_summary) after settle; non-fatal on error
-- [x] `notion_sync.py` block writes migrated to ntn CLI (ntn pages update); token from ~/.config/credentials/notion.env
-- [x] `notion_sync.py --slips` and `--slip N` flags added
-
-Deferred to v2:
-- [ ] Backfill subcommand over historical settled rows (low priority — most legacy slips lack per-pick context to regenerate)
-- [ ] `/lessons-review` skill wrapper (CLI works for now)
-- [ ] Wire `underdog-mlb-analyze` to read confirmed rules as score modifiers (defer until ≥5 confirmed rules exist)
+`underdog-mlb-analyze` applies confirmed rules as score modifiers (+15 confirmed / -15 contradicted) -- active once rules exist.

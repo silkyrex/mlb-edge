@@ -1,15 +1,25 @@
-# Game Day Cheat Sheet
+# Game Day Runbook
 
-For explanations of terms (ERA, WHIP, splits, etc.) see `README.md`.
+See `docs/GLOSSARY.md` for term definitions. See `docs/DATASOURCES.md` for API details.
+
+---
+
+## What Runs Automatically
+
+| Time (PT) | What | Where |
+|---|---|---|
+| 9am M-F | `morning_brief.py` -- pitcher grades, IL flags, all starter stats cached | Discord + mlb.db |
+| nightly | `daily.sh` -- `cache_tomorrow.py` (night-before IL pre-cache) | mlb.db |
+
+Everything else is manual.
 
 ---
 
 ## The Night Before
 
 ```bash
-# Pre-load injury data for tomorrow -- no Underdog login needed
+# Only needed if tomorrow's games aren't in the auto-cache yet
 python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-16 --roster
-# Or let daily.sh handle it automatically via cache_tomorrow.py
 ```
 
 ---
@@ -17,78 +27,76 @@ python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-16 --roster
 ## Morning (before noon)
 
 ```bash
-# Full game picture -- pitchers, lineups, splits, regression flags, prop angles
-python dive.py --game "SF Giants @ Athletics" --date 2026-05-16
-
-# Early lean read (before Discord signal arrives)
-python matchup.py
-
-# Check if Underdog has tomorrow's lines up yet
-python lines_query.py --list-games
+python dive.py --game "SF Giants @ Athletics"    # full pre-game picture
+python matchup.py                                 # early lean read before signal
+python lines_query.py --list-games               # check if lines are posted yet
 ```
 
 ---
 
-## After Lean Signal Drops (~12pm PT)
+## After Lean Signal Drops (~noon PT)
 
-Discord: `UNDER LEAN, Civale ELITE ERA 2.54, Mahle FADE ERA 5.42, ATH mid, SF FADE`
-
-**1. Log into Underdog**
+**Step 1 -- Log into Underdog**
 ```
 /playwright-underdog
 ```
-Enter the 6-digit phone code. Wait for confirmation.
+Enter the 6-digit phone code when prompted.
 
-**2. Scrape lines**
+**Step 2 -- Scrape lines**
 ```
 /underdog-mlb Giants
 ```
-Takes ~70 seconds. Saves all prop lines to mlb.db.
+~70 seconds. Saves all prop lines to mlb.db.
 
-**3. Cache all stats (one command)**
+**Step 3 -- Cache all stats (one command)**
 ```bash
 python prep.py
 ```
-Runs `cache_stats` → `cache_espn` → `cache_news` + `cache_team` for every scraped game in parallel. Takes ~30-60s. Verify first with `--check`:
+Runs `cache_stats` → `cache_espn` → `cache_news` + `cache_team` for every scraped game in parallel. ~30-60s.
+
+Check before running closer.py:
 ```bash
-python prep.py --check    # all + before running closer.py
+python prep.py --check    # all columns must show + before proceeding
 ```
 
-**4. Analyze (optional quick read)**
+**Step 4 -- Optional quick read**
 ```
 /underdog-mlb-analyze "SF Giants @ Athletics" "UNDER LEAN, Civale ELITE ERA 2.54, ..."
 ```
-Outputs GREEN / YELLOW / SKIP picks ranked by score. Use as a sanity check before closer.py.
+GREEN / YELLOW / SKIP ranked by score. Use as a sanity check, not final word.
 
-**5. Final round critique (3-agent debate)**
+**Step 5 -- Final round critique**
 ```bash
 python closer.py
 ```
-Scout finds 6-8 angles. Skeptic tears each apart. Closer fetches live Statcast (xFIP, wRC+, pitch arsenal), umpire rating, and today's lineup card, then renders final 3-5 picks with pre-filled `reason` strings. Outputs a ready-to-paste `sliplog.py add --picks` command.
+Scout finds 6-8 angles across today's slate. Skeptic challenges each. Closer fetches live Statcast (xFIP, wRC+, pitch arsenal), umpire rating, and today's lineup card, then renders 3-5 final picks with `reason` strings. Output is a ready-to-paste `sliplog.py add --picks` command.
+
+Single game or budget run:
+```bash
+python closer.py --game "Giants"    # filter to one game
+python closer.py --model haiku      # faster/cheaper
+```
 
 ---
 
 ## Picking a Slip
 
-- GREEN picks only (score ≥ 65)
-- Picks must be from different teams
-- Max $50 Flex, max $20 Standard
-
-**Hard stops -- skip regardless of score:**
-- Player is on the injured list
-- Player came back from injury today
+Hard stops -- skip regardless of score:
+- Player is on the IL or returned from IL today
+- IL return within 7 days (rust, -10 score penalty)
 - Both Higher and Lower show no multiplier
-- First-inning pitch count on a FADE pitcher (unless the opposing lineup walks a lot)
-- Pitcher Ks Higher when line ≥ recent L5 median Ks (`/underdog-mlb-analyze` flags this; verify before placing)
-- Pitcher Ks Lower when `pitcher_role` is `reliever` / `mixed` and tonight is a start (relief K sample does not predict starter Ks)
+- First-inning pitch count Higher on a FADE pitcher
+- Pitcher Ks Higher when line >= recent L5 median Ks
+- Pitcher Ks Lower when L5 sample is from wrong role (relief sample, starting tonight)
 
-**Marginal-leg gate (when stacking a 3-pick on top of a 2-pick of the same legs):**
-
-Adding a 3rd leg is only +EV if `P(new leg hits | base legs hit) > 1 − (base_mult / new_mult)`. Otherwise drop the 3-pick and double the 2-pick stake instead. See `docs/PICK_LESSONS.md` for the worked example.
+Slip construction rules:
+- Picks from 2+ different teams
+- Max $50 Flex, max $20 Standard/Power
+- 3-pick on top of 2-pick only if `P(new leg hits | base legs hit) > 1 - (base_mult / new_mult)`
 
 ---
 
-## Log the Slip (Underdog pick-em)
+## Log the Slip
 
 Paste the command from `closer.py` output, or build manually:
 
@@ -107,27 +115,27 @@ python sliplog.py add \
 ## After the Game
 
 ```bash
-# Verify what got captured before settling
-python sliplog.py picks --slip-id 6              # focused per-slip detail
-python sliplog.py list --all --detailed          # all slips with per-pick rows indented
+# Verify picks before settling
+python sliplog.py picks --slip-id N
+python sliplog.py list --all --detailed
 
-# Settle with per-pick outcomes (auto-fires pick_lessons.observe per pick)
-python sliplog.py result --id 6 --result loss \
-  --outcomes '{"Aaron Civale":4,"Matt Chapman":0}'
+# Settle (auto-fires pick_lessons.observe per pick)
+python sliplog.py result --id N --result win/loss \
+  --outcomes '{"Aaron Civale": 4, "Matt Chapman": 0}'
 
-# Notion pages auto-update after result (slip + summary)
+# Notion + OB1 update automatically after result
 
-# Review running totals
-python sliplog.py summary                       # slip P&L
-python pick_lessons.py review                   # watching queue (near-graduation rules)
-python pick_lessons.py review --confirmed       # active score-modifier rules
+# Review totals and lessons
+python sliplog.py summary
+python pick_lessons.py review
+python pick_lessons.py review --confirmed
 ```
 
 ---
 
 ## Pick Direction Quick Reference
 
-| Situation | Bet | Direction |
+| Situation | Stat | Direction |
 |---|---|---|
 | ELITE pitcher | Strikeouts, Pitching Outs | Higher |
 | ELITE pitcher | Hits Allowed, Runs Allowed | Lower |
@@ -135,20 +143,24 @@ python pick_lessons.py review --confirmed       # active score-modifier rules
 | FADE pitcher | Runs Allowed, Hits Allowed | Higher |
 | FADE offense batter | H+R+RBI, Hits, Total Bases | Lower |
 | ELITE offense batter | H+R+RBI | Higher |
-| UNDER lean, game total | Total Runs | Lower |
+| UNDER lean | Total Runs | Lower |
 
-**Batter split rule:** use the vs-RHP or vs-LHP split based on today's pitcher's throwing hand, not the season average.
+**Batter split rule:** use vs-RHP or vs-LHP split based on today's starter's arm -- not season average.
 
-**Hot batter rule:** if a batter's last-15-game H+R+RBI average is well above the line, don't fade them even if their team is graded FADE.
+**Hot batter rule:** if L15 H+R+RBI average is well above the line, don't fade regardless of team grade.
 
-**Regression rule:** if a batter's actual average is much higher than their expected average (xAVG), they've been lucky -- lean toward fading.
+**Regression rule:** real avg much higher than xAVG = lucky, lean toward fading.
+
+**Ump rule:** high error rate ump = downgrade K Higher props for both starters that game.
+
+**Rest rule:** short rest (<=3d) = downgrade K Higher; extra rest (>=6d) = note first-inning rust risk.
 
 ---
 
 ## Drill Deeper
 
 ```bash
-python player.py pitcher "Aaron Civale"          # last 5 starts
-python player.py batter "Matt Chapman"           # last 15 games + splits
-python player.py matchup "Chapman" "Civale"      # career head-to-head
+python player.py pitcher "Aaron Civale"
+python player.py batter "Matt Chapman"
+python player.py matchup "Chapman" "Civale"
 ```

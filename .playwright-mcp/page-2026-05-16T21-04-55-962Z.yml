@@ -1,0 +1,400 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e12]:
+      - link "home" [ref=e13] [cursor=pointer]:
+        - /url: /pick-em/higher-lower/all/featured
+        - img [ref=e15]
+      - generic [ref=e18]:
+        - link "Champions" [ref=e19] [cursor=pointer]:
+          - /url: /pick-em
+        - link "Drafts" [ref=e20] [cursor=pointer]:
+          - /url: /lobby
+        - link "Live" [ref=e21] [cursor=pointer]:
+          - /url: /live
+        - link "Results" [ref=e22] [cursor=pointer]:
+          - /url: /results
+        - link "Rankings" [ref=e23] [cursor=pointer]:
+          - /url: /rankings
+        - link "News feed" [ref=e24] [cursor=pointer]:
+          - /url: /news-feed
+      - generic [ref=e25]:
+        - button [ref=e26] [cursor=pointer]:
+          - img [ref=e30]
+        - button [ref=e32] [cursor=pointer]:
+          - img [ref=e36]
+        - link [ref=e38] [cursor=pointer]:
+          - /url: /account
+          - img [ref=e41]
+        - link "$87.55" [ref=e43] [cursor=pointer]:
+          - /url: /deposit
+          - generic [ref=e44]:
+            - generic [ref=e45]: $87.55
+            - img [ref=e48]
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e53]:
+          - search [ref=e56]:
+            - button [ref=e57] [cursor=pointer]:
+              - img [ref=e59]
+            - textbox "Find teams, players and stats" [ref=e61]
+          - button "Champions tips" [ref=e62] [cursor=pointer]:
+            - paragraph [ref=e63]: Champions tips
+            - img [ref=e65]
+        - generic [ref=e67]:
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - button "Featured" [ref=e72] [cursor=pointer]
+              - button "Live" [ref=e74] [cursor=pointer]
+              - button "NBA" [ref=e76] [cursor=pointer]
+              - button "MLB" [ref=e78] [cursor=pointer]
+              - button "Soccer" [ref=e80] [cursor=pointer]
+              - button "Tennis" [ref=e82] [cursor=pointer]
+              - button "NHL" [ref=e84] [cursor=pointer]
+              - button "PGA" [ref=e86] [cursor=pointer]
+              - button "WNBA" [ref=e88] [cursor=pointer]
+              - button "NFL" [ref=e90] [cursor=pointer]
+              - button "Esports" [ref=e92] [cursor=pointer]
+              - button "CS2" [ref=e94] [cursor=pointer]
+              - button "LoL" [ref=e96] [cursor=pointer]
+              - button "Valorant" [ref=e98] [cursor=pointer]
+              - button "MLBCombos" [ref=e100] [cursor=pointer]
+              - button "MMA" [ref=e102] [cursor=pointer]
+              - button "Lacrosse" [ref=e104] [cursor=pointer]
+              - button "World of Outlaws" [ref=e106] [cursor=pointer]
+              - button "USAC Racing" [ref=e108] [cursor=pointer]
+            - button [ref=e110] [cursor=pointer]:
+              - img [ref=e112]
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - button "New Customer Gimme 🎁 $10 max Change a pick to 0! Promo icon 1 Left Apply" [ref=e118] [cursor=pointer]:
+                - generic [ref=e119]:
+                  - generic [ref=e120]:
+                    - heading "New Customer Gimme 🎁" [level=2] [ref=e121]
+                    - paragraph [ref=e123]: $10 max
+                    - paragraph [ref=e124]: Change a pick to 0!
+                  - img "Promo icon" [ref=e125]
+                - generic [ref=e126]:
+                  - paragraph [ref=e128]: 1 Left
+                  - button "Apply" [ref=e129]:
+                    - generic [ref=e131]: Apply
+              - button "Extender 20% Boost NBA Only • $50 max Boost the profit of your entry Promo icon 1 day 1 Left Apply" [ref=e133] [cursor=pointer]:
+                - generic [ref=e134]:
+                  - generic [ref=e135]:
+                    - heading "Extender 20% Boost" [level=2] [ref=e136]
+                    - generic [ref=e137]:
+                      - paragraph [ref=e138]: NBA Only
+                      - generic [ref=e139]: •
+                      - paragraph [ref=e140]: $50 max
+                    - paragraph [ref=e141]: Boost the profit of your entry
+                  - img "Promo icon" [ref=e142]
+                - generic [ref=e143]:
+                  - generic [ref=e144]:
+                    - generic [ref=e145]: 1 day
+                    - img [ref=e147]
+                    - paragraph [ref=e149]: 1 Left
+                  - button "Apply" [ref=e150]:
+                    - generic [ref=e152]: Apply
+              - button "40% Boost $50 max • 3-8 picks Boost the profit of your entry Promo icon 1 day 2 Left Apply" [ref=e154] [cursor=pointer]:
+                - generic [ref=e155]:
+                  - generic [ref=e156]:
+                    - heading "40% Boost" [level=2] [ref=e157]
+                    - generic [ref=e158]:
+                      - paragraph [ref=e159]: $50 max
+                      - generic [ref=e160]: •
+                      - paragraph [ref=e161]: 3-8 picks
+                    - paragraph [ref=e162]: Boost the profit of your entry
+                  - img "Promo icon" [ref=e163]
+                - generic [ref=e164]:
+                  - generic [ref=e165]:
+                    - generic [ref=e166]: 1 day
+                    - img [ref=e168]
+                    - paragraph [ref=e170]: 2 Left
+                  - button "Apply" [ref=e171]:
+                    - generic [ref=e173]: Apply
+              - button "30% MMA Boost MMA Only • $50 max Boost the profit of your entry Promo icon 06:54:04 1 Left Apply" [ref=e175] [cursor=pointer]:
+                - generic [ref=e176]:
+                  - generic [ref=e177]:
+                    - heading "30% MMA Boost" [level=2] [ref=e178]
+                    - generic [ref=e179]:
+                      - paragraph [ref=e180]: MMA Only
+                      - generic [ref=e181]: •
+                      - paragraph [ref=e182]: $50 max
+                    - paragraph [ref=e183]: Boost the profit of your entry
+                  - img "Promo icon" [ref=e184]
+                - generic [ref=e185]:
+                  - generic [ref=e186]:
+                    - generic [ref=e187]: 06:54:04
+                    - img [ref=e189]
+                    - paragraph [ref=e191]: 1 Left
+                  - button "Apply" [ref=e192]:
+                    - generic [ref=e194]: Apply
+              - button "30% PGA Boost PGA Only • $50 max Boost the profit of your entry Promo icon 22:55:04 1 Left Apply" [ref=e196] [cursor=pointer]:
+                - generic [ref=e197]:
+                  - generic [ref=e198]:
+                    - heading "30% PGA Boost" [level=2] [ref=e199]
+                    - generic [ref=e200]:
+                      - paragraph [ref=e201]: PGA Only
+                      - generic [ref=e202]: •
+                      - paragraph [ref=e203]: $50 max
+                    - paragraph [ref=e204]: Boost the profit of your entry
+                  - img "Promo icon" [ref=e205]
+                - generic [ref=e206]:
+                  - generic [ref=e207]:
+                    - generic [ref=e208]: 22:55:04
+                    - img [ref=e210]
+                    - paragraph [ref=e212]: 1 Left
+                  - button "Apply" [ref=e213]:
+                    - generic [ref=e215]: Apply
+              - button "30% Soccer Boost Soccer Only • $50 max Boost the profit of your entry Promo icon 1 day 1 Left Apply" [ref=e217] [cursor=pointer]:
+                - generic [ref=e218]:
+                  - generic [ref=e219]:
+                    - heading "30% Soccer Boost" [level=2] [ref=e220]
+                    - generic [ref=e221]:
+                      - paragraph [ref=e222]: Soccer Only
+                      - generic [ref=e223]: •
+                      - paragraph [ref=e224]: $50 max
+                    - paragraph [ref=e225]: Boost the profit of your entry
+                  - img "Promo icon" [ref=e226]
+                - generic [ref=e227]:
+                  - generic [ref=e228]:
+                    - generic [ref=e229]: 1 day
+                    - img [ref=e231]
+                    - paragraph [ref=e233]: 1 Left
+                  - button "Apply" [ref=e234]:
+                    - generic [ref=e236]: Apply
+              - button "30% MLB Boost MLB Only • $50 max Boost the profit of your entry Promo icon 1 day 1 Left Apply" [ref=e238] [cursor=pointer]:
+                - generic [ref=e239]:
+                  - generic [ref=e240]:
+                    - heading "30% MLB Boost" [level=2] [ref=e241]
+                    - generic [ref=e242]:
+                      - paragraph [ref=e243]: MLB Only
+                      - generic [ref=e244]: •
+                      - paragraph [ref=e245]: $50 max
+                    - paragraph [ref=e246]: Boost the profit of your entry
+                  - img "Promo icon" [ref=e247]
+                - generic [ref=e248]:
+                  - generic [ref=e249]:
+                    - generic [ref=e250]: 1 day
+                    - img [ref=e252]
+                    - paragraph [ref=e254]: 1 Left
+                  - button "Apply" [ref=e255]:
+                    - generic [ref=e257]: Apply
+            - button [ref=e259] [cursor=pointer]:
+              - img [ref=e261]
+          - generic [ref=e263]:
+            - heading "PGA Championship" [level=2] [ref=e265]
+            - generic [ref=e266]:
+              - generic [ref=e267]:
+                - button "athlete or team avatar Cameron Young PGA Championship R3 - 13th Hole 11.5 Holes 16-17-18 Strokes Higher Lower" [ref=e268] [cursor=pointer]:
+                  - generic [ref=e270]:
+                    - img "athlete or team avatar" [ref=e277]
+                    - generic [ref=e278]:
+                      - generic [ref=e281]: Cameron Young
+                      - generic [ref=e282]:
+                        - img [ref=e284]
+                        - paragraph [ref=e286]:
+                          - strong [ref=e287]: PGA Championship R3
+                          - text: "- 13th Hole"
+                  - generic [ref=e288]:
+                    - generic [ref=e293]:
+                      - generic [ref=e295]: "11.5"
+                      - generic [ref=e296]: Holes 16-17-18 Strokes
+                    - generic [ref=e299]:
+                      - button "Higher" [ref=e300]:
+                        - generic [ref=e302]: Higher
+                      - button "Lower" [ref=e303]:
+                        - generic [ref=e305]: Lower
+                - button "athlete or team avatar Hideki Matsuyama PGA Championship R3 - 10th Hole 11.5 Holes 16-17-18 Strokes Higher 0.88x Lower 1.03x" [ref=e306] [cursor=pointer]:
+                  - generic [ref=e308]:
+                    - img "athlete or team avatar" [ref=e315]
+                    - generic [ref=e316]:
+                      - generic [ref=e319]: Hideki Matsuyama
+                      - generic [ref=e320]:
+                        - img [ref=e322]
+                        - paragraph [ref=e324]:
+                          - strong [ref=e325]: PGA Championship R3
+                          - text: "- 10th Hole"
+                  - generic [ref=e326]:
+                    - generic [ref=e331]:
+                      - generic [ref=e333]: "11.5"
+                      - generic [ref=e334]: Holes 16-17-18 Strokes
+                    - generic [ref=e337]:
+                      - button "Higher 0.88x" [ref=e338]:
+                        - generic [ref=e339]:
+                          - generic [ref=e340]: Higher
+                          - generic [ref=e341]: 0.88x
+                      - button "Lower 1.03x" [ref=e342]:
+                        - generic [ref=e343]:
+                          - generic [ref=e344]: Lower
+                          - generic [ref=e345]: 1.03x
+                - button "athlete or team avatar Chris Gotterup PGA Championship R3 - 10th Hole 11.5 Holes 16-17-18 Strokes Higher 0.88x Lower 1.03x" [ref=e346] [cursor=pointer]:
+                  - generic [ref=e348]:
+                    - img "athlete or team avatar" [ref=e355]
+                    - generic [ref=e356]:
+                      - generic [ref=e359]: Chris Gotterup
+                      - generic [ref=e360]:
+                        - img [ref=e362]
+                        - paragraph [ref=e364]:
+                          - strong [ref=e365]: PGA Championship R3
+                          - text: "- 10th Hole"
+                  - generic [ref=e366]:
+                    - generic [ref=e371]:
+                      - generic [ref=e373]: "11.5"
+                      - generic [ref=e374]: Holes 16-17-18 Strokes
+                    - generic [ref=e377]:
+                      - button "Higher 0.88x" [ref=e378]:
+                        - generic [ref=e379]:
+                          - generic [ref=e380]: Higher
+                          - generic [ref=e381]: 0.88x
+                      - button "Lower 1.03x" [ref=e382]:
+                        - generic [ref=e383]:
+                          - generic [ref=e384]: Lower
+                          - generic [ref=e385]: 1.03x
+              - generic [ref=e386]:
+                - button "athlete or team avatar Min Woo Lee PGA Championship R3 - 12th Hole 11.5 Holes 16-17-18 Strokes Higher 0.88x Lower 1.03x" [ref=e387] [cursor=pointer]:
+                  - generic [ref=e389]:
+                    - img "athlete or team avatar" [ref=e396]
+                    - generic [ref=e397]:
+                      - generic [ref=e400]: Min Woo Lee
+                      - generic [ref=e401]:
+                        - img [ref=e403]
+                        - paragraph [ref=e405]:
+                          - strong [ref=e406]: PGA Championship R3
+                          - text: "- 12th Hole"
+                  - generic [ref=e407]:
+                    - generic [ref=e412]:
+                      - generic [ref=e414]: "11.5"
+                      - generic [ref=e415]: Holes 16-17-18 Strokes
+                    - generic [ref=e418]:
+                      - button "Higher 0.88x" [ref=e419]:
+                        - generic [ref=e420]:
+                          - generic [ref=e421]: Higher
+                          - generic [ref=e422]: 0.88x
+                      - button "Lower 1.03x" [ref=e423]:
+                        - generic [ref=e424]:
+                          - generic [ref=e425]: Lower
+                          - generic [ref=e426]: 1.03x
+                - button "athlete or team avatar Justin Thomas PGA Championship R3 - 13th Hole 11.5 Holes 16-17-18 Strokes Higher Lower" [ref=e427] [cursor=pointer]:
+                  - generic [ref=e429]:
+                    - img "athlete or team avatar" [ref=e436]
+                    - generic [ref=e437]:
+                      - generic [ref=e440]: Justin Thomas
+                      - generic [ref=e441]:
+                        - img [ref=e443]
+                        - paragraph [ref=e445]:
+                          - strong [ref=e446]: PGA Championship R3
+                          - text: "- 13th Hole"
+                  - generic [ref=e447]:
+                    - generic [ref=e452]:
+                      - generic [ref=e454]: "11.5"
+                      - generic [ref=e455]: Holes 16-17-18 Strokes
+                    - generic [ref=e458]:
+                      - button "Higher" [ref=e459]:
+                        - generic [ref=e461]: Higher
+                      - button "Lower" [ref=e462]:
+                        - generic [ref=e464]: Lower
+                - button "athlete or team avatar Aldrich Potgieter PGA Championship R3 - 11th Hole 11.5 Holes 16-17-18 Strokes Higher 0.84x Lower 1.06x" [ref=e465] [cursor=pointer]:
+                  - generic [ref=e467]:
+                    - img "athlete or team avatar" [ref=e474]
+                    - generic [ref=e475]:
+                      - generic [ref=e478]: Aldrich Potgieter
+                      - generic [ref=e479]:
+                        - img [ref=e481]
+                        - paragraph [ref=e483]:
+                          - strong [ref=e484]: PGA Championship R3
+                          - text: "- 11th Hole"
+                  - generic [ref=e485]:
+                    - generic [ref=e490]:
+                      - generic [ref=e492]: "11.5"
+                      - generic [ref=e493]: Holes 16-17-18 Strokes
+                    - generic [ref=e496]:
+                      - button "Higher 0.84x" [ref=e497]:
+                        - generic [ref=e498]:
+                          - generic [ref=e499]: Higher
+                          - generic [ref=e500]: 0.84x
+                      - button "Lower 1.06x" [ref=e501]:
+                        - generic [ref=e502]:
+                          - generic [ref=e503]: Lower
+                          - generic [ref=e504]: 1.06x
+      - generic [ref=e562]:
+        - button [ref=e564] [cursor=pointer]:
+          - img [ref=e568]
+        - generic [ref=e570]:
+          - heading "Add picks" [level=2] [ref=e571]
+          - paragraph [ref=e572]: Add picks to start playing.
+        - generic [ref=e574]:
+          - generic [ref=e576]:
+            - generic [ref=e577]:
+              - img [ref=e579]
+              - heading "Champions entry amount" [level=3] [ref=e581]
+              - button [ref=e582] [cursor=pointer]:
+                - img [ref=e586]
+            - button [ref=e589] [cursor=pointer]:
+              - img [ref=e593]
+          - generic [ref=e595]:
+            - paragraph [ref=e598]: Rewards
+            - generic [ref=e600]:
+              - generic [ref=e601]:
+                - button "New Customer Gimme 🎁" [ref=e603] [cursor=pointer]:
+                  - generic [ref=e604]:
+                    - img [ref=e607]
+                    - paragraph [ref=e610]: New Customer Gimme 🎁
+                - button "Extender 20% Boost" [ref=e612] [cursor=pointer]:
+                  - generic [ref=e613]:
+                    - img [ref=e616]
+                    - paragraph [ref=e619]: Extender 20% Boost
+                - button "40% Boost" [ref=e621] [cursor=pointer]:
+                  - generic [ref=e622]:
+                    - img [ref=e625]
+                    - paragraph [ref=e628]: 40% Boost
+                - button "30% MMA Boost" [ref=e630] [cursor=pointer]:
+                  - generic [ref=e631]:
+                    - img [ref=e634]
+                    - paragraph [ref=e637]: 30% MMA Boost
+                - button "30% PGA Boost" [ref=e639] [cursor=pointer]:
+                  - generic [ref=e640]:
+                    - img [ref=e643]
+                    - paragraph [ref=e646]: 30% PGA Boost
+                - button "30% Soccer Boost" [ref=e648] [cursor=pointer]:
+                  - generic [ref=e649]:
+                    - img [ref=e652]
+                    - paragraph [ref=e655]: 30% Soccer Boost
+                - button "30% MLB Boost" [ref=e657] [cursor=pointer]:
+                  - generic [ref=e658]:
+                    - img [ref=e661]
+                    - paragraph [ref=e664]: 30% MLB Boost
+              - button [ref=e666] [cursor=pointer]:
+                - img [ref=e668]
+            - generic [ref=e671]:
+              - generic [ref=e673]: Predictions powered by UDM Services, LLC | Crypto.com
+              - paragraph [ref=e674]: Sports Event Trading is a derivatives product offered by Crypto.com | Derivatives North America, a CFTC-regulated exchange. Trading on CDNA involves risk and may not be appropriate for all. By trading you risk losing your cost to enter any transaction, including fees. You should carefully consider whether trading on CDNA is appropriate for you in light of your investment experience and financial resources. Any trading decisions you make are solely your responsibility and at your own risk. The Event Contract has not been endorsed by any Association, any Association Participant that is part of such Association, or any Individual in any Association. The use of the name of any Association, Association Participant or Individual in any Association does not indicate any endorsement of this tradeable financial instrument. For Crypto.com Predictions, "pick" refers to a product traded on CDNA.
+              - paragraph [ref=e675]:
+                - text: The Sports Event Trading contract specifications are available
+                - link "here" [ref=e677] [cursor=pointer]:
+                  - /url: https://www.nadex.com/rules/
+                - text: . Rules are available
+                - link "here" [ref=e679] [cursor=pointer]:
+                  - /url: https://www.cftc.gov/sites/default/files/filings/ptc/25/05/ptc05072520850.pdf
+                - text: .
+            - button "Show more" [ref=e681] [cursor=pointer]:
+              - generic [ref=e683]: Show more
+            - generic [ref=e688]:
+              - img [ref=e690]
+              - textbox "Enter amount" [ref=e692]
+          - generic [ref=e694]:
+            - paragraph [ref=e697]: Standard
+            - generic [ref=e699] [cursor=pointer]:
+              - paragraph [ref=e700]: Flex
+              - button [ref=e701]:
+                - img [ref=e705]
+          - button "Play" [disabled] [ref=e708]:
+            - generic [ref=e711]: Play
+  - generic:
+    - img:
+      - generic:
+        - generic "basketball-icon"
+  - iframe [ref=e11]:
+    
+  - button "Open Intercom Messenger" [ref=e712] [cursor=pointer]:
+    - generic:
+      - img

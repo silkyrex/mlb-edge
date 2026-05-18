@@ -1,0 +1,969 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - link "home" [ref=e5] [cursor=pointer]:
+        - /url: /pick-em/higher-lower/all/featured
+        - img [ref=e7]
+      - generic [ref=e10]:
+        - link "Champions" [ref=e11] [cursor=pointer]:
+          - /url: /pick-em
+        - link "Drafts" [ref=e12] [cursor=pointer]:
+          - /url: /lobby
+        - link "Live" [ref=e13] [cursor=pointer]:
+          - /url: /live
+        - link "Results" [ref=e14] [cursor=pointer]:
+          - /url: /results
+        - link "Rankings" [ref=e15] [cursor=pointer]:
+          - /url: /rankings
+        - link "News feed" [ref=e16] [cursor=pointer]:
+          - /url: /news-feed
+      - generic [ref=e17]:
+        - button [ref=e18] [cursor=pointer]:
+          - img [ref=e22]
+        - button [ref=e24] [cursor=pointer]:
+          - img [ref=e28]
+        - link [ref=e30] [cursor=pointer]:
+          - /url: /account
+          - img [ref=e33]
+        - link "$87.55" [ref=e35] [cursor=pointer]:
+          - /url: /deposit
+          - generic [ref=e36]:
+            - generic [ref=e37]: $87.55
+            - img [ref=e40]
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e52]:
+          - search [ref=e55]:
+            - button [ref=e56] [cursor=pointer]:
+              - img [ref=e58]
+            - textbox "Find MLB teams, players and stats" [ref=e794]
+          - button "Champions tips" [ref=e61] [cursor=pointer]:
+            - paragraph [ref=e62]: Champions tips
+            - img [ref=e64]
+        - generic [ref=e66]:
+          - generic [ref=e68]:
+            - button [ref=e796] [cursor=pointer]:
+              - img [ref=e798]
+            - generic [ref=e69]:
+              - button "Featured" [ref=e71] [cursor=pointer]
+              - button "Live" [ref=e73] [cursor=pointer]
+              - button "NBA" [ref=e75] [cursor=pointer]
+              - button "MLB" [ref=e77] [cursor=pointer]
+              - button "Soccer" [ref=e79] [cursor=pointer]
+              - button "Tennis" [ref=e81] [cursor=pointer]
+              - button "NHL" [ref=e83] [cursor=pointer]
+              - button "WNBA" [ref=e85] [cursor=pointer]
+              - button "NFL" [ref=e87] [cursor=pointer]
+              - button "Esports" [ref=e89] [cursor=pointer]
+              - button "CS2" [ref=e91] [cursor=pointer]
+              - button "LoL" [ref=e93] [cursor=pointer]
+              - button "Valorant" [ref=e95] [cursor=pointer]
+              - button "MLBCombos" [ref=e97] [cursor=pointer]
+              - button "MMA" [ref=e99] [cursor=pointer]
+              - button "Lacrosse" [ref=e101] [cursor=pointer]
+              - button "World of Outlaws" [ref=e103] [cursor=pointer]
+            - button [ref=e105] [cursor=pointer]:
+              - img [ref=e107]
+          - generic [ref=e801]:
+            - generic [ref=e802]:
+              - button "AZ @ COL 2 - 4" [ref=e804] [cursor=pointer]:
+                - generic [ref=e805]:
+                  - generic [ref=e806]: AZ @ COL
+                  - generic [ref=e808]: 2 - 4
+              - button "BAL @ WSH 2 - 4" [ref=e810] [cursor=pointer]:
+                - generic [ref=e811]:
+                  - generic [ref=e812]: BAL @ WSH
+                  - generic [ref=e814]: 2 - 4
+              - button "PHI @ PIT 5 - 0" [ref=e816] [cursor=pointer]:
+                - generic [ref=e817]:
+                  - generic [ref=e818]: PHI @ PIT
+                  - generic [ref=e820]: 5 - 0
+              - button "MIA @ TB 1 - 1" [ref=e822] [cursor=pointer]:
+                - generic [ref=e823]:
+                  - generic [ref=e824]: MIA @ TB
+                  - generic [ref=e826]: 1 - 1
+              - button "CIN @ CLE 3:10pm" [ref=e828] [cursor=pointer]:
+                - generic [ref=e829]:
+                  - generic [ref=e830]: CIN @ CLE
+                  - generic [ref=e831]: 3:10pm
+              - button "CHC @ CWS 4:10pm" [ref=e833] [cursor=pointer]:
+                - generic [ref=e834]:
+                  - generic [ref=e835]: CHC @ CWS
+                  - generic [ref=e836]: 4:10pm
+              - button "MIL @ MIN 4:10pm" [ref=e838] [cursor=pointer]:
+                - generic [ref=e839]:
+                  - generic [ref=e840]: MIL @ MIN
+                  - generic [ref=e841]: 4:10pm
+              - button "TEX @ HOU 4:10pm" [ref=e843] [cursor=pointer]:
+                - generic [ref=e844]:
+                  - generic [ref=e845]: TEX @ HOU
+                  - generic [ref=e846]: 4:10pm
+              - button "BOS @ ATL 4:15pm" [ref=e848] [cursor=pointer]:
+                - generic [ref=e849]:
+                  - generic [ref=e850]: BOS @ ATL
+                  - generic [ref=e851]: 4:15pm
+              - button "NYY @ NYM 4:15pm" [ref=e853] [cursor=pointer]:
+                - generic [ref=e854]:
+                  - generic [ref=e855]: NYY @ NYM
+                  - generic [ref=e856]: 4:15pm
+              - button "SD @ SEA 4:15pm" [ref=e858] [cursor=pointer]:
+                - generic [ref=e859]:
+                  - generic [ref=e860]: SD @ SEA
+                  - generic [ref=e861]: 4:15pm
+              - button "LAD @ LAA 6:38pm" [ref=e863] [cursor=pointer]:
+                - generic [ref=e864]:
+                  - generic [ref=e865]: LAD @ LAA
+                  - generic [ref=e866]: 6:38pm
+              - button "SF @ ATH 6:40pm" [ref=e868] [cursor=pointer]:
+                - generic [ref=e869]:
+                  - generic [ref=e870]: SF @ ATH
+                  - generic [ref=e871]: 6:40pm
+              - button "MIA @ TB Sun, 9:15am" [ref=e873] [cursor=pointer]:
+                - generic [ref=e874]:
+                  - generic [ref=e875]: MIA @ TB
+                  - generic [ref=e876]: Sun, 9:15am
+              - button "Futures" [ref=e878] [cursor=pointer]:
+                - generic [ref=e880]: Futures
+            - button [ref=e882] [cursor=pointer]:
+              - img [ref=e884]
+          - generic [ref=e887]:
+            - generic [ref=e888]:
+              - button "Popular" [ref=e890] [cursor=pointer]
+              - button "Team Picks" [ref=e892] [cursor=pointer]
+              - button "Strikeouts" [ref=e894] [cursor=pointer]
+              - button "Hits + Runs + RBIs" [ref=e896] [cursor=pointer]
+              - button "Home Runs" [ref=e898] [cursor=pointer]
+              - button "Total Bases" [ref=e900] [cursor=pointer]
+              - button "Fantasy Points" [ref=e902] [cursor=pointer]
+              - button "Pitching Outs" [ref=e904] [cursor=pointer]
+              - button "Hits Allowed" [ref=e906] [cursor=pointer]
+              - button "Earned Runs Allowed" [ref=e908] [cursor=pointer]
+              - button "Walks Allowed" [ref=e910] [cursor=pointer]
+              - button "Hits" [ref=e912] [cursor=pointer]
+              - button "Runs" [ref=e914] [cursor=pointer]
+              - button "RBIs" [ref=e916] [cursor=pointer]
+              - button "Singles" [ref=e918] [cursor=pointer]
+              - button "Batter Strikeouts" [ref=e920] [cursor=pointer]
+              - button "Batter Walks" [ref=e922] [cursor=pointer]
+              - button "Stolen Bases" [ref=e924] [cursor=pointer]
+              - button "1st Inn. Strikeouts" [ref=e926] [cursor=pointer]
+              - button "1st Inn. Runs Allowed" [ref=e928] [cursor=pointer]
+              - button "1st Inn. Batters Faced" [ref=e930] [cursor=pointer]
+              - button "1st Inn. Hits Allowed" [ref=e932] [cursor=pointer]
+              - button "1-3 Inn. Runs Allowed" [ref=e934] [cursor=pointer]
+              - button "Doubles" [ref=e936] [cursor=pointer]
+            - button [ref=e938] [cursor=pointer]:
+              - img [ref=e940]
+          - generic [ref=e943]:
+            - generic [ref=e944]:
+              - button "New Customer Gimme 🎁 $10 max Change a pick to 0! Promo icon 1 Left Apply" [ref=e946] [cursor=pointer]:
+                - generic [ref=e947]:
+                  - generic [ref=e948]:
+                    - heading "New Customer Gimme 🎁" [level=2] [ref=e949]
+                    - paragraph [ref=e951]: $10 max
+                    - paragraph [ref=e952]: Change a pick to 0!
+                  - img "Promo icon" [ref=e953]
+                - generic [ref=e954]:
+                  - paragraph [ref=e956]: 1 Left
+                  - button "Apply" [ref=e957]:
+                    - generic [ref=e959]: Apply
+              - button "40% Boost $50 max • 3-8 picks Boost the profit of your entry Promo icon 1 day 2 Left Apply" [ref=e961] [cursor=pointer]:
+                - generic [ref=e962]:
+                  - generic [ref=e963]:
+                    - heading "40% Boost" [level=2] [ref=e964]
+                    - generic [ref=e965]:
+                      - paragraph [ref=e966]: $50 max
+                      - generic [ref=e967]: •
+                      - paragraph [ref=e968]: 3-8 picks
+                    - paragraph [ref=e969]: Boost the profit of your entry
+                  - img "Promo icon" [ref=e970]
+                - generic [ref=e971]:
+                  - generic [ref=e972]:
+                    - generic [ref=e973]: 1 day
+                    - img [ref=e975]
+                    - paragraph [ref=e977]: 2 Left
+                  - button "Apply" [ref=e978]:
+                    - generic [ref=e980]: Apply
+              - button "30% MLB Boost MLB Only • $50 max Boost the profit of your entry Promo icon 1 day 1 Left Apply" [ref=e982] [cursor=pointer]:
+                - generic [ref=e983]:
+                  - generic [ref=e984]:
+                    - heading "30% MLB Boost" [level=2] [ref=e985]
+                    - generic [ref=e986]:
+                      - paragraph [ref=e987]: MLB Only
+                      - generic [ref=e988]: •
+                      - paragraph [ref=e989]: $50 max
+                    - paragraph [ref=e990]: Boost the profit of your entry
+                  - img "Promo icon" [ref=e991]
+                - generic [ref=e992]:
+                  - generic [ref=e993]:
+                    - generic [ref=e994]: 1 day
+                    - img [ref=e996]
+                    - paragraph [ref=e998]: 1 Left
+                  - button "Apply" [ref=e999]:
+                    - generic [ref=e1001]: Apply
+            - button [ref=e1003] [cursor=pointer]:
+              - img [ref=e1005]
+          - generic [ref=e1007]:
+            - generic [ref=e1008]:
+              - heading "Games" [level=2] [ref=e1009]
+              - button [disabled] [ref=e1010]:
+                - img [ref=e1012]
+              - button [ref=e1014] [cursor=pointer]:
+                - img [ref=e1016]
+            - generic [ref=e1019]:
+              - generic [ref=e1022]:
+                - link "athlete or team avatar AZ 2 Bot 8th athlete or team avatar COL 4" [ref=e1023] [cursor=pointer]:
+                  - generic [ref=e1028]:
+                    - generic [ref=e1029]:
+                      - img "athlete or team avatar" [ref=e1031]
+                      - generic [ref=e1032]:
+                        - generic [ref=e1033]: AZ
+                        - generic [ref=e1034]: "2"
+                    - generic [ref=e1037]: Bot 8th
+                    - generic [ref=e1038]:
+                      - img "athlete or team avatar" [ref=e1040]
+                      - generic [ref=e1041]:
+                        - generic [ref=e1042]: COL
+                        - generic [ref=e1043]: "4"
+                - generic [ref=e1045]:
+                  - button "D'Backs to win +809" [ref=e1928] [cursor=pointer]:
+                    - generic [ref=e1929]:
+                      - paragraph [ref=e1930]: D'Backs to win
+                      - paragraph [ref=e1931]: "+809"
+                  - button "Rockies to win -1667" [ref=e1932] [cursor=pointer]:
+                    - generic [ref=e1933]:
+                      - paragraph [ref=e1934]: Rockies to win
+                      - paragraph [ref=e1935]: "-1667"
+                  - generic [ref=e1054]: "@"
+                - generic [ref=e1056]:
+                  - generic [ref=e1057]:
+                    - paragraph [ref=e1058]: Spread
+                    - paragraph [ref=e1059]: Spread
+                  - generic [ref=e1060]:
+                    - button "AZ +2.5 -371" [ref=e1936] [cursor=pointer]:
+                      - generic [ref=e1937]: AZ +2.5
+                      - generic [ref=e1938]: "-371"
+                    - button "COL -2.5 +245" [ref=e1939] [cursor=pointer]:
+                      - generic [ref=e1940]: COL -2.5
+                      - generic [ref=e1941]: "+245"
+                - generic [ref=e1068]:
+                  - generic [ref=e1069]:
+                    - paragraph [ref=e1070]: "6.5"
+                    - paragraph [ref=e1071]: Total Runs
+                  - generic [ref=e1072]:
+                    - button "Higher -127" [ref=e1942] [cursor=pointer]:
+                      - generic [ref=e1943]: Higher
+                      - generic [ref=e1944]: "-127"
+                    - button "Lower +104" [ref=e1945] [cursor=pointer]:
+                      - generic [ref=e1946]: Lower
+                      - generic [ref=e1947]: "+104"
+                - img "prediction" [ref=e1081]
+              - generic [ref=e1085]:
+                - link "athlete or team avatar PHI 5 Bot 7th athlete or team avatar PIT 0" [ref=e1086] [cursor=pointer]:
+                  - generic [ref=e1091]:
+                    - generic [ref=e1092]:
+                      - img "athlete or team avatar" [ref=e1094]
+                      - generic [ref=e1095]:
+                        - generic [ref=e1096]: PHI
+                        - generic [ref=e1097]: "5"
+                    - generic [ref=e1100]: Bot 7th
+                    - generic [ref=e1101]:
+                      - img "athlete or team avatar" [ref=e1103]
+                      - generic [ref=e1104]:
+                        - generic [ref=e1105]: PIT
+                        - generic [ref=e1106]: "0"
+                - generic [ref=e1108]:
+                  - button "Phillies to win -10000" [ref=e1109] [cursor=pointer]:
+                    - generic [ref=e1110]:
+                      - paragraph [ref=e1111]: Phillies to win
+                      - paragraph [ref=e1112]: "-10000"
+                  - button "Pirates to win +1570" [ref=e1948] [cursor=pointer]:
+                    - generic [ref=e1949]:
+                      - paragraph [ref=e1950]: Pirates to win
+                      - paragraph [ref=e1951]: "+1570"
+                  - generic [ref=e1117]: "@"
+                - generic [ref=e1119]:
+                  - generic [ref=e1120]:
+                    - paragraph [ref=e1121]: Spread
+                    - paragraph [ref=e1122]: Spread
+                  - generic [ref=e1123]:
+                    - button "PHI -4.5 -150" [ref=e1952] [cursor=pointer]:
+                      - generic [ref=e1953]: PHI -4.5
+                      - generic [ref=e1954]: "-150"
+                    - button "PIT +4.5 +113" [ref=e1955] [cursor=pointer]:
+                      - generic [ref=e1956]: PIT +4.5
+                      - generic [ref=e1957]: "+113"
+                - generic [ref=e1131]:
+                  - generic [ref=e1132]:
+                    - paragraph [ref=e1133]: "7.5"
+                    - paragraph [ref=e1134]: Total Runs
+                  - generic [ref=e1135]:
+                    - button "Higher +133" [ref=e1958] [cursor=pointer]:
+                      - generic [ref=e1959]: Higher
+                      - generic [ref=e1960]: "+133"
+                    - button "Lower -157" [ref=e1961] [cursor=pointer]:
+                      - generic [ref=e1962]: Lower
+                      - generic [ref=e1963]: "-157"
+                - img "prediction" [ref=e1144]
+              - generic [ref=e1148]:
+                - link "athlete or team avatar BAL 2 Top 7th athlete or team avatar WSH 4" [ref=e1149] [cursor=pointer]:
+                  - generic [ref=e1154]:
+                    - generic [ref=e1155]:
+                      - img "athlete or team avatar" [ref=e1157]
+                      - generic [ref=e1158]:
+                        - generic [ref=e1159]: BAL
+                        - generic [ref=e1160]: "2"
+                    - generic [ref=e1163]: Top 7th
+                    - generic [ref=e1164]:
+                      - img "athlete or team avatar" [ref=e1166]
+                      - generic [ref=e1167]:
+                        - generic [ref=e1168]: WSH
+                        - generic [ref=e1169]: "4"
+                - generic [ref=e1171]:
+                  - button "Orioles to win +335" [ref=e1964] [cursor=pointer]:
+                    - generic [ref=e1965]:
+                      - paragraph [ref=e1966]: Orioles to win
+                      - paragraph [ref=e1967]: "+335"
+                  - button "Nationals to win -500" [ref=e1968] [cursor=pointer]:
+                    - generic [ref=e1969]:
+                      - paragraph [ref=e1970]: Nationals to win
+                      - paragraph [ref=e1971]: "-500"
+                  - generic [ref=e1180]: "@"
+                - generic [ref=e1182]:
+                  - generic [ref=e1183]:
+                    - paragraph [ref=e1184]: Spread
+                    - paragraph [ref=e1185]: Spread
+                  - generic [ref=e1186]:
+                    - button "BAL +1.5 +113" [ref=e1187] [cursor=pointer]:
+                      - generic [ref=e1188]: BAL +1.5
+                      - generic [ref=e1189]: "+113"
+                    - button "WSH -1.5 -139" [ref=e1972] [cursor=pointer]:
+                      - generic [ref=e1973]: WSH -1.5
+                      - generic [ref=e1974]: "-139"
+                - generic [ref=e1194]:
+                  - generic [ref=e1195]:
+                    - paragraph [ref=e1196]: "8.5"
+                    - paragraph [ref=e1197]: Total Runs
+                  - generic [ref=e1198]:
+                    - button "Higher -139" [ref=e1975] [cursor=pointer]:
+                      - generic [ref=e1976]: Higher
+                      - generic [ref=e1977]: "-139"
+                    - button "Lower +117" [ref=e1978] [cursor=pointer]:
+                      - generic [ref=e1979]: Lower
+                      - generic [ref=e1980]: "+117"
+                - img "prediction" [ref=e1207]
+              - generic [ref=e1211]:
+                - link "athlete or team avatar MIA 1 Bot 7th athlete or team avatar TB 1" [ref=e1212] [cursor=pointer]:
+                  - generic [ref=e1217]:
+                    - generic [ref=e1218]:
+                      - img "athlete or team avatar" [ref=e1220]
+                      - generic [ref=e1221]:
+                        - generic [ref=e1222]: MIA
+                        - generic [ref=e1223]: "1"
+                    - generic [ref=e1226]: Bot 7th
+                    - generic [ref=e1227]:
+                      - img "athlete or team avatar" [ref=e1229]
+                      - generic [ref=e1230]:
+                        - generic [ref=e1231]: TB
+                        - generic [ref=e1232]: "1"
+                - generic [ref=e1234]:
+                  - button "Marlins to win +113" [ref=e1981] [cursor=pointer]:
+                    - generic [ref=e1982]:
+                      - paragraph [ref=e1983]: Marlins to win
+                      - paragraph [ref=e1984]: "+113"
+                  - button "Rays to win -145" [ref=e1985] [cursor=pointer]:
+                    - generic [ref=e1986]:
+                      - paragraph [ref=e1987]: Rays to win
+                      - paragraph [ref=e1988]: "-145"
+                  - generic [ref=e1243]: "@"
+                - generic [ref=e1245]:
+                  - generic [ref=e1246]:
+                    - paragraph [ref=e1247]: Spread
+                    - paragraph [ref=e1248]: Spread
+                  - generic [ref=e1249]:
+                    - button "MIA -1.5 +285" [ref=e1989] [cursor=pointer]:
+                      - generic [ref=e1990]: MIA -1.5
+                      - generic [ref=e1991]: "+285"
+                    - button "TB +1.5 -455" [ref=e1992] [cursor=pointer]:
+                      - generic [ref=e1993]: TB +1.5
+                      - generic [ref=e1994]: "-455"
+                - generic [ref=e1257]:
+                  - generic [ref=e1258]:
+                    - paragraph [ref=e1259]: "4.5"
+                    - paragraph [ref=e1260]: Total Runs
+                  - generic [ref=e1261]:
+                    - button "Higher +113" [ref=e1995] [cursor=pointer]:
+                      - generic [ref=e1996]: Higher
+                      - generic [ref=e1997]: "+113"
+                    - button "Lower -145" [ref=e1998] [cursor=pointer]:
+                      - generic [ref=e1999]: Lower
+                      - generic [ref=e2000]: "-145"
+                - img "prediction" [ref=e1270]
+              - generic [ref=e1274]:
+                - link "athlete or team avatar CIN 24-21 3:10pm Moderate or heavy rain shower 68 33.2K athlete or team avatar CLE 24-22" [ref=e1275] [cursor=pointer]:
+                  - generic [ref=e1280]:
+                    - generic [ref=e1281]:
+                      - img "athlete or team avatar" [ref=e1283]
+                      - generic [ref=e1284]:
+                        - generic [ref=e1285]: CIN
+                        - generic [ref=e1286]: 24-21
+                    - generic [ref=e1287]:
+                      - generic [ref=e1288]: 3:10pm
+                      - generic [ref=e1289]:
+                        - generic [ref=e1290]: Moderate or heavy rain shower 68
+                        - img [ref=e1292]
+                        - generic [ref=e1294]:
+                          - img [ref=e1296]
+                          - generic [ref=e1298]: 33.2K
+                    - generic [ref=e1299]:
+                      - img "athlete or team avatar" [ref=e1301]
+                      - generic [ref=e1302]:
+                        - generic [ref=e1303]: CLE
+                        - generic [ref=e1304]: 24-22
+                - generic [ref=e1306]:
+                  - button "Reds to win +127" [ref=e1307] [cursor=pointer]:
+                    - generic [ref=e1308]:
+                      - paragraph [ref=e1309]: Reds to win
+                      - paragraph [ref=e1310]: "+127"
+                  - button "Guardians to win -157" [ref=e1311] [cursor=pointer]:
+                    - generic [ref=e1312]:
+                      - paragraph [ref=e1313]: Guardians to win
+                      - paragraph [ref=e1314]: "-157"
+                  - generic [ref=e1315]: "@"
+                - generic [ref=e1317]:
+                  - generic [ref=e1318]:
+                    - paragraph [ref=e1319]: Spread
+                    - paragraph [ref=e1320]: Spread
+                  - generic [ref=e1321]:
+                    - button "CIN +1.5 -164" [ref=e1322] [cursor=pointer]:
+                      - generic [ref=e1323]: CIN +1.5
+                      - generic [ref=e1324]: "-164"
+                    - button "CLE -1.5 +133" [ref=e1325] [cursor=pointer]:
+                      - generic [ref=e1326]: CLE -1.5
+                      - generic [ref=e1327]: "+133"
+                - generic [ref=e1329]:
+                  - generic [ref=e1330]:
+                    - paragraph [ref=e1331]: "8.5"
+                    - paragraph [ref=e1332]: Total Runs
+                  - generic [ref=e1333]:
+                    - button "Higher -113" [ref=e1334] [cursor=pointer]:
+                      - generic [ref=e1335]: Higher
+                      - generic [ref=e1336]: "-113"
+                    - button "Lower -109" [ref=e1337] [cursor=pointer]:
+                      - generic [ref=e1338]: Lower
+                      - generic [ref=e1339]: "-109"
+                - img "prediction" [ref=e1342]
+              - generic [ref=e1346]:
+                - link "athlete or team avatar MIL 25-17 4:10pm Sunny 76 14.8K athlete or team avatar MIN 20-25" [ref=e1347] [cursor=pointer]:
+                  - generic [ref=e1352]:
+                    - generic [ref=e1353]:
+                      - img "athlete or team avatar" [ref=e1355]
+                      - generic [ref=e1356]:
+                        - generic [ref=e1357]: MIL
+                        - generic [ref=e1358]: 25-17
+                    - generic [ref=e1359]:
+                      - generic [ref=e1360]: 4:10pm
+                      - generic [ref=e1361]:
+                        - generic [ref=e1362]: Sunny 76
+                        - img [ref=e1364]
+                        - generic [ref=e1366]:
+                          - img [ref=e1368]
+                          - generic [ref=e1370]: 14.8K
+                    - generic [ref=e1371]:
+                      - img "athlete or team avatar" [ref=e1373]
+                      - generic [ref=e1374]:
+                        - generic [ref=e1375]: MIN
+                        - generic [ref=e1376]: 20-25
+                - generic [ref=e1378]:
+                  - button "Brewers to win -139" [ref=e1379] [cursor=pointer]:
+                    - generic [ref=e1380]:
+                      - paragraph [ref=e1381]: Brewers to win
+                      - paragraph [ref=e1382]: "-139"
+                  - button "Twins to win +113" [ref=e1383] [cursor=pointer]:
+                    - generic [ref=e1384]:
+                      - paragraph [ref=e1385]: Twins to win
+                      - paragraph [ref=e1386]: "+113"
+                  - generic [ref=e1387]: "@"
+                - generic [ref=e1389]:
+                  - generic [ref=e1390]:
+                    - paragraph [ref=e1391]: Spread
+                    - paragraph [ref=e1392]: Spread
+                  - generic [ref=e1393]:
+                    - button "MIL -1.5 +122" [ref=e1394] [cursor=pointer]:
+                      - generic [ref=e1395]: MIL -1.5
+                      - generic [ref=e1396]: "+122"
+                    - button "MIN +1.5 -150" [ref=e1397] [cursor=pointer]:
+                      - generic [ref=e1398]: MIN +1.5
+                      - generic [ref=e1399]: "-150"
+                - generic [ref=e1401]:
+                  - generic [ref=e1402]:
+                    - paragraph [ref=e1403]: "8.5"
+                    - paragraph [ref=e1404]: Total Runs
+                  - generic [ref=e1405]:
+                    - button "Higher -105" [ref=e1406] [cursor=pointer]:
+                      - generic [ref=e1407]: Higher
+                      - generic [ref=e1408]: "-105"
+                    - button "Lower -113" [ref=e1409] [cursor=pointer]:
+                      - generic [ref=e1410]: Lower
+                      - generic [ref=e1411]: "-113"
+                - img "prediction" [ref=e1414]
+              - generic [ref=e1418]:
+                - link "athlete or team avatar CHC 29-16 4:10pm Patchy rain nearby 71 29.2K athlete or team avatar CWS 22-22" [ref=e1419] [cursor=pointer]:
+                  - generic [ref=e1424]:
+                    - generic [ref=e1425]:
+                      - img "athlete or team avatar" [ref=e1427]
+                      - generic [ref=e1428]:
+                        - generic [ref=e1429]: CHC
+                        - generic [ref=e1430]: 29-16
+                    - generic [ref=e1431]:
+                      - generic [ref=e1432]: 4:10pm
+                      - generic [ref=e1433]:
+                        - generic [ref=e1434]: Patchy rain nearby 71
+                        - img [ref=e1436]
+                        - generic [ref=e1438]:
+                          - img [ref=e1440]
+                          - generic [ref=e1442]: 29.2K
+                    - generic [ref=e1443]:
+                      - img "athlete or team avatar" [ref=e1445]
+                      - generic [ref=e1446]:
+                        - generic [ref=e1447]: CWS
+                        - generic [ref=e1448]: 22-22
+                - generic [ref=e1450]:
+                  - button "Cubs to win -109" [ref=e1451] [cursor=pointer]:
+                    - generic [ref=e1452]:
+                      - paragraph [ref=e1453]: Cubs to win
+                      - paragraph [ref=e1454]: "-109"
+                  - button "White Sox to win -113" [ref=e1455] [cursor=pointer]:
+                    - generic [ref=e1456]:
+                      - paragraph [ref=e1457]: White Sox to win
+                      - paragraph [ref=e1458]: "-113"
+                  - generic [ref=e1459]: "@"
+                - generic [ref=e1461]:
+                  - generic [ref=e1462]:
+                    - paragraph [ref=e1463]: Spread
+                    - paragraph [ref=e1464]: Spread
+                  - generic [ref=e1465]:
+                    - button "CHC -1.5 +144" [ref=e1466] [cursor=pointer]:
+                      - generic [ref=e1467]: CHC -1.5
+                      - generic [ref=e1468]: "+144"
+                    - button "CWS +1.5 -186" [ref=e1469] [cursor=pointer]:
+                      - generic [ref=e1470]: CWS +1.5
+                      - generic [ref=e1471]: "-186"
+                - generic [ref=e1473]:
+                  - generic [ref=e1474]:
+                    - paragraph [ref=e1475]: "8.5"
+                    - paragraph [ref=e1476]: Total Runs
+                  - generic [ref=e1477]:
+                    - button "Higher -113" [ref=e1478] [cursor=pointer]:
+                      - generic [ref=e1479]: Higher
+                      - generic [ref=e1480]: "-113"
+                    - button "Lower -109" [ref=e1481] [cursor=pointer]:
+                      - generic [ref=e1482]: Lower
+                      - generic [ref=e1483]: "-109"
+                - img "prediction" [ref=e1486]
+              - generic [ref=e1490]:
+                - link "athlete or team avatar TEX 21-23 4:10pm Partly Cloudy 84 20.3K athlete or team avatar HOU 18-28" [ref=e1491] [cursor=pointer]:
+                  - generic [ref=e1496]:
+                    - generic [ref=e1497]:
+                      - img "athlete or team avatar" [ref=e1499]
+                      - generic [ref=e1500]:
+                        - generic [ref=e1501]: TEX
+                        - generic [ref=e1502]: 21-23
+                    - generic [ref=e1503]:
+                      - generic [ref=e1504]: 4:10pm
+                      - generic [ref=e1505]:
+                        - generic [ref=e1506]: Partly Cloudy 84
+                        - img [ref=e1508]
+                        - generic [ref=e1510]:
+                          - img [ref=e1512]
+                          - generic [ref=e1514]: 20.3K
+                    - generic [ref=e1515]:
+                      - img "athlete or team avatar" [ref=e1517]
+                      - generic [ref=e1518]:
+                        - generic [ref=e1519]: HOU
+                        - generic [ref=e1520]: 18-28
+                - generic [ref=e1522]:
+                  - button "Rangers to win -150" [ref=e1523] [cursor=pointer]:
+                    - generic [ref=e1524]:
+                      - paragraph [ref=e1525]: Rangers to win
+                      - paragraph [ref=e1526]: "-150"
+                  - button "Astros to win +122" [ref=e1527] [cursor=pointer]:
+                    - generic [ref=e1528]:
+                      - paragraph [ref=e1529]: Astros to win
+                      - paragraph [ref=e1530]: "+122"
+                  - generic [ref=e1531]: "@"
+                - generic [ref=e1533]:
+                  - generic [ref=e1534]:
+                    - paragraph [ref=e1535]: Spread
+                    - paragraph [ref=e1536]: Spread
+                  - generic [ref=e1537]:
+                    - button "TEX -1.5 +113" [ref=e1538] [cursor=pointer]:
+                      - generic [ref=e1539]: TEX -1.5
+                      - generic [ref=e1540]: "+113"
+                    - button "HOU +1.5 -139" [ref=e1541] [cursor=pointer]:
+                      - generic [ref=e1542]: HOU +1.5
+                      - generic [ref=e1543]: "-139"
+                - generic [ref=e1545]:
+                  - generic [ref=e1546]:
+                    - paragraph [ref=e1547]: "7.5"
+                    - paragraph [ref=e1548]: Total Runs
+                  - generic [ref=e1549]:
+                    - button "Higher -118" [ref=e1550] [cursor=pointer]:
+                      - generic [ref=e1551]: Higher
+                      - generic [ref=e1552]: "-118"
+                    - button "Lower +100" [ref=e1553] [cursor=pointer]:
+                      - generic [ref=e1554]: Lower
+                      - generic [ref=e1555]: "+100"
+                - img "prediction" [ref=e1558]
+              - generic [ref=e1562]:
+                - link "athlete or team avatar NYY 28-17 4:15pm Sunny 76 FOX 24.7K athlete or team avatar NYM 18-26" [ref=e1563] [cursor=pointer]:
+                  - generic [ref=e1568]:
+                    - generic [ref=e1569]:
+                      - img "athlete or team avatar" [ref=e1571]
+                      - generic [ref=e1572]:
+                        - generic [ref=e1573]: NYY
+                        - generic [ref=e1574]: 28-17
+                    - generic [ref=e1575]:
+                      - generic [ref=e1576]: 4:15pm
+                      - generic [ref=e1577]:
+                        - generic [ref=e1578]: Sunny 76
+                        - img [ref=e1580]
+                        - generic [ref=e1582]: FOX
+                        - img [ref=e1584]
+                        - generic [ref=e1586]:
+                          - img [ref=e1588]
+                          - generic [ref=e1590]: 24.7K
+                    - generic [ref=e1591]:
+                      - img "athlete or team avatar" [ref=e1593]
+                      - generic [ref=e1594]:
+                        - generic [ref=e1595]: NYM
+                        - generic [ref=e1596]: 18-26
+                - generic [ref=e1598]:
+                  - button "Yankees to win -122" [ref=e1599] [cursor=pointer]:
+                    - generic [ref=e1600]:
+                      - paragraph [ref=e1601]: Yankees to win
+                      - paragraph [ref=e1602]: "-122"
+                  - button "Mets to win +100" [ref=e1603] [cursor=pointer]:
+                    - generic [ref=e1604]:
+                      - paragraph [ref=e1605]: Mets to win
+                      - paragraph [ref=e1606]: "+100"
+                  - generic [ref=e1607]: "@"
+                - generic [ref=e1609]:
+                  - generic [ref=e1610]:
+                    - paragraph [ref=e1611]: Spread
+                    - paragraph [ref=e1612]: Spread
+                  - generic [ref=e1613]:
+                    - button "NYY -1.5 +133" [ref=e1614] [cursor=pointer]:
+                      - generic [ref=e1615]: NYY -1.5
+                      - generic [ref=e1616]: "+133"
+                    - button "NYM +1.5 -164" [ref=e1617] [cursor=pointer]:
+                      - generic [ref=e1618]: NYM +1.5
+                      - generic [ref=e1619]: "-164"
+                - generic [ref=e1621]:
+                  - generic [ref=e1622]:
+                    - paragraph [ref=e1623]: "8.5"
+                    - paragraph [ref=e1624]: Total Runs
+                  - generic [ref=e1625]:
+                    - button "Higher -109" [ref=e1626] [cursor=pointer]:
+                      - generic [ref=e1627]: Higher
+                      - generic [ref=e1628]: "-109"
+                    - button "Lower -109" [ref=e1629] [cursor=pointer]:
+                      - generic [ref=e1630]: Lower
+                      - generic [ref=e1631]: "-109"
+                - img "prediction" [ref=e1634]
+              - generic [ref=e1638]:
+                - link "athlete or team avatar SD 26-18 4:15pm Patchy light rain 54 FOX 11.4K athlete or team avatar SEA 22-24" [ref=e1639] [cursor=pointer]:
+                  - generic [ref=e1644]:
+                    - generic [ref=e1645]:
+                      - img "athlete or team avatar" [ref=e1647]
+                      - generic [ref=e1648]:
+                        - generic [ref=e1649]: SD
+                        - generic [ref=e1650]: 26-18
+                    - generic [ref=e1651]:
+                      - generic [ref=e1652]: 4:15pm
+                      - generic [ref=e1653]:
+                        - generic [ref=e1654]: Patchy light rain 54
+                        - img [ref=e1656]
+                        - generic [ref=e1658]: FOX
+                        - img [ref=e1660]
+                        - generic [ref=e1662]:
+                          - img [ref=e1664]
+                          - generic [ref=e1666]: 11.4K
+                    - generic [ref=e1667]:
+                      - img "athlete or team avatar" [ref=e1669]
+                      - generic [ref=e1670]:
+                        - generic [ref=e1671]: SEA
+                        - generic [ref=e1672]: 22-24
+                - generic [ref=e1674]:
+                  - button "Padres to win +138" [ref=e1675] [cursor=pointer]:
+                    - generic [ref=e1676]:
+                      - paragraph [ref=e1677]: Padres to win
+                      - paragraph [ref=e1678]: "+138"
+                  - button "Mariners to win -179" [ref=e1679] [cursor=pointer]:
+                    - generic [ref=e1680]:
+                      - paragraph [ref=e1681]: Mariners to win
+                      - paragraph [ref=e1682]: "-179"
+                  - generic [ref=e1683]: "@"
+                - generic [ref=e1685]:
+                  - generic [ref=e1686]:
+                    - paragraph [ref=e1687]: Spread
+                    - paragraph [ref=e1688]: Spread
+                  - generic [ref=e1689]:
+                    - button "SD +1.5 -157" [ref=e1690] [cursor=pointer]:
+                      - generic [ref=e1691]: SD +1.5
+                      - generic [ref=e1692]: "-157"
+                    - button "SEA -1.5 +133" [ref=e1693] [cursor=pointer]:
+                      - generic [ref=e1694]: SEA -1.5
+                      - generic [ref=e1695]: "+133"
+                - generic [ref=e1697]:
+                  - generic [ref=e1698]:
+                    - paragraph [ref=e1699]: "7.5"
+                    - paragraph [ref=e1700]: Total Runs
+                  - generic [ref=e1701]:
+                    - button "Higher +108" [ref=e1702] [cursor=pointer]:
+                      - generic [ref=e1703]: Higher
+                      - generic [ref=e1704]: "+108"
+                    - button "Lower -134" [ref=e1705] [cursor=pointer]:
+                      - generic [ref=e1706]: Lower
+                      - generic [ref=e1707]: "-134"
+                - img "prediction" [ref=e1710]
+              - generic [ref=e1714]:
+                - link "athlete or team avatar BOS 18-26 4:15pm Sunny 86 23K athlete or team avatar ATL 31-14" [ref=e1715] [cursor=pointer]:
+                  - generic [ref=e1720]:
+                    - generic [ref=e1721]:
+                      - img "athlete or team avatar" [ref=e1723]
+                      - generic [ref=e1724]:
+                        - generic [ref=e1725]: BOS
+                        - generic [ref=e1726]: 18-26
+                    - generic [ref=e1727]:
+                      - generic [ref=e1728]: 4:15pm
+                      - generic [ref=e1729]:
+                        - generic [ref=e1730]: Sunny 86
+                        - img [ref=e1732]
+                        - generic [ref=e1734]:
+                          - img [ref=e1736]
+                          - generic [ref=e1738]: 23K
+                    - generic [ref=e1739]:
+                      - img "athlete or team avatar" [ref=e1741]
+                      - generic [ref=e1742]:
+                        - generic [ref=e1743]: ATL
+                        - generic [ref=e1744]: 31-14
+                - generic [ref=e1746]:
+                  - button "Red Sox to win +100" [ref=e1747] [cursor=pointer]:
+                    - generic [ref=e1748]:
+                      - paragraph [ref=e1749]: Red Sox to win
+                      - paragraph [ref=e1750]: "+100"
+                  - button "Braves to win -118" [ref=e1751] [cursor=pointer]:
+                    - generic [ref=e1752]:
+                      - paragraph [ref=e1753]: Braves to win
+                      - paragraph [ref=e1754]: "-118"
+                  - generic [ref=e1755]: "@"
+                - generic [ref=e1757]:
+                  - generic [ref=e1758]:
+                    - paragraph [ref=e1759]: Spread
+                    - paragraph [ref=e1760]: Spread
+                  - generic [ref=e1761]:
+                    - button "BOS +1.5 -205" [ref=e1762] [cursor=pointer]:
+                      - generic [ref=e1763]: BOS +1.5
+                      - generic [ref=e1764]: "-205"
+                    - button "ATL -1.5 +170" [ref=e1765] [cursor=pointer]:
+                      - generic [ref=e1766]: ATL -1.5
+                      - generic [ref=e1767]: "+170"
+                - generic [ref=e1769]:
+                  - generic [ref=e1770]:
+                    - paragraph [ref=e1771]: "7.5"
+                    - paragraph [ref=e1772]: Total Runs
+                  - generic [ref=e1773]:
+                    - button "Higher -113" [ref=e1774] [cursor=pointer]:
+                      - generic [ref=e1775]: Higher
+                      - generic [ref=e1776]: "-113"
+                    - button "Lower -105" [ref=e1777] [cursor=pointer]:
+                      - generic [ref=e1778]: Lower
+                      - generic [ref=e1779]: "-105"
+                - img "prediction" [ref=e1782]
+              - generic [ref=e1786]:
+                - link "athlete or team avatar LAD 27-18 6:38pm Sunny 69 26.4K athlete or team avatar LAA 16-29" [ref=e1787] [cursor=pointer]:
+                  - generic [ref=e1792]:
+                    - generic [ref=e1793]:
+                      - img "athlete or team avatar" [ref=e1795]
+                      - generic [ref=e1796]:
+                        - generic [ref=e1797]: LAD
+                        - generic [ref=e1798]: 27-18
+                    - generic [ref=e1799]:
+                      - generic [ref=e1800]: 6:38pm
+                      - generic [ref=e1801]:
+                        - generic [ref=e1802]: Sunny 69
+                        - img [ref=e1804]
+                        - generic [ref=e1806]:
+                          - img [ref=e1808]
+                          - generic [ref=e1810]: 26.4K
+                    - generic [ref=e1811]:
+                      - img "athlete or team avatar" [ref=e1813]
+                      - generic [ref=e1814]:
+                        - generic [ref=e1815]: LAA
+                        - generic [ref=e1816]: 16-29
+                - generic [ref=e1818]:
+                  - button "Dodgers to win -139" [ref=e1819] [cursor=pointer]:
+                    - generic [ref=e1820]:
+                      - paragraph [ref=e1821]: Dodgers to win
+                      - paragraph [ref=e1822]: "-139"
+                  - button "Angels to win +113" [ref=e1823] [cursor=pointer]:
+                    - generic [ref=e1824]:
+                      - paragraph [ref=e1825]: Angels to win
+                      - paragraph [ref=e1826]: "+113"
+                  - generic [ref=e1827]: "@"
+                - generic [ref=e1829]:
+                  - generic [ref=e1830]:
+                    - paragraph [ref=e1831]: Spread
+                    - paragraph [ref=e1832]: Spread
+                  - generic [ref=e1833]:
+                    - button "LAD -1.5 +113" [ref=e1834] [cursor=pointer]:
+                      - generic [ref=e1835]: LAD -1.5
+                      - generic [ref=e1836]: "+113"
+                    - button "LAA +1.5 -139" [ref=e1837] [cursor=pointer]:
+                      - generic [ref=e1838]: LAA +1.5
+                      - generic [ref=e1839]: "-139"
+                - generic [ref=e1841]:
+                  - generic [ref=e1842]:
+                    - paragraph [ref=e1843]: "8.5"
+                    - paragraph [ref=e1844]: Total Runs
+                  - generic [ref=e1845]:
+                    - button "Higher -113" [ref=e1846] [cursor=pointer]:
+                      - generic [ref=e1847]: Higher
+                      - generic [ref=e1848]: "-113"
+                    - button "Lower -109" [ref=e1849] [cursor=pointer]:
+                      - generic [ref=e1850]: Lower
+                      - generic [ref=e1851]: "-109"
+                - img "prediction" [ref=e1854]
+              - generic [ref=e1858]:
+                - link "athlete or team avatar SF 18-27 6:40pm Sunny 80 16.4K athlete or team avatar ATH 23-21" [ref=e1859] [cursor=pointer]:
+                  - generic [ref=e1864]:
+                    - generic [ref=e1865]:
+                      - img "athlete or team avatar" [ref=e1867]
+                      - generic [ref=e1868]:
+                        - generic [ref=e1869]: SF
+                        - generic [ref=e1870]: 18-27
+                    - generic [ref=e1871]:
+                      - generic [ref=e1872]: 6:40pm
+                      - generic [ref=e1873]:
+                        - generic [ref=e1874]: Sunny 80
+                        - img [ref=e1876]
+                        - generic [ref=e1878]:
+                          - img [ref=e1880]
+                          - generic [ref=e1882]: 16.4K
+                    - generic [ref=e1883]:
+                      - img "athlete or team avatar" [ref=e1885]
+                      - generic [ref=e1886]:
+                        - generic [ref=e1887]: ATH
+                        - generic [ref=e1888]: 23-21
+                - generic [ref=e1890]:
+                  - button "Giants to win +113" [ref=e1891] [cursor=pointer]:
+                    - generic [ref=e1892]:
+                      - paragraph [ref=e1893]: Giants to win
+                      - paragraph [ref=e1894]: "+113"
+                  - button "Athletics to win -139" [ref=e1895] [cursor=pointer]:
+                    - generic [ref=e1896]:
+                      - paragraph [ref=e1897]: Athletics to win
+                      - paragraph [ref=e1898]: "-139"
+                  - generic [ref=e1899]: "@"
+                - generic [ref=e1901]:
+                  - generic [ref=e1902]:
+                    - paragraph [ref=e1903]: Spread
+                    - paragraph [ref=e1904]: Spread
+                  - generic [ref=e1905]:
+                    - button "SF +1.5 -186" [ref=e1906] [cursor=pointer]:
+                      - generic [ref=e1907]: SF +1.5
+                      - generic [ref=e1908]: "-186"
+                    - button "ATH -1.5 +144" [ref=e1909] [cursor=pointer]:
+                      - generic [ref=e1910]: ATH -1.5
+                      - generic [ref=e1911]: "+144"
+                - generic [ref=e1913]:
+                  - generic [ref=e1914]:
+                    - paragraph [ref=e1915]: "9.5"
+                    - paragraph [ref=e1916]: Total Runs
+                  - generic [ref=e1917]:
+                    - button "Higher -105" [ref=e1918] [cursor=pointer]:
+                      - generic [ref=e1919]: Higher
+                      - generic [ref=e1920]: "-105"
+                    - button "Lower -118" [ref=e1921] [cursor=pointer]:
+                      - generic [ref=e1922]: Lower
+                      - generic [ref=e1923]: "-118"
+                - img "prediction" [ref=e1926]
+      - generic [ref=e652]:
+        - button [ref=e654] [cursor=pointer]:
+          - img [ref=e658]
+        - generic [ref=e660]:
+          - heading "Add picks" [level=2] [ref=e661]
+          - paragraph [ref=e662]: Add picks to start playing.
+        - generic [ref=e664]:
+          - generic [ref=e666]:
+            - generic [ref=e667]:
+              - img [ref=e669]
+              - heading "Champions entry amount" [level=3] [ref=e671]
+              - button [ref=e672] [cursor=pointer]:
+                - img [ref=e676]
+            - button [ref=e679] [cursor=pointer]:
+              - img [ref=e683]
+          - generic [ref=e685]:
+            - paragraph [ref=e688]: Rewards
+            - generic [ref=e690]:
+              - generic [ref=e691]:
+                - button "New Customer Gimme 🎁" [ref=e693] [cursor=pointer]:
+                  - generic [ref=e694]:
+                    - img [ref=e697]
+                    - paragraph [ref=e700]: New Customer Gimme 🎁
+                - button "Extender 20% Boost" [ref=e702] [cursor=pointer]:
+                  - generic [ref=e703]:
+                    - img [ref=e706]
+                    - paragraph [ref=e709]: Extender 20% Boost
+                - button "40% Boost" [ref=e711] [cursor=pointer]:
+                  - generic [ref=e712]:
+                    - img [ref=e715]
+                    - paragraph [ref=e718]: 40% Boost
+                - button "30% MMA Boost" [ref=e720] [cursor=pointer]:
+                  - generic [ref=e721]:
+                    - img [ref=e724]
+                    - paragraph [ref=e727]: 30% MMA Boost
+                - button "30% Soccer Boost" [ref=e729] [cursor=pointer]:
+                  - generic [ref=e730]:
+                    - img [ref=e733]
+                    - paragraph [ref=e736]: 30% Soccer Boost
+                - button "30% MLB Boost" [ref=e738] [cursor=pointer]:
+                  - generic [ref=e739]:
+                    - img [ref=e742]
+                    - paragraph [ref=e745]: 30% MLB Boost
+              - button [ref=e747] [cursor=pointer]:
+                - img [ref=e749]
+            - generic [ref=e752]:
+              - generic [ref=e754]: Predictions powered by UDM Services, LLC | Crypto.com
+              - paragraph [ref=e755]: Sports Event Trading is a derivatives product offered by Crypto.com | Derivatives North America, a CFTC-regulated exchange. Trading on CDNA involves risk and may not be appropriate for all. By trading you risk losing your cost to enter any transaction, including fees. You should carefully consider whether trading on CDNA is appropriate for you in light of your investment experience and financial resources. Any trading decisions you make are solely your responsibility and at your own risk. The Event Contract has not been endorsed by any Association, any Association Participant that is part of such Association, or any Individual in any Association. The use of the name of any Association, Association Participant or Individual in any Association does not indicate any endorsement of this tradeable financial instrument. For Crypto.com Predictions, "pick" refers to a product traded on CDNA.
+              - paragraph [ref=e756]:
+                - text: The Sports Event Trading contract specifications are available
+                - link "here" [ref=e758] [cursor=pointer]:
+                  - /url: https://www.nadex.com/rules/
+                - text: . Rules are available
+                - link "here" [ref=e760] [cursor=pointer]:
+                  - /url: https://www.cftc.gov/sites/default/files/filings/ptc/25/05/ptc05072520850.pdf
+                - text: .
+            - button "Show more" [ref=e762] [cursor=pointer]:
+              - generic [ref=e764]: Show more
+            - generic [ref=e769]:
+              - img [ref=e771]
+              - textbox "Enter amount" [ref=e773]
+          - generic [ref=e775]:
+            - paragraph [ref=e778]: Standard
+            - generic [ref=e780] [cursor=pointer]:
+              - paragraph [ref=e781]: Flex
+              - button [ref=e782]:
+                - img [ref=e786]
+          - button "Play" [disabled] [ref=e789]:
+            - generic [ref=e792]: Play
+  - generic:
+    - img:
+      - generic:
+        - generic "basketball-icon"
+  - iframe [ref=e46]:
+    
+  - button "Open Intercom Messenger" [ref=e47] [cursor=pointer]:
+    - generic:
+      - img

@@ -1,0 +1,66 @@
+[   38567ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'sportId')
+    at appearance (https://app.underdogsports.com/2484.159be2cbd52ad448.js:1:4081)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:2:565319)
+    at e (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161146)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161357 @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0
+[   38568ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'sportId')
+    at appearance (https://app.underdogsports.com/2484.159be2cbd52ad448.js:1:4081)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:2:565319)
+    at e (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161146)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161357 @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0
+[   38569ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'sportId')
+    at appearance (https://app.underdogsports.com/2484.159be2cbd52ad448.js:1:4081)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:2:565319)
+    at e (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161146)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161357 @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0
+[   38570ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'sportId')
+    at appearance (https://app.underdogsports.com/2484.159be2cbd52ad448.js:1:4081)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:2:565319)
+    at e (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161146)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161357 @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0
+[   38570ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'sportId')
+    at appearance (https://app.underdogsports.com/2484.159be2cbd52ad448.js:1:4081)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:2:565319)
+    at e (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161146)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161357 @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0
+[   38571ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'sportId')
+    at appearance (https://app.underdogsports.com/2484.159be2cbd52ad448.js:1:4081)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211806
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:211830
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:14:210468)
+    at a (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:2:565319)
+    at e (https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161146)
+    at https://app.underdogsports.com/npm..pnpm.6ed3d1c3a62b8914.js:6:161357 @ https://app.underdogsports.com/critical.31f216b47b46f64b.js:0

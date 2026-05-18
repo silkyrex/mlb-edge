@@ -1,0 +1,422 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e3] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=e7]:
+    - generic [ref=e9]:
+      - navigation "Sidebar":
+        - generic:
+          - generic:
+            - generic:
+              - button "Open sidebar":
+                - img
+        - generic:
+          - generic:
+            - link "New chat":
+              - /url: /
+              - generic:
+                - img
+              - generic: New chat
+          - generic:
+            - button "Search chats":
+              - generic:
+                - img
+              - generic: Search chats
+          - generic:
+            - button "Recents":
+              - generic:
+                - img
+              - generic: Recents
+        - generic:
+          - generic:
+            - button "Open profile menu"
+      - generic [ref=e10]:
+        - heading "Chat history" [level=2] [ref=e11]
+        - generic [ref=e12]:
+          - navigation "Chat history" [ref=e13]:
+            - generic [ref=e16]:
+              - link "Home" [ref=e17] [cursor=pointer]:
+                - /url: /
+                - generic [ref=e18]: ChatGPT
+              - button "Close sidebar" [expanded] [ref=e20]:
+                - img [ref=e21]
+            - list [ref=e24]:
+              - listitem [ref=e25]:
+                - link "New chat Shift Command O" [ref=e123] [cursor=pointer]:
+                  - /url: /
+                  - generic [ref=e27]:
+                    - img [ref=e125]
+                    - generic [ref=e128]: New chat
+                  - generic [ref=e129]:
+                    - generic "Shift" [ref=e130]:
+                      - generic [ref=e131]: ⇧
+                    - generic "Command" [ref=e132]:
+                      - generic [ref=e133]: ⌘
+                    - generic [ref=e135]: O
+              - listitem [ref=e32]:
+                - button "Search chats Command K" [ref=e136] [cursor=pointer]:
+                  - generic [ref=e34]:
+                    - img [ref=e138]
+                    - generic [ref=e141]: Search chats
+                  - generic [ref=e142]:
+                    - generic "Command" [ref=e143]:
+                      - generic [ref=e144]: ⌘
+                    - generic [ref=e146]: K
+            - link "Codex" [ref=e39] [cursor=pointer]:
+              - /url: /codex/cloud
+              - generic [ref=e40]:
+                - img [ref=e42]
+                - generic [ref=e45]: Codex
+              - img [ref=e47]
+            - generic [ref=e50] [cursor=pointer]:
+              - img [ref=e52]
+              - generic [ref=e55]: More
+            - generic [ref=e147]:
+              - button "GPTs" [expanded] [ref=e149] [cursor=pointer]:
+                - heading "GPTs" [level=2] [ref=e150]
+              - list [ref=e151]:
+                - listitem [ref=e152]:
+                  - link "MomoEdge" [ref=e153] [cursor=pointer]:
+                    - /url: /g/g-69b0aeac6f108191b19c5b68bd0dbcbf-momoedge
+                    - generic [ref=e154]:
+                      - img [ref=e156]
+                      - generic [ref=e159]: MomoEdge
+                    - button [ref=e161]:
+                      - img [ref=e163]
+                - listitem [ref=e165]:
+                  - link "Image 2 Image" [ref=e166] [cursor=pointer]:
+                    - /url: /g/g-x2X1uC2lW-image-2-image
+                    - generic [ref=e171]: Image 2 Image
+                    - button [ref=e173]:
+                      - img [ref=e175]
+                - listitem [ref=e177]:
+                  - link "Fitness, Workout & Diet - PhD Coach" [ref=e178] [cursor=pointer]:
+                    - /url: /g/g-ipOIcM229-fitness-workout-diet-phd-coach
+                    - generic "Fitness, Workout & Diet - PhD Coach" [ref=e183]
+                    - button [ref=e185]:
+                      - img [ref=e187]
+                - listitem [ref=e189]:
+                  - link "Scholar GPT" [ref=e190] [cursor=pointer]:
+                    - /url: /g/g-kZ0eYXlJe-scholar-gpt
+                    - generic [ref=e195]: Scholar GPT
+                    - button [ref=e197]:
+                      - img [ref=e199]
+              - link "Explore GPTs" [ref=e201] [cursor=pointer]:
+                - /url: /gpts
+                - img [ref=e203]
+                - generic [ref=e206]: Explore GPTs
+            - generic [ref=e207]:
+              - button "Projects" [expanded] [ref=e209] [cursor=pointer]:
+                - heading "Projects" [level=2] [ref=e210]
+              - list [ref=e211]:
+                - listitem [ref=e212]:
+                  - button "New project" [ref=e213] [cursor=pointer]:
+                    - img [ref=e215]
+                    - generic [ref=e218]: New project
+                - listitem [ref=e219]:
+                  - link "Show chats Alex Hormozi Open project options for Alex Hormozi" [ref=e220] [cursor=pointer]:
+                    - /url: /g/g-p-69c987f709488191956e4ce19b4ca57c-alex-hormozi/project
+                    - generic [ref=e221]:
+                      - button "Show chats" [ref=e223]:
+                        - generic [ref=e224]:
+                          - img [ref=e228]
+                          - img [ref=e238]
+                      - generic [ref=e241]: Alex Hormozi
+                    - button "Open project options for Alex Hormozi" [ref=e243]:
+                      - img [ref=e245]
+                - listitem [ref=e247]:
+                  - link "Show chats Lean game plan Open project options for Lean game plan" [ref=e248] [cursor=pointer]:
+                    - /url: /g/g-p-69a13e07261c8191abe3d513c4928f77-lean-game-plan/project
+                    - generic [ref=e249]:
+                      - button "Show chats" [ref=e251]:
+                        - generic [ref=e252]:
+                          - img [ref=e256]
+                          - img [ref=e266]
+                      - generic [ref=e269]: Lean game plan
+                    - button "Open project options for Lean game plan" [ref=e271]:
+                      - img [ref=e273]
+                - listitem [ref=e275]:
+                  - link "Show chats Story I tell myself Open project options for Story I tell myself" [ref=e276] [cursor=pointer]:
+                    - /url: /g/g-p-698ac44581988191b065b994f6d4a002-story-i-tell-myself/project
+                    - generic [ref=e277]:
+                      - button "Show chats" [ref=e279]:
+                        - generic [ref=e280]:
+                          - img [ref=e284]
+                          - img [ref=e294]
+                      - generic [ref=e297]: Story I tell myself
+                    - button "Open project options for Story I tell myself" [ref=e299]:
+                      - img [ref=e301]
+                - listitem [ref=e303]:
+                  - link "Show chats Side Hustle Open project options for Side Hustle" [ref=e304] [cursor=pointer]:
+                    - /url: /g/g-p-69b327626ae881919c51828902c40968-side-hustle/project
+                    - generic [ref=e305]:
+                      - button "Show chats" [ref=e307]:
+                        - generic [ref=e308]:
+                          - img [ref=e312]
+                          - img [ref=e322]
+                      - generic [ref=e325]: Side Hustle
+                    - button "Open project options for Side Hustle" [ref=e327]:
+                      - img [ref=e329]
+                - listitem [ref=e331]:
+                  - link "Show chats Time tracker Open project options for Time tracker" [ref=e332] [cursor=pointer]:
+                    - /url: /g/g-p-69c415bdfe648191ad98ddf327034ba8-time-tracker/project
+                    - generic [ref=e333]:
+                      - button "Show chats" [ref=e335]:
+                        - generic [ref=e336]:
+                          - img [ref=e340]
+                          - img [ref=e350]
+                      - generic [ref=e353]: Time tracker
+                    - button "Open project options for Time tracker" [ref=e355]:
+                      - img [ref=e357]
+                - listitem [ref=e359]:
+                  - generic [ref=e360] [cursor=pointer]:
+                    - img [ref=e362]
+                    - generic [ref=e365]: More
+            - generic [ref=e366]:
+              - button "Recents" [expanded] [ref=e368] [cursor=pointer]:
+                - heading "Recents" [level=2] [ref=e369]
+              - generic [ref=e370]:
+                - list [ref=e371]:
+                  - listitem [ref=e372]:
+                    - link "Momentum Trading Workflow, pinned conversation" [ref=e373] [cursor=pointer]:
+                      - /url: /c/69c3550b-b034-83e8-9ea1-4d2907944775
+                      - generic [ref=e375]:
+                        - text: Momentum Trading Workflow
+                        - generic [ref=e376]: Pinned
+                      - generic [ref=e377]:
+                        - generic [ref=e379]:
+                          - img [ref=e381]
+                          - button "Open conversation options for Momentum Trading Workflow" [ref=e383]:
+                            - img [ref=e385]
+                        - img [ref=e389]
+                - list [ref=e391]:
+                  - listitem [ref=e891]:
+                    - link "Cinematic Illustration Concept" [ref=e892] [cursor=pointer]:
+                      - /url: /c/6a0989ba-fdb4-83e8-b329-b642e26d0d4c
+                      - generic [ref=e894]: Cinematic Illustration Concept
+                      - button "Open conversation options for Cinematic Illustration Concept" [ref=e897]:
+                        - img [ref=e899]
+                  - listitem [ref=e392]:
+                    - link "JGB Impact on US Equities" [ref=e393] [cursor=pointer]:
+                      - /url: /c/6a08ddf9-89e4-83e8-b7cb-d14e835ece3c
+                      - generic [ref=e395]: JGB Impact on US Equities
+                      - button "Open conversation options for JGB Impact on US Equities" [ref=e398]:
+                        - img [ref=e400]
+                  - listitem [ref=e402]:
+                    - link "Weekly Review Reminder, unread" [ref=e403] [cursor=pointer]:
+                      - /url: /c/69dcbe78-8df0-83e8-9221-5ecdfba5bc3d
+                      - generic [ref=e405]: Weekly Review Reminder
+                      - button "Open conversation options for Weekly Review Reminder" [ref=e409]:
+                        - img [ref=e411]
+                  - listitem [ref=e415]:
+                    - link "Substack banner design" [ref=e416] [cursor=pointer]:
+                      - /url: /c/6a0132e0-2a34-83e8-8e71-48f3826f334b
+                      - generic [ref=e418]: Substack banner design
+                      - button "Open conversation options for Substack banner design" [ref=e421]:
+                        - img [ref=e423]
+                  - listitem [ref=e425]:
+                    - link "New chat" [ref=e426] [cursor=pointer]:
+                      - /url: /c/69fe2c46-c9a8-83e8-bf09-d171201ddfa1
+                      - generic [ref=e428]: New chat
+                      - button "Open conversation options for New chat" [ref=e431]:
+                        - img [ref=e433]
+                  - listitem [ref=e435]:
+                    - link "Menu Redesign Request" [ref=e436] [cursor=pointer]:
+                      - /url: /c/69fe28a9-2294-83e8-a395-11fa342a2b82
+                      - generic [ref=e438]: Menu Redesign Request
+                      - button "Open conversation options for Menu Redesign Request" [ref=e441]:
+                        - img [ref=e443]
+                  - listitem [ref=e445]:
+                    - link "Canva Editable Design" [ref=e446] [cursor=pointer]:
+                      - /url: /c/69fbb8af-7f30-83e8-9d03-bfd5ef60bc11
+                      - generic [ref=e448]: Canva Editable Design
+                      - button "Open conversation options for Canva Editable Design" [ref=e451]:
+                        - img [ref=e453]
+                  - listitem [ref=e455]:
+                    - link "Menu Design Help" [ref=e456] [cursor=pointer]:
+                      - /url: /c/69faa6ff-4c58-83e8-83a0-fe9043345698
+                      - generic [ref=e458]: Menu Design Help
+                      - button "Open conversation options for Menu Design Help" [ref=e461]:
+                        - img [ref=e463]
+                  - listitem [ref=e465]:
+                    - link "The Third Naming" [ref=e466] [cursor=pointer]:
+                      - /url: /c/69fadbf4-c118-83e8-9814-38f713e1a43a
+                      - generic [ref=e468]: The Third Naming
+                      - button "Open conversation options for The Third Naming" [ref=e471]:
+                        - img [ref=e473]
+                  - listitem [ref=e475]:
+                    - link "Menu Creation Assistance" [ref=e476] [cursor=pointer]:
+                      - /url: /g/g-x2X1uC2lW-image-2-image/c/69faa5be-2c04-83e8-b80a-ea0a718a0e9b
+                      - generic [ref=e478]: Menu Creation Assistance
+                      - button "Open conversation options for Menu Creation Assistance" [ref=e481]:
+                        - img [ref=e483]
+                  - listitem [ref=e485]:
+                    - link "Strip Club Money" [ref=e486] [cursor=pointer]:
+                      - /url: /c/69f948fd-4784-8329-9054-a8a471f3c019
+                      - generic [ref=e488]: Strip Club Money
+                      - button "Open conversation options for Strip Club Money" [ref=e491]:
+                        - img [ref=e493]
+                  - listitem [ref=e495]:
+                    - link "Sovereign Operator Persona" [ref=e496] [cursor=pointer]:
+                      - /url: /c/69f6b062-e4a4-83e8-9b35-dcadc06e0bfe
+                      - generic [ref=e498]: Sovereign Operator Persona
+                      - button "Open conversation options for Sovereign Operator Persona" [ref=e501]:
+                        - img [ref=e503]
+                  - listitem [ref=e505]:
+                    - link "4 EMA vs 5 SMA" [ref=e506] [cursor=pointer]:
+                      - /url: /c/69f6a7fc-3788-83e8-a41e-d58648d6bffd
+                      - generic [ref=e508]: 4 EMA vs 5 SMA
+                      - button "Open conversation options for 4 EMA vs 5 SMA" [ref=e511]:
+                        - img [ref=e513]
+                  - listitem [ref=e515]:
+                    - link "Instagram Boba Shop Marketing" [ref=e516] [cursor=pointer]:
+                      - /url: /c/69f14bfb-e944-83e8-8e7e-89bddefb53bc
+                      - generic [ref=e518]: Instagram Boba Shop Marketing
+                      - button "Open conversation options for Instagram Boba Shop Marketing" [ref=e521]:
+                        - img [ref=e523]
+                  - listitem [ref=e525]:
+                    - link "Sports Betting Mockup Design" [ref=e526] [cursor=pointer]:
+                      - /url: /g/g-x2X1uC2lW-image-2-image/c/69f13d90-5e34-83e8-8dcc-7993cf2f9af0
+                      - generic [ref=e528]: Sports Betting Mockup Design
+                      - button "Open conversation options for Sports Betting Mockup Design" [ref=e531]:
+                        - img [ref=e533]
+                  - listitem [ref=e535]:
+                    - link "Manga Page Layout" [ref=e536] [cursor=pointer]:
+                      - /url: /c/69f0f91c-91f4-83e8-96cb-5fa1d1499f8c
+                      - generic [ref=e538]: Manga Page Layout
+                      - button "Open conversation options for Manga Page Layout" [ref=e541]:
+                        - img [ref=e543]
+                  - listitem [ref=e545]:
+                    - link "Action Button ChatGPT Setup" [ref=e546] [cursor=pointer]:
+                      - /url: /c/69ed1730-a38c-83e8-b8e0-79c09b4c7b20
+                      - generic [ref=e548]: Action Button ChatGPT Setup
+                      - button "Open conversation options for Action Button ChatGPT Setup" [ref=e551]:
+                        - img [ref=e553]
+                  - listitem [ref=e555]:
+                    - link "Waymo LiDAR Spinning Explained" [ref=e556] [cursor=pointer]:
+                      - /url: /c/69ec2f12-6630-83e8-9934-c5b5cc76a68b
+                      - generic [ref=e558]: Waymo LiDAR Spinning Explained
+                      - button "Open conversation options for Waymo LiDAR Spinning Explained" [ref=e561]:
+                        - img [ref=e563]
+                  - listitem [ref=e565]:
+                    - link "Using Hermes AI" [ref=e566] [cursor=pointer]:
+                      - /url: /c/69ea24a1-0b44-83e8-92d5-863b49c9251d
+                      - generic [ref=e568]: Using Hermes AI
+                      - button "Open conversation options for Using Hermes AI" [ref=e571]:
+                        - img [ref=e573]
+                  - listitem [ref=e575]:
+                    - link "Harness vs Playwright" [ref=e576] [cursor=pointer]:
+                      - /url: /c/69e9e312-91dc-83e8-8c7b-2f63725cf14a
+                      - generic [ref=e578]: Harness vs Playwright
+                      - button "Open conversation options for Harness vs Playwright" [ref=e581]:
+                        - img [ref=e583]
+                  - listitem [ref=e585]:
+                    - link "Momentum Stock Scan Setup" [ref=e586] [cursor=pointer]:
+                      - /url: /c/69cb2745-4db8-83e8-95b2-b1e10ef41ceb
+                      - generic [ref=e588]: Momentum Stock Scan Setup
+                      - button "Open conversation options for Momentum Stock Scan Setup" [ref=e591]:
+                        - img [ref=e593]
+                  - listitem [ref=e595]:
+                    - link "Evening routine suggestions" [ref=e596] [cursor=pointer]:
+                      - /url: /c/69df03b8-4574-83e8-8ccd-88359696be58
+                      - generic [ref=e598]: Evening routine suggestions
+                      - button "Open conversation options for Evening routine suggestions" [ref=e601]:
+                        - img [ref=e603]
+                  - listitem [ref=e605]:
+                    - link "Raymond Zhu's Operating Context" [ref=e606] [cursor=pointer]:
+                      - /url: /c/69defd5b-63e0-83e8-90da-796d67f5e40e
+                      - generic [ref=e608]: Raymond Zhu's Operating Context
+                      - button "Open conversation options for Raymond Zhu's Operating Context" [ref=e611]:
+                        - img [ref=e613]
+                  - listitem [ref=e615]:
+                    - link "Elite Performance Mindset" [ref=e616] [cursor=pointer]:
+                      - /url: /c/69db1d32-2e04-83e8-b58f-427c06e04953
+                      - generic [ref=e618]: Elite Performance Mindset
+                      - button "Open conversation options for Elite Performance Mindset" [ref=e621]:
+                        - img [ref=e623]
+                  - listitem [ref=e625]:
+                    - link "Recent Momentum Stocks" [ref=e626] [cursor=pointer]:
+                      - /url: /c/69d9c6d6-c220-83e8-8444-2a4524355472
+                      - generic [ref=e628]: Recent Momentum Stocks
+                      - button "Open conversation options for Recent Momentum Stocks" [ref=e631]:
+                        - img [ref=e633]
+                  - listitem [ref=e635]:
+                    - link "Alex Hormozi Insights" [ref=e636] [cursor=pointer]:
+                      - /url: /c/69d9abd9-23f4-83e8-8b04-010bec7d05be
+                      - generic [ref=e638]: Alex Hormozi Insights
+                      - button "Open conversation options for Alex Hormozi Insights" [ref=e641]:
+                        - img [ref=e643]
+                  - listitem [ref=e645]:
+                    - link "Public Visibility and Criticism" [ref=e646] [cursor=pointer]:
+                      - /url: /c/69d99ec9-0378-83e8-810c-673c709de4b4
+                      - generic [ref=e648]: Public Visibility and Criticism
+                      - button "Open conversation options for Public Visibility and Criticism" [ref=e651]:
+                        - img [ref=e653]
+                  - listitem [ref=e655]:
+                    - link "Heart Rate Interpretation" [ref=e656] [cursor=pointer]:
+                      - /url: /c/69d91f83-2a78-83e8-8be5-ebc6dc91e407
+                      - generic [ref=e658]: Heart Rate Interpretation
+                      - button "Open conversation options for Heart Rate Interpretation" [ref=e661]:
+                        - img [ref=e663]
+          - button "Raymond Zhu Plus, open profile menu" [ref=e59] [cursor=pointer]:
+            - generic [ref=e63]:
+              - generic [ref=e65]: Raymond Zhu
+              - generic [ref=e68]: Plus
+            - button "Download apps" [ref=e71]:
+              - img [ref=e73]
+    - generic [ref=e76]:
+      - banner:
+        - generic [ref=e79]:
+          - button "Share" [ref=e901] [cursor=pointer]:
+            - generic [ref=e902]:
+              - img [ref=e903]
+              - text: Share
+          - button "Open conversation options" [ref=e906] [cursor=pointer]:
+            - img [ref=e907]
+      - main [ref=e85]:
+        - generic [ref=e86]:
+          - generic [ref=e910]:
+            - generic [ref=e913]:
+              - heading "You said:" [level=4] [ref=e914]
+              - generic [ref=e916]:
+                - generic [ref=e924]: Cinematic editorial illustration for a financial magazine. A massive wave of Japanese yen bills crashing against the New York Stock Exchange building at dusk. The sky transitions from calm blue over Tokyo to dark storm clouds over Wall Street. The yen wave is golden, detailed, photorealistic. Dramatic lighting. No text or labels. Wide 16:9 format.
+                - generic [ref=e925]:
+                  - group "Your message actions":
+                    - button "Copy message":
+                      - generic:
+                        - img
+                    - button "Edit message":
+                      - generic:
+                        - img
+            - generic [ref=e929]:
+              - heading "ChatGPT said:" [level=4] [ref=e930]
+              - generic [ref=e932]:
+                - button "Thinking Generating a more detailed image — hang tight." [ref=e935] [cursor=pointer]:
+                  - generic [ref=e936]:
+                    - generic [ref=e937]: Thinking
+                    - generic [ref=e938]: Generating a more detailed image — hang tight.
+                - generic "Generating image..." [ref=e945]
+          - generic [ref=e96]:
+            - button [ref=e947] [cursor=pointer]:
+              - img [ref=e948]
+            - generic [ref=e102]:
+              - generic [ref=e106]:
+                - button "Add files and more" [ref=e109] [cursor=pointer]:
+                  - img
+                - textbox "Chat with ChatGPT" [ref=e676]:
+                  - paragraph [ref=e677]: Ask anything
+                - generic [ref=e113]:
+                  - button "Thinking" [ref=e681] [cursor=pointer]:
+                    - generic [ref=e682]: Thinking
+                    - img
+                  - generic [ref=e114]:
+                    - button "Start dictation" [ref=e683] [cursor=pointer]:
+                      - img
+                    - button "Start Voice" [ref=e956] [cursor=pointer]:
+                      - img [ref=e957]
+              - button [ref=e119]
+              - button [ref=e120]
+            - generic [ref=e964]:
+              - text: ChatGPT can make mistakes. Check important info. See Your privacy choices.⁠
+              - img [ref=e966]
+  - alert [ref=e121]
+  - status [ref=e122]

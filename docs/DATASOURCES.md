@@ -2,63 +2,74 @@
 
 ## MLB Stats API (active)
 
-The official MLB data source. Free, no account needed.
+Free, no account needed. Base URL: `https://statsapi.mlb.com/api/v1`
 
-- Base URL: `https://statsapi.mlb.com/api/v1`
-- Community docs: https://github.com/toddrob99/MLB-StatsAPI
+Used for:
+- Game schedules, box scores, linescore
+- Player stats: pitcher game logs (L5 starts), batter game logs (L15), L/R/home/away splits
+- Expected stats: xAVG, xwOBA (how hard the ball was hit, regardless of result)
+- Injury transactions: IL placements, returns, active roster
+- Team rosters (for IL night-before mode)
+- Ballpark info: roof, field dimensions
+- **Statcast (live, via closer.py):** xFIP, xBA, xSLG, xwOBA, wRC+, WAR, ERA-, pitch arsenal (velocity + usage %)
+- **Lineup card + HP umpire (live, via closer.py):** one `schedule?hydrate=lineups,officials` call per run
 
-What we use it for:
-- Daily game schedules (who's playing, when, where)
-- Box scores (final stats for each player after a game ends)
-- Player stats: recent starts for pitchers, recent games for batters, splits (vs lefties/righties, home/away)
-- Expected stats (xAVG, xwOBA) -- how hard batters actually hit the ball, regardless of whether it fell for a hit
-- Injury transactions -- who got placed on the injured list, who came back, and when
-- Team rosters -- who's on the active roster right now
-- Bullpen vs starter ERA splits -- whether the starting rotation or relief pitchers are performing better
-- Ballpark info -- outdoor vs dome, field dimensions
+Community docs: https://github.com/toddrob99/MLB-StatsAPI
+
+---
+
+## ESPN API (active)
+
+Unofficial JSON endpoint. No auth required.
+
+Used for:
+- Pitcher WAR, FIP (computed: `(13*HR + 3*BB - 2*K) / IP + 3.1`), K/BB
+- Covers ~75 qualified starters; updates after each outing
+- Run via `cache_espn.py` after `cache_stats.py`
+
+---
+
+## UmpScorecards (active)
+
+Free API. Base URL: `https://umpscorecards.com/api/umpires`
+
+Used for:
+- HP umpire season accuracy %, error rate %, weighted score
+- Fetched live in `closer.py` (one call per run, in-memory)
+- Tight zone (high error rate) = fewer called strikeouts for pitchers
 
 ---
 
 ## Underdog Sports (active)
 
-Where the bets live. Requires a login.
+Where the bets are placed. Requires login + 2FA.
 
-Site: https://app.underdogsports.com/pick-em
+Site: `https://app.underdogsports.com/pick-em`
 
-The system logs in using browser automation (Playwright) and scrapes all available bets for a specific game. About 170 bets per game across 23 categories:
+Scraped via Playwright browser automation (`/playwright-underdog` → `/underdog-mlb`). About 170 props per game across 23 categories:
 
-**Pitcher bets:** Strikeouts, Pitching Outs (how many batters he gets out total), Hits Allowed, Runs Allowed, Walks, Fantasy Points, and first-inning versions of most of these.
+**Pitcher:** Strikeouts, Pitching Outs, Hits Allowed, Runs Allowed, Walks, Fantasy Points, first-inning versions of most.
 
-**Batter bets:** Hits + Runs + RBIs combined, Home Runs, Total Bases (singles=1, doubles=2, triples=3, HRs=4), Hits, Runs, RBIs, Singles, Strikeouts, Walks, Stolen Bases, Doubles.
+**Batter:** H+R+RBI, Home Runs, Total Bases, Hits, Runs, RBIs, Singles, Strikeouts, Walks, Stolen Bases, Doubles.
 
-**Game-level bets:** Moneyline (who wins), Spread (win by how much), Total Runs (game total over/under).
+**Game:** Moneyline, Spread, Total Runs.
 
-Each bet also shows a multiplier -- if a pick says 1.05x Higher, a $10 entry pays $10.50 if you're right. If it says 0.88x, you'd only get $8.80 back. The multiplier tells you what the market thinks -- below 1.00x means the market disagrees with that direction.
-
-**Navigation note:** The system navigates to the general pick-em page first, then clicks to the MLB section. Going directly to the MLB URL triggers a location check that blocks the page.
+Each prop shows a multiplier. Below 1.00x = market disagrees with that side. Navigation: go to general pick-em page first, then click to MLB -- direct MLB URL triggers a location block.
 
 ---
 
 ## Discord (active)
 
 Two uses:
-1. **Lean signal** -- arrives daily at noon PT. Grades each pitcher and offense for the day's games.
-2. **Alerts** -- the 9am morning brief and 11pm bet status updates post here.
+1. **Lean signal** -- arrives daily ~noon PT. Pitcher and offense grades for today's games.
+2. **Alerts** -- 9am morning brief and settlement notifications post here.
 
-Webhook URL is stored in `.env` (not in the repo -- it's private).
-
----
-
-## Baseball Reference (not yet active)
-
-Site: https://www.baseball-reference.com
-
-Has rich historical data and advanced stats not available in the free MLB API. Would require scraping (no official API), which is fragile. Only worth adding if we need multi-year historical data for backtesting.
+Webhook URL in `.env` (not in repo).
 
 ---
 
-## Paid Services (not yet active)
+## OB1 Semantic Memory (active)
 
-- **The Odds API** -- betting lines from multiple sportsbooks, historical odds. Free tier is 500 requests/month. Would let us compare Underdog lines to the broader market.
-- **Sportradar** -- enterprise MLB data feed. Expensive. Not needed at current scale.
-- **DraftKings / FanDuel** -- unofficial and fragile. Not recommended.
+REST MCP at the URL in `~/.config/credentials/ob1.env`. Every settled slip is captured with full context (lean, picks, FIP flags, result). Queryable: "which stat types win under UNDER lean."
+
+Shared helper: `from ob1 import ob1_push` (used in sliplog.py, pick_lessons.py).

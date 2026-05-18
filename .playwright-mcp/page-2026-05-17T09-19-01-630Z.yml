@@ -1,0 +1,202 @@
+- generic:
+  - generic:
+    - link:
+      - /url: "#main"
+      - text: Skip to content
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - navigation:
+                - generic:
+                  - generic:
+                    - generic:
+                      - button:
+                        - img
+                - generic:
+                  - generic:
+                    - link:
+                      - /url: /
+                      - generic:
+                        - img
+                      - generic: New chat
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                      - generic: Search chats
+                  - generic:
+                    - link:
+                      - /url: /images
+                      - generic:
+                        - img
+                      - generic: Images
+                - generic:
+                  - generic:
+                    - button:
+                      - generic:
+                        - generic:
+                          - img
+              - generic:
+                - heading [level=2]: Chat history
+                - generic:
+                  - navigation:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - link:
+                            - /url: /
+                            - img
+                          - generic:
+                            - button [expanded]:
+                              - img
+                    - generic:
+                      - list:
+                        - listitem:
+                          - link:
+                            - /url: /
+                            - generic:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic: New chat
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - generic: ⇧
+                                - generic:
+                                  - generic: ⌘
+                                - generic:
+                                  - generic: O
+                        - listitem:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - img
+                              - generic:
+                                - generic: Search chats
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - generic: ⌘
+                                - generic:
+                                  - generic: K
+                    - link:
+                      - /url: /images
+                      - generic:
+                        - img
+                      - generic:
+                        - generic: Images
+                    - generic:
+                      - link:
+                        - /url: https://openai.com/chatgpt/pricing/
+                        - generic:
+                          - generic:
+                            - img
+                          - text: See plans and pricing
+                        - generic:
+                          - img
+                      - generic:
+                        - generic:
+                          - img
+                        - text: Settings
+                      - generic:
+                        - generic:
+                          - generic:
+                            - img
+                          - generic:
+                            - generic: Help
+                        - generic:
+                          - img
+                    - generic:
+                      - generic:
+                        - paragraph: Get responses tailored to you
+                        - paragraph: Log in to get answers based on saved chats, plus create images and upload files.
+                      - button [ref=e177] [cursor=pointer]:
+                        - generic [ref=e76]: Log in
+          - generic:
+            - generic:
+              - banner:
+                - button [ref=e178] [cursor=pointer]:
+                  - generic [ref=e81]:
+                    - generic [ref=e82]: ChatGPT
+                    - img [ref=e83]
+                - generic [ref=e89]:
+                  - button [ref=e179] [cursor=pointer]:
+                    - generic [ref=e92]: Log in
+                  - button [ref=e180] [cursor=pointer]:
+                    - generic [ref=e94]: Sign up for free
+              - main:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - heading [level=1]:
+                                  - generic: Ready when you are.
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic [ref=e116]:
+                                  - button [ref=e181] [cursor=pointer]:
+                                    - img
+                                  - textbox [ref=e182]:
+                                    - paragraph [ref=e176]: Ask anything
+                                  - generic [ref=e124]:
+                                    - button [ref=e183] [cursor=pointer]:
+                                      - img
+                                    - button [ref=e184] [cursor=pointer]:
+                                      - img [ref=e131]
+                                      - generic [ref=e133]: Voice
+                                - button
+                                - button
+                    - generic [ref=e144]:
+                      - text: By messaging ChatGPT, an AI chatbot, you agree to our
+                      - link [ref=e185] [cursor=pointer]:
+                        - /url: https://openai.com/terms
+                        - text: Terms
+                      - text: and have read our
+                      - link [ref=e186] [cursor=pointer]:
+                        - /url: https://openai.com/privacy
+                        - text: Privacy Policy
+                      - text: . See Your privacy choices.⁠
+                      - img [ref=e148]
+  - alert
+  - status
+  - dialog [ref=e189]:
+    - banner [ref=e190]:
+      - generic:
+        - generic:
+          - heading [level=2]
+      - button "Close" [ref=e192] [cursor=pointer]:
+        - img
+    - generic [ref=e195]:
+      - heading "Log in or sign up" [level=2] [ref=e196]
+      - paragraph [ref=e198]: You’ll get smarter responses and can upload files, images, and more.
+      - form [ref=e199]:
+        - generic [ref=e200]:
+          - button "Continue with Google" [ref=e201] [cursor=pointer]:
+            - generic [ref=e202]:
+              - img [ref=e205]
+              - text: Continue with Google
+          - button "Continue with Apple" [ref=e207] [cursor=pointer]:
+            - generic [ref=e208]:
+              - img [ref=e211]
+              - text: Continue with Apple
+          - button "Continue with phone" [ref=e213] [cursor=pointer]:
+            - generic [ref=e214]:
+              - img [ref=e217]
+              - text: Continue with phone
+        - generic [ref=e221]: OR
+        - textbox "Email address" [active] [ref=e228]
+        - button "Continue" [ref=e229] [cursor=pointer]:
+          - generic [ref=e230]: Continue

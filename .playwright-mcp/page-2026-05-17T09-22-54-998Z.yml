@@ -1,0 +1,16 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - link "ChatGPT" [ref=e5] [cursor=pointer]:
+      - /url: https://chatgpt.com
+      - img "ChatGPT" [ref=e6]
+    - heading "Verify your identity" [level=1] [ref=e15]
+    - generic [ref=e17]: Use your passkey to verify it is you.
+  - group [ref=e18]:
+    - link "Try another method" [ref=e21] [cursor=pointer]:
+      - /url: /mfa-challenge
+  - generic [ref=e23]:
+    - link "Terms of Use" [ref=e24] [cursor=pointer]:
+      - /url: https://openai.com/policies/terms-of-use
+    - generic [ref=e25]: "|"
+    - link "Privacy Policy" [ref=e26] [cursor=pointer]:
+      - /url: https://openai.com/policies/privacy-policy

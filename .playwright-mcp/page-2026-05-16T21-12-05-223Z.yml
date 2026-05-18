@@ -1,0 +1,224 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - link "home" [ref=e5] [cursor=pointer]:
+        - /url: /pick-em/higher-lower/all/featured
+        - img [ref=e7]
+      - generic [ref=e10]:
+        - link "Champions" [ref=e11] [cursor=pointer]:
+          - /url: /pick-em
+        - link "Drafts" [ref=e12] [cursor=pointer]:
+          - /url: /lobby
+        - link "Live" [ref=e13] [cursor=pointer]:
+          - /url: /live
+        - link "Results" [ref=e14] [cursor=pointer]:
+          - /url: /results
+        - link "Rankings" [ref=e15] [cursor=pointer]:
+          - /url: /rankings
+        - link "News feed" [ref=e16] [cursor=pointer]:
+          - /url: /news-feed
+      - generic [ref=e17]:
+        - button [ref=e18] [cursor=pointer]:
+          - img [ref=e22]
+        - button [ref=e24] [cursor=pointer]:
+          - img [ref=e28]
+        - link [ref=e30] [cursor=pointer]:
+          - /url: /account
+          - img [ref=e33]
+        - link "$87.55" [ref=e35] [cursor=pointer]:
+          - /url: /deposit
+          - generic [ref=e36]:
+            - generic [ref=e37]: $87.55
+            - img [ref=e40]
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e52]:
+          - search [ref=e55]:
+            - button [ref=e56] [cursor=pointer]:
+              - img [ref=e58]
+            - textbox "Find teams, players and stats" [ref=e1888]
+          - button "Champions tips" [ref=e61] [cursor=pointer]:
+            - paragraph [ref=e62]: Champions tips
+            - img [ref=e64]
+        - generic [ref=e66]:
+          - generic [ref=e1894]:
+            - generic [ref=e1895]:
+              - img "athlete or team avatar" [ref=e1897]
+              - generic [ref=e1898]:
+                - generic [ref=e1899]: TEX
+                - generic [ref=e1900]: 21-23
+            - generic [ref=e1901]:
+              - generic [ref=e1902]: 4:10pm
+              - generic [ref=e1904]: Partly Cloudy 84
+            - generic [ref=e1905]:
+              - img "athlete or team avatar" [ref=e1907]
+              - generic [ref=e1908]:
+                - generic [ref=e1909]: HOU
+                - generic [ref=e1910]: 18-28
+          - generic [ref=e1912]:
+            - button [ref=e2957] [cursor=pointer]:
+              - img [ref=e2959]
+            - generic [ref=e1913]:
+              - button "Popular" [ref=e1915] [cursor=pointer]
+              - button "Team Picks" [ref=e1917] [cursor=pointer]
+              - button "Strikeouts" [ref=e1919] [cursor=pointer]
+              - button "Hits + Runs + RBIs" [ref=e1921] [cursor=pointer]
+              - button "Home Runs" [ref=e1923] [cursor=pointer]
+              - button "Total Bases" [ref=e1925] [cursor=pointer]
+              - button "Fantasy Points" [ref=e1927] [cursor=pointer]
+              - button "Pitching Outs" [ref=e1929] [cursor=pointer]
+              - button "Hits Allowed" [ref=e1931] [cursor=pointer]
+              - button "Earned Runs Allowed" [ref=e1933] [cursor=pointer]
+              - button "Walks Allowed" [ref=e1935] [cursor=pointer]
+              - button "Hits" [ref=e1937] [cursor=pointer]
+              - button "Runs" [ref=e1939] [cursor=pointer]
+              - button "RBIs" [ref=e1941] [cursor=pointer]
+              - button "Singles" [ref=e1943] [cursor=pointer]
+              - button "Batter Strikeouts" [ref=e1945] [cursor=pointer]
+              - button "Batter Walks" [ref=e1947] [cursor=pointer]
+              - button "Stolen Bases" [ref=e1949] [cursor=pointer]
+              - button "1st Inn. Strikeouts" [ref=e1951] [cursor=pointer]
+              - button "1st Inn. Runs Allowed" [ref=e1953] [cursor=pointer]
+              - button "1st Inn. Batters Faced" [ref=e1955] [cursor=pointer]
+              - button "1st Inn. Hits Allowed" [ref=e1957] [cursor=pointer]
+              - button "1-3 Inn. Runs Allowed" [ref=e1959] [cursor=pointer]
+              - button "Doubles" [ref=e1961] [cursor=pointer]
+            - button [ref=e1963] [cursor=pointer]:
+              - img [ref=e1965]
+          - generic [ref=e2962]:
+            - button "athlete or team avatar Jacob deGrom TEX @ HOU - 4:10PM PDT 17.5 Pitching Outs Higher 0.77x Lower 1.06x" [ref=e2964] [cursor=pointer]:
+              - generic [ref=e2966]:
+                - img "athlete or team avatar" [ref=e2973]
+                - generic [ref=e2974]:
+                  - generic [ref=e2977]: Jacob deGrom
+                  - generic [ref=e2978]:
+                    - img [ref=e2980]
+                    - paragraph [ref=e2982]:
+                      - strong [ref=e2983]: TEX
+                      - text: "@ HOU - 4:10PM PDT"
+              - generic [ref=e2984]:
+                - generic [ref=e2985]:
+                  - button [ref=e2986]:
+                    - img [ref=e2988]
+                    - img [ref=e2991]
+                  - generic [ref=e2996]:
+                    - generic [ref=e2998]: "17.5"
+                    - generic [ref=e2999]: Pitching Outs
+                - generic [ref=e3002]:
+                  - button "Higher 0.77x" [ref=e3003]:
+                    - generic [ref=e3004]:
+                      - generic [ref=e3005]: Higher
+                      - generic [ref=e3006]: 0.77x
+                  - button "Lower 1.06x" [ref=e3007]:
+                    - generic [ref=e3008]:
+                      - generic [ref=e3009]: Lower
+                      - generic [ref=e3010]: 1.06x
+            - button "athlete or team avatar Kai-Wei Teng HOU vs TEX - 4:10PM PDT 14.5 Pitching Outs Higher 1.03x Lower 0.88x" [ref=e3012] [cursor=pointer]:
+              - generic [ref=e3014]:
+                - img "athlete or team avatar" [ref=e3021]
+                - generic [ref=e3022]:
+                  - generic [ref=e3025]: Kai-Wei Teng
+                  - generic [ref=e3026]:
+                    - img [ref=e3028]
+                    - paragraph [ref=e3030]:
+                      - strong [ref=e3031]: HOU
+                      - text: vs TEX - 4:10PM PDT
+              - generic [ref=e3032]:
+                - generic [ref=e3033]:
+                  - button [ref=e3034]:
+                    - img [ref=e3036]
+                    - img [ref=e3039]
+                  - generic [ref=e3044]:
+                    - generic [ref=e3046]: "14.5"
+                    - generic [ref=e3047]: Pitching Outs
+                - generic [ref=e3050]:
+                  - button "Higher 1.03x" [ref=e3051]:
+                    - generic [ref=e3052]:
+                      - generic [ref=e3053]: Higher
+                      - generic [ref=e3054]: 1.03x
+                  - button "Lower 0.88x" [ref=e3055]:
+                    - generic [ref=e3056]:
+                      - generic [ref=e3057]: Lower
+                      - generic [ref=e3058]: 0.88x
+      - generic [ref=e561]:
+        - button [ref=e563] [cursor=pointer]:
+          - img [ref=e567]
+        - generic [ref=e569]:
+          - heading "Add picks" [level=2] [ref=e570]
+          - paragraph [ref=e571]: Add picks to start playing.
+        - generic [ref=e573]:
+          - generic [ref=e575]:
+            - generic [ref=e576]:
+              - img [ref=e578]
+              - heading "Champions entry amount" [level=3] [ref=e580]
+              - button [ref=e581] [cursor=pointer]:
+                - img [ref=e585]
+            - button [ref=e588] [cursor=pointer]:
+              - img [ref=e592]
+          - generic [ref=e594]:
+            - paragraph [ref=e597]: Rewards
+            - generic [ref=e599]:
+              - generic [ref=e600]:
+                - button "New Customer Gimme 🎁" [ref=e602] [cursor=pointer]:
+                  - generic [ref=e603]:
+                    - img [ref=e606]
+                    - paragraph [ref=e609]: New Customer Gimme 🎁
+                - button "Extender 20% Boost" [ref=e611] [cursor=pointer]:
+                  - generic [ref=e612]:
+                    - img [ref=e615]
+                    - paragraph [ref=e618]: Extender 20% Boost
+                - button "40% Boost" [ref=e620] [cursor=pointer]:
+                  - generic [ref=e621]:
+                    - img [ref=e624]
+                    - paragraph [ref=e627]: 40% Boost
+                - button "30% MMA Boost" [ref=e629] [cursor=pointer]:
+                  - generic [ref=e630]:
+                    - img [ref=e633]
+                    - paragraph [ref=e636]: 30% MMA Boost
+                - button "30% PGA Boost" [ref=e638] [cursor=pointer]:
+                  - generic [ref=e639]:
+                    - img [ref=e642]
+                    - paragraph [ref=e645]: 30% PGA Boost
+                - button "30% Soccer Boost" [ref=e647] [cursor=pointer]:
+                  - generic [ref=e648]:
+                    - img [ref=e651]
+                    - paragraph [ref=e654]: 30% Soccer Boost
+                - button "30% MLB Boost" [ref=e656] [cursor=pointer]:
+                  - generic [ref=e657]:
+                    - img [ref=e660]
+                    - paragraph [ref=e663]: 30% MLB Boost
+              - button [ref=e665] [cursor=pointer]:
+                - img [ref=e667]
+            - generic [ref=e670]:
+              - generic [ref=e672]: Predictions powered by UDM Services, LLC | Crypto.com
+              - paragraph [ref=e673]: Sports Event Trading is a derivatives product offered by Crypto.com | Derivatives North America, a CFTC-regulated exchange. Trading on CDNA involves risk and may not be appropriate for all. By trading you risk losing your cost to enter any transaction, including fees. You should carefully consider whether trading on CDNA is appropriate for you in light of your investment experience and financial resources. Any trading decisions you make are solely your responsibility and at your own risk. The Event Contract has not been endorsed by any Association, any Association Participant that is part of such Association, or any Individual in any Association. The use of the name of any Association, Association Participant or Individual in any Association does not indicate any endorsement of this tradeable financial instrument. For Crypto.com Predictions, "pick" refers to a product traded on CDNA.
+              - paragraph [ref=e674]:
+                - text: The Sports Event Trading contract specifications are available
+                - link "here" [ref=e676] [cursor=pointer]:
+                  - /url: https://www.nadex.com/rules/
+                - text: . Rules are available
+                - link "here" [ref=e678] [cursor=pointer]:
+                  - /url: https://www.cftc.gov/sites/default/files/filings/ptc/25/05/ptc05072520850.pdf
+                - text: .
+            - button "Show more" [ref=e680] [cursor=pointer]:
+              - generic [ref=e682]: Show more
+            - generic [ref=e687]:
+              - img [ref=e689]
+              - textbox "Enter amount" [ref=e691]
+          - generic [ref=e693]:
+            - paragraph [ref=e696]: Standard
+            - generic [ref=e698] [cursor=pointer]:
+              - paragraph [ref=e699]: Flex
+              - button [ref=e700]:
+                - img [ref=e704]
+          - button "Play" [disabled] [ref=e707]:
+            - generic [ref=e710]: Play
+  - generic:
+    - img:
+      - generic:
+        - generic "basketball-icon"
+  - iframe [ref=e46]:
+    
+  - button "Open Intercom Messenger" [ref=e47] [cursor=pointer]:
+    - generic:
+      - img

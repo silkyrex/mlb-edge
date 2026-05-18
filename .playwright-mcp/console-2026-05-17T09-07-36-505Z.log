@@ -1,0 +1,125 @@
+[     158ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://substack.com/dashboard:0
+[     372ms] [LOG] %c
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░ SUBSTACK WANTS YOU ░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▒░░░░░░░░▒▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▒▒░░░░░░░░░░░░░░▒▒▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▒░░░░░░░░░░░░░░░░░░░░░░▒▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░ TO BUILD A NEW ECONOMIC ENGINE FOR CULTURE ░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                   https://substack.com/jobs
+ font-family:monospace @ https://substackcdn.com/bundle/static/js/6920.98f123c8.js:0
+[   14231ms] [LOG] %c
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░ SUBSTACK WANTS YOU ░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▒░░░░░░░░▒▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▒▒░░░░░░░░░░░░░░▒▒▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▒░░░░░░░░░░░░░░░░░░░░░░▒▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░ TO BUILD A NEW ECONOMIC ENGINE FOR CULTURE ░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                   https://substack.com/jobs
+ font-family:monospace @ https://substackcdn.com/bundle/static/js/20478.22d3f23a.js:0
+[   84342ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://substack.com/dashboard:0
+[   84362ms] [INFO] Loading the script 'https://js.sentry-cdn.com/6c2ff3e3828e4017b7faf7b63e24cdf8.min.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84365ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/lib-react.ec047807.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84365ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/lib-router.6aaf5db6.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84365ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/7522.82989624.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84365ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/2070.7d3d41af.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/2153.70334485.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/299.6681f9a0.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/3859.e96234de.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/9834.79ee7490.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/2773.98b00422.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/5319.2102420b.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/3902.bba45160.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/8283.81cc641f.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/3407.990632c2.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/8935.6df170fc.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/6178.cc48ac8a.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/6920.98f123c8.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/5158.03f148e2.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/reactSubstack.2b4cc700.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/1292.ad34609c.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/4403.c22273fd.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/3975.c531185a.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/4001.b7094961.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/2812.ad57b96f.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/3585.5db1a371.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84366ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/860.3636d33a.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84367ms] [INFO] Loading the script 'https://www.datadoghq-browser-agent.com/us1/v5/datadog-rum.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:305
+[   84367ms] [INFO] Loading the script 'https://static.cloudflareinsights.com/beacon.min.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substack.com/dashboard:0
+[   84425ms] [LOG] %c
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░ SUBSTACK WANTS YOU ░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▒░░░░░░░░▒▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▒▒░░░░░░░░░░░░░░▒▒▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▓▓▓▓▒░░░░░░░░░░░░░░░░░░░░░░▒▓▓▓▓▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░▓▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▓░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░ TO BUILD A NEW ECONOMIC ENGINE FOR CULTURE ░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                   https://substack.com/jobs
+ font-family:monospace @ https://substackcdn.com/bundle/static/js/6920.98f123c8.js:0
+[   84438ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/async/4667.03a29241.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substackcdn.com/bundle/static/js/reactSubstack.2b4cc700.js:0
+[   84438ms] [INFO] Loading the script 'https://substackcdn.com/bundle/static/js/async/8044.804cbbbf.js' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substackcdn.com/bundle/static/js/reactSubstack.2b4cc700.js:0
+[   84485ms] [INFO] Loading the script 'https://www.googletagmanager.com/gtag/js?id=G-TLW0DF6G5V&l=localGaDataLayer' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://substackcdn.com/bundle/static/js/6920.98f123c8.js:0
+[   84497ms] [INFO] Loading the script 'https://www.googletagmanager.com/gtag/js?id=AW-316245675&l=localGaDataLayer&cx=c&gtm=4e65d0h1' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://www.googletagmanager.com/gtag/js?id=G-TLW0DF6G5V&l=localGaDataLayer:223
+[   84504ms] [INFO] Loading the script 'https://googleads.g.doubleclick.net/pagead/viewthroughconversion/316245675/?random=1779008941005&cv=11&fst=1779008941005&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65d0h1v887153041za200zb880777354zd880777354xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938466~115938468&u_w=1470&u_h=956&url=https%3A%2F%2Fsubstack.com%2Fdashboard&ref=https%3A%2F%2Fsubstack.com%2Fsign-in%3Fredirect%3D%252Fdashboard&rcb=12&frm=0&tiba=Discover%20Substack%20Newsletters&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1382859053.1779008850&uaa=arm&uab=64&uafvl=Chromium%3B148.0.7778.168%7CGoogle%2520Chrome%3B148.0.7778.168%7CNot%252FA)Brand%3B99.0.0.0&uamb=0&uam=&uap=macOS&uapv=26.3.1&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=4' violates the following Content Security Policy directive: "script-src 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The policy is report-only, so the violation has been logged but no further action has been taken. @ https://www.googletagmanager.com/gtag/js?id=AW-316245675&l=localGaDataLayer&cx=c&gtm=4e65d0h1:145

@@ -1,0 +1,44 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e14]:
+      - link "home" [ref=e15] [cursor=pointer]:
+        - /url: /pick-em/higher-lower/all/featured
+        - img [ref=e17]
+      - generic [ref=e20]:
+        - link "Pick'em" [ref=e21] [cursor=pointer]:
+          - /url: /pick-em
+        - link "Drafts" [ref=e22] [cursor=pointer]:
+          - /url: /lobby
+        - link "Live" [ref=e23] [cursor=pointer]:
+          - /url: /live
+        - link "Results" [ref=e24] [cursor=pointer]:
+          - /url: /results
+        - link "Rankings" [ref=e25] [cursor=pointer]:
+          - /url: /rankings
+        - link "News feed" [ref=e26] [cursor=pointer]:
+          - /url: /news-feed
+      - generic [ref=e27]:
+        - button [ref=e28] [cursor=pointer]:
+          - img [ref=e32]
+        - button [ref=e34] [cursor=pointer]:
+          - img [ref=e38]
+        - link [ref=e40] [cursor=pointer]:
+          - /url: /account
+          - img [ref=e43]
+        - link "$87.55" [ref=e45] [cursor=pointer]:
+          - /url: /deposit
+          - generic [ref=e46]:
+            - generic [ref=e47]: $87.55
+            - img [ref=e50]
+    - generic [ref=e52]:
+      - heading "Pick'em" [level=1] [ref=e53]
+      - paragraph [ref=e54]: Pick'em is not available in your location.
+  - generic:
+    - img:
+      - generic:
+        - generic "basketball-icon"
+  - iframe [ref=e11]:
+    
+  - button "Open Intercom Messenger" [ref=e12] [cursor=pointer]:
+    - generic:
+      - img

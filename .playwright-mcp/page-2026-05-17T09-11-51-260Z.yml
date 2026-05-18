@@ -1,0 +1,118 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e605]:
+      - generic [ref=e606]:
+        - generic [ref=e607]:
+          - generic [ref=e608]: File Settings
+          - generic [ref=e609] [cursor=pointer]: Done
+        - generic [ref=e610]:
+          - generic [ref=e611]: Title
+          - textbox "Add a title..." [ref=e612]
+        - generic [ref=e613]:
+          - generic [ref=e614]: Description
+          - textbox "Add a description..." [ref=e615]
+        - generic [ref=e616]:
+          - generic [ref=e617]:
+            - generic [ref=e618]: Thumbnail
+            - generic [ref=e619]: Will be cropped to a 3:2 aspect ratio
+          - generic [ref=e620] [cursor=pointer]:
+            - img [ref=e622]
+            - text: Upload
+      - generic [ref=e625]:
+        - generic [ref=e626]:
+          - button "Exit" [ref=e627] [cursor=pointer]:
+            - img [ref=e628]
+          - button "Saved" [ref=e631] [cursor=pointer]: Saved
+        - generic [ref=e634]:
+          - button "Preview" [ref=e635] [cursor=pointer]
+          - button "Continue" [ref=e636] [cursor=pointer]:
+            - generic [ref=e637]: Continue
+      - generic [ref=e640]:
+        - generic:
+          - button [disabled]:
+            - img
+        - toolbar [ref=e642]:
+          - generic [ref=e643]:
+            - button "Undo2" [disabled]:
+              - img
+            - button "Redo2" [disabled]:
+              - img
+          - separator [ref=e644]
+          - button "Style" [ref=e646] [cursor=pointer]:
+            - text: Style
+            - img [ref=e647]
+          - separator [ref=e650]
+          - generic [ref=e652]:
+            - button "Bold" [ref=e654] [cursor=pointer]:
+              - img [ref=e655]
+            - button "Italic" [ref=e658] [cursor=pointer]:
+              - img [ref=e659]
+            - button "Strikethrough" [ref=e662] [cursor=pointer]:
+              - img [ref=e663]
+            - button "Code" [ref=e667] [cursor=pointer]:
+              - img [ref=e668]
+          - separator [ref=e671]
+          - generic [ref=e673]:
+            - button "Link" [ref=e675] [cursor=pointer]:
+              - img [ref=e676]
+            - button "Image" [ref=e680] [cursor=pointer]:
+              - img [ref=e681]
+            - button "Headphones" [ref=e686] [cursor=pointer]:
+              - img [ref=e687]
+            - button "Video" [ref=e690] [cursor=pointer]:
+              - img [ref=e691]
+            - button "Message Square Quote" [ref=e695] [cursor=pointer]:
+              - img [ref=e696]
+          - separator [ref=e700]
+          - generic [ref=e702]:
+            - button "List" [ref=e704] [cursor=pointer]:
+              - img [ref=e705]
+            - button "List Ordered" [ref=e707] [cursor=pointer]:
+              - img [ref=e708]
+            - button [ref=e711] [cursor=pointer]:
+              - img [ref=e712]
+              - img [ref=e713]
+          - separator [ref=e716]
+          - button "Button" [ref=e719] [cursor=pointer]:
+            - text: Button
+            - img [ref=e720]
+          - separator [ref=e723]
+          - button "Template" [ref=e726] [cursor=pointer]:
+            - text: Template
+            - img [ref=e727]
+          - separator [ref=e730]
+          - button "More" [ref=e733] [cursor=pointer]:
+            - text: More
+            - img [ref=e734]
+        - generic:
+          - button [disabled]:
+            - img
+      - generic [ref=e739]:
+        - button "Email header / footer" [ref=e741] [cursor=pointer]:
+          - img [ref=e742]
+          - text: Email header / footer
+        - generic [ref=e744]:
+          - textbox "title" [active] [ref=e745]:
+            - /placeholder: Title
+          - textbox "Add a subtitle…" [ref=e746]
+        - generic [ref=e747]:
+          - button "Paper Receipt" [ref=e748] [cursor=pointer]:
+            - generic [ref=e749]: Paper Receipt
+            - img [ref=e751]
+          - button "Plus" [ref=e754] [cursor=pointer]:
+            - img [ref=e755]
+        - generic [ref=e757]:
+          - text: Start writing...
+          - paragraph [ref=e758]
+      - generic:
+        - generic [ref=e759]:
+          - button "Version history" [ref=e761] [cursor=pointer]:
+            - img [ref=e762]
+          - button "Info" [ref=e767] [cursor=pointer]:
+            - img [ref=e768]
+        - button "Settings" [ref=e770] [cursor=pointer]:
+          - img [ref=e771]
+          - text: Settings
+    - region "Notifications (F8)":
+      - list
+  - generic [ref=e549]: 2026/05/17

@@ -1,0 +1,38 @@
+- generic [ref=e3]:
+  - button "Chevron Left" [ref=e6] [cursor=pointer]:
+    - img [ref=e7]
+  - generic [ref=e11]:
+    - generic [ref=e12]:
+      - link [ref=e13] [cursor=pointer]:
+        - /url: https://substack.com
+        - img [ref=e14]
+      - heading "Sign in to Substack" [level=2] [ref=e19]
+    - generic [ref=e20]:
+      - heading "Check your email" [level=4] [ref=e49]
+      - paragraph [ref=e50]: If you have an account with us, we've sent an email to ryodzu@gmail.com. Click the link inside or enter the code below.
+      - textbox [active] [ref=e52]
+      - paragraph [ref=e53]:
+        - text: You can also
+        - link "try again" [ref=e54] [cursor=pointer]:
+          - /url: javascript:void(0)
+        - text: or
+        - link "sign in using your password" [ref=e55] [cursor=pointer]:
+          - /url: javascript:void(0)
+        - text: .
+      - generic [ref=e56]:
+        - text: First time here?
+        - link "Create an account" [ref=e57] [cursor=pointer]:
+          - /url: https://substack.com/explore?action=signup&redirect=%2Fdashboard
+  - generic [ref=e32] [cursor=pointer]:
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - heading "Stay signed in" [level=3] [ref=e35]
+        - generic [ref=e36]: Download the Substack app for Android or iOS
+      - generic [ref=e42]:
+        - link [ref=e43]:
+          - /url: https://substack.com/app/app-store-redirect?utm_campaign=app-marketing&utm_content=sign-in-page&utm_source=badge&force=ios
+          - img [ref=e44]
+        - link [ref=e45]:
+          - /url: https://substack.com/app/app-store-redirect?utm_campaign=app-marketing&utm_content=sign-in-page&utm_source=badge&force=android
+          - img [ref=e46]
+    - img [ref=e48]

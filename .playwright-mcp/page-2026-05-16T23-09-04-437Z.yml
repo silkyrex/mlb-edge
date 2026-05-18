@@ -1,0 +1,93 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - link "home" [ref=e5] [cursor=pointer]:
+        - /url: /pick-em/higher-lower/all/featured
+        - img [ref=e7]
+      - generic [ref=e10]:
+        - link "Champions" [ref=e11] [cursor=pointer]:
+          - /url: /pick-em
+        - link "Drafts" [ref=e12] [cursor=pointer]:
+          - /url: /lobby
+        - link "Live" [ref=e13] [cursor=pointer]:
+          - /url: /live
+        - link "Results" [ref=e14] [cursor=pointer]:
+          - /url: /results
+        - link "Rankings" [ref=e15] [cursor=pointer]:
+          - /url: /rankings
+        - link "News feed" [ref=e16] [cursor=pointer]:
+          - /url: /news-feed
+      - generic [ref=e17]:
+        - button [ref=e18] [cursor=pointer]:
+          - img [ref=e22]
+        - button [ref=e24] [cursor=pointer]:
+          - img [ref=e28]
+        - link [ref=e30] [cursor=pointer]:
+          - /url: /account
+          - img [ref=e33]
+        - link "$47.55" [ref=e35] [cursor=pointer]:
+          - /url: /deposit
+          - generic [ref=e36]:
+            - generic [ref=e37]: $47.55
+            - img [ref=e40]
+    - generic [ref=e43]:
+      - link "Daily" [ref=e44] [cursor=pointer]:
+        - /url: /live/daily
+        - generic [ref=e45]: Daily
+      - link "Best Ball" [ref=e46] [cursor=pointer]:
+        - /url: /live/best-ball
+        - generic [ref=e47]: Best Ball
+      - link "Picks" [ref=e48] [cursor=pointer]:
+        - /url: /live/pick-em
+        - generic [ref=e49]: Picks
+    - generic [ref=e50]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - 'button "Champions: 3 picks 7.48x 9.42x" [ref=e55] [cursor=pointer]':
+              - paragraph [ref=e56]: "Champions: 3 picks"
+              - generic [ref=e57]:
+                - paragraph [ref=e58]: 7.48x
+                - paragraph [ref=e59]: 9.42x
+                - img [ref=e61]
+            - paragraph [ref=e63]: Teng, deGrom, Soriano
+          - generic [ref=e65]:
+            - img [ref=e67]
+            - text: 30% MLB Boost
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - text: Entry
+              - button [ref=e72] [cursor=pointer]:
+                - img [ref=e76]
+            - generic [ref=e78]: $20
+          - generic [ref=e79]:
+            - generic [ref=e80]: Payout
+            - generic [ref=e81]: $188.40
+      - generic [ref=e83]:
+        - generic [ref=e85]:
+          - 'button "Champions: 2 picks 3.89x" [ref=e86] [cursor=pointer]':
+            - paragraph [ref=e87]: "Champions: 2 picks"
+            - generic [ref=e88]:
+              - paragraph [ref=e89]: 3.89x
+              - img [ref=e91]
+          - paragraph [ref=e93]: Teng, Soriano
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - generic [ref=e96]:
+              - text: Entry
+              - button [ref=e97] [cursor=pointer]:
+                - img [ref=e101]
+            - generic [ref=e103]: $20
+          - generic [ref=e104]:
+            - generic [ref=e105]: Payout
+            - generic [ref=e106]: $77.80
+  - generic:
+    - img:
+      - generic:
+        - generic "basketball-icon"
+  - iframe [ref=e107]:
+    
+  - button "Open Intercom Messenger" [ref=e108] [cursor=pointer]:
+    - generic:
+      - img

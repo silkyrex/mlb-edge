@@ -1,0 +1,61 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: Loading
+        - progressbar [ref=e8]
+      - main [ref=e91]:
+        - generic [ref=e92]:
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - img [ref=e97]
+              - generic [ref=e102]: Sign in with Google
+            - img "OpenAI" [ref=e103]
+          - generic [ref=e104]:
+            - heading "Welcome" [level=1] [ref=e105]
+            - generic [ref=e109]:
+              - img [ref=e111]
+              - generic [ref=e114]: ryodzu@gmail.com
+        - generic [ref=e117]:
+          - generic [ref=e123]:
+            - generic [ref=e131]:
+              - textbox "Enter your password" [active] [ref=e132]
+              - generic: Enter your password
+            - generic [ref=e139]:
+              - generic [ref=e142] [cursor=pointer]:
+                - checkbox "Show password" [ref=e143]
+                - generic:
+                  - img
+              - generic [ref=e146] [cursor=pointer]: Show password
+          - generic [ref=e149]:
+            - text: Before using this app, you can review OpenAI’s
+            - link "Privacy Policy" [ref=e150] [cursor=pointer]:
+              - /url: https://openai.com/policies/privacy-policy
+            - text: and
+            - link "Terms of Service" [ref=e151] [cursor=pointer]:
+              - /url: https://openai.com/policies/terms-of-use
+            - text: .
+        - generic [ref=e153]:
+          - button "Next" [ref=e157]:
+            - generic [ref=e160]: Next
+          - button "Try another way" [ref=e164]:
+            - generic [ref=e167]: Try another way
+    - contentinfo [ref=e76]:
+      - combobox "Change language English (United States)" [ref=e80] [cursor=pointer]:
+        - generic:
+          - generic: English (United States)
+        - generic:
+          - img
+      - list [ref=e82]:
+        - listitem [ref=e83]:
+          - link "Help" [ref=e84] [cursor=pointer]:
+            - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+        - listitem [ref=e85]:
+          - link "Privacy" [ref=e86] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=US&hl=en-US&privacy=true
+        - listitem [ref=e87]:
+          - link "Terms" [ref=e88] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=US&hl=en-US
+  - iframe [ref=e89]:
+    
+  - generic [ref=e170]: Welcome

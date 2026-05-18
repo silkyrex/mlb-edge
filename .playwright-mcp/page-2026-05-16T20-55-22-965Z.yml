@@ -1,0 +1,8 @@
+- generic [active]:
+  - generic [ref=e2]:
+    - img [ref=e3]
+    - paragraph [ref=e15]: Loading...
+  - generic:
+    - img:
+      - generic:
+        - generic "basketball-icon"

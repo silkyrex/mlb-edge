@@ -1,0 +1,26 @@
+[  270054ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3D25476a54-7d37-49c5-b717-a1a916fc9f5e:0
+[19120957ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/backend-api/sentinel/heartbeat:0
+[22092736ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3D49ef35ac-156e-45b1-aa13-4aa8b37aef0b:0
+[23030391ms] [ERROR] Failed to load resource: net::ERR_QUIC_PROTOCOL_ERROR.QUIC_NETWORK_IDLE_TIMEOUT @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3D1a416e5f-1045-40dc-90fb-652d9d0adf46:0
+[23030400ms] [ERROR] Failed to load resource: net::ERR_QUIC_PROTOCOL_ERROR.QUIC_NETWORK_IDLE_TIMEOUT @ https://chatgpt.com/ces/statsc/flush:0
+[23030414ms] [ERROR] TypeError: Failed to fetch
+    at o (https://chatgpt.com/cdn/assets/2340486e-clg423ry0ibju5j0.js:59:3287)
+    at Qae.postMetrics (https://chatgpt.com/cdn/assets/4813494d-kxjl6bwxgyryk1g4.js:3:48681)
+    at https://chatgpt.com/cdn/assets/4813494d-kxjl6bwxgyryk1g4.js:3:48072 {json: {"counters":[{"namespace":"ws","metric":"pubsub.fe…,"value":1}],"histograms":[],"client_type":"web"}} @ https://chatgpt.com/cdn/assets/2340486e-clg423ry0ibju5j0.js:60
+[27899056ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/ces/statsc/flush:0
+[27899057ms] [ERROR] TypeError: Failed to fetch
+    at o (https://chatgpt.com/cdn/assets/2340486e-clg423ry0ibju5j0.js:59:3287)
+    at Qae.postMetrics (https://chatgpt.com/cdn/assets/4813494d-kxjl6bwxgyryk1g4.js:3:48681)
+    at https://chatgpt.com/cdn/assets/4813494d-kxjl6bwxgyryk1g4.js:3:48072 {json: {"counters":[{"namespace":"internal","metric":"pos…,"value":1}],"histograms":[],"client_type":"web"}} @ https://chatgpt.com/cdn/assets/2340486e-clg423ry0ibju5j0.js:60
+[27899066ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ https://chatgpt.com/backend-api/sentinel/heartbeat:0
+[32591690ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://chatgpt.com/ces/statsc/flush:0
+[32591702ms] [ERROR] TypeError: Failed to fetch
+    at o (https://chatgpt.com/cdn/assets/2340486e-clg423ry0ibju5j0.js:59:3287)
+    at Qae.postMetrics (https://chatgpt.com/cdn/assets/4813494d-kxjl6bwxgyryk1g4.js:3:48681)
+    at https://chatgpt.com/cdn/assets/4813494d-kxjl6bwxgyryk1g4.js:3:48072 {json: {"counters":[{"namespace":"internal","metric":"pos…,"value":1}],"histograms":[],"client_type":"web"}} @ https://chatgpt.com/cdn/assets/2340486e-clg423ry0ibju5j0.js:60
+[32591731ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://chatgpt.com/backend-api/sentinel/heartbeat:0
+[35011976ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://chatgpt.com/ces/statsc/flush:0
+[35011983ms] [ERROR] TypeError: Failed to fetch
+    at o (https://chatgpt.com/cdn/assets/2340486e-clg423ry0ibju5j0.js:59:3287)
+    at Qae.postMetrics (https://chatgpt.com/cdn/assets/4813494d-kxjl6bwxgyryk1g4.js:3:48681)
+    at https://chatgpt.com/cdn/assets/4813494d-kxjl6bwxgyryk1g4.js:3:48072 {json: {"counters":[{"namespace":"internal","metric":"pos…,"value":1}],"histograms":[],"client_type":"web"}} @ https://chatgpt.com/cdn/assets/2340486e-clg423ry0ibju5j0.js:60

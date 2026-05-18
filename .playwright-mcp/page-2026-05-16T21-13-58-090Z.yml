@@ -1,0 +1,737 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - link "home" [ref=e5] [cursor=pointer]:
+        - /url: /pick-em/higher-lower/all/featured
+        - img [ref=e7]
+      - generic [ref=e10]:
+        - link "Champions" [ref=e11] [cursor=pointer]:
+          - /url: /pick-em
+        - link "Drafts" [ref=e12] [cursor=pointer]:
+          - /url: /lobby
+        - link "Live" [ref=e13] [cursor=pointer]:
+          - /url: /live
+        - link "Results" [ref=e14] [cursor=pointer]:
+          - /url: /results
+        - link "Rankings" [ref=e15] [cursor=pointer]:
+          - /url: /rankings
+        - link "News feed" [ref=e16] [cursor=pointer]:
+          - /url: /news-feed
+      - generic [ref=e17]:
+        - button [ref=e18] [cursor=pointer]:
+          - img [ref=e22]
+        - button [ref=e24] [cursor=pointer]:
+          - img [ref=e28]
+        - link [ref=e30] [cursor=pointer]:
+          - /url: /account
+          - img [ref=e33]
+        - link "$87.55" [ref=e35] [cursor=pointer]:
+          - /url: /deposit
+          - generic [ref=e36]:
+            - generic [ref=e37]: $87.55
+            - img [ref=e40]
+    - generic [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e45]:
+          - search [ref=e48]:
+            - button [ref=e49] [cursor=pointer]:
+              - img [ref=e51]
+            - textbox "Find teams, players and stats" [ref=e1869]
+          - button "Champions tips" [ref=e54] [cursor=pointer]:
+            - paragraph [ref=e55]: Champions tips
+            - img [ref=e57]
+        - generic [ref=e59]:
+          - generic [ref=e1875]:
+            - generic [ref=e1876]:
+              - img "athlete or team avatar" [ref=e1878]
+              - generic [ref=e1879]:
+                - generic [ref=e1880]: LAD
+                - generic [ref=e1881]: 27-18
+            - generic [ref=e1882]:
+              - generic [ref=e1883]: 6:38pm
+              - generic [ref=e1885]: Sunny 69
+            - generic [ref=e1886]:
+              - img "athlete or team avatar" [ref=e1888]
+              - generic [ref=e1889]:
+                - generic [ref=e1890]: LAA
+                - generic [ref=e1891]: 16-29
+          - generic [ref=e1893]:
+            - generic [ref=e1894]:
+              - button "Popular" [ref=e1896] [cursor=pointer]
+              - button "Team Picks" [ref=e1898] [cursor=pointer]
+              - button "Strikeouts" [ref=e1900] [cursor=pointer]
+              - button "Hits + Runs + RBIs" [ref=e1902] [cursor=pointer]
+              - button "Home Runs" [ref=e1904] [cursor=pointer]
+              - button "Total Bases" [ref=e1906] [cursor=pointer]
+              - button "Fantasy Points" [ref=e1908] [cursor=pointer]
+              - button "Pitching Outs" [ref=e1910] [cursor=pointer]
+              - button "Hits Allowed" [ref=e1912] [cursor=pointer]
+              - button "Earned Runs Allowed" [ref=e1914] [cursor=pointer]
+              - button "Walks Allowed" [ref=e1916] [cursor=pointer]
+              - button "Hits" [ref=e1918] [cursor=pointer]
+              - button "Runs" [ref=e1920] [cursor=pointer]
+              - button "RBIs" [ref=e1922] [cursor=pointer]
+              - button "Singles" [ref=e1924] [cursor=pointer]
+              - button "Batter Strikeouts" [ref=e1926] [cursor=pointer]
+              - button "Batter Walks" [ref=e1928] [cursor=pointer]
+              - button "Stolen Bases" [ref=e1930] [cursor=pointer]
+              - button "1st Inn. Strikeouts" [ref=e1932] [cursor=pointer]
+              - button "1st Inn. Runs Allowed" [ref=e1934] [cursor=pointer]
+              - button "1st Inn. Batters Faced" [ref=e1936] [cursor=pointer]
+              - button "1st Inn. Hits Allowed" [ref=e1938] [cursor=pointer]
+              - button "1-3 Inn. Runs Allowed" [ref=e1940] [cursor=pointer]
+              - button "Doubles" [ref=e1942] [cursor=pointer]
+            - button [ref=e1944] [cursor=pointer]:
+              - img [ref=e1946]
+          - generic [ref=e1948]:
+            - generic [ref=e1949]:
+              - generic [ref=e1950]: 55%
+              - generic [ref=e1951]: Los Angeles Dodgers
+            - img [ref=e1954]:
+              - generic [ref=e1955]:
+                - generic [ref=e1956]: 65%
+                - generic [ref=e1957]: 50%
+                - generic [ref=e1958]: 65%
+            - generic [ref=e1971]:
+              - generic [ref=e1972]: 45%
+              - generic [ref=e1973]: Los Angeles Angels
+            - generic [ref=e1974]:
+              - button "1H" [ref=e1975] [cursor=pointer]
+              - button "1D" [ref=e1976] [cursor=pointer]
+              - button "ALL" [ref=e1977] [cursor=pointer]
+          - generic [ref=e1983]:
+            - link "athlete or team avatar LAD 27-18 6:38pm Sunny 69 athlete or team avatar LAA 16-29" [ref=e1984] [cursor=pointer]:
+              - generic [ref=e1989]:
+                - generic [ref=e1990]:
+                  - img "athlete or team avatar" [ref=e1992]
+                  - generic [ref=e1993]:
+                    - generic [ref=e1994]: LAD
+                    - generic [ref=e1995]: 27-18
+                - generic [ref=e1996]:
+                  - generic [ref=e1997]: 6:38pm
+                  - generic [ref=e1999]: Sunny 69
+                - generic [ref=e2000]:
+                  - img "athlete or team avatar" [ref=e2002]
+                  - generic [ref=e2003]:
+                    - generic [ref=e2004]: LAA
+                    - generic [ref=e2005]: 16-29
+            - generic [ref=e2007]:
+              - button "Dodgers to win -139" [ref=e2008] [cursor=pointer]:
+                - generic [ref=e2009]:
+                  - paragraph [ref=e2010]: Dodgers to win
+                  - paragraph [ref=e2011]: "-139"
+              - button "Angels to win +113" [ref=e2012] [cursor=pointer]:
+                - generic [ref=e2013]:
+                  - paragraph [ref=e2014]: Angels to win
+                  - paragraph [ref=e2015]: "+113"
+              - generic [ref=e2016]: "@"
+            - generic [ref=e2018]:
+              - generic [ref=e2019]:
+                - paragraph [ref=e2020]: Spread
+                - paragraph [ref=e2021]: Spread
+              - generic [ref=e2022]:
+                - button "LAD -1.5 +113" [ref=e2023] [cursor=pointer]:
+                  - generic [ref=e2024]: LAD -1.5
+                  - generic [ref=e2025]: "+113"
+                - button "LAA +1.5 -145" [ref=e2026] [cursor=pointer]:
+                  - generic [ref=e2027]: LAA +1.5
+                  - generic [ref=e2028]: "-145"
+            - generic [ref=e2030]:
+              - generic [ref=e2031]:
+                - paragraph [ref=e2032]: "8.5"
+                - paragraph [ref=e2033]: Total Runs
+              - generic [ref=e2034]:
+                - button "Higher -113" [ref=e2035] [cursor=pointer]:
+                  - generic [ref=e2036]: Higher
+                  - generic [ref=e2037]: "-113"
+                - button "Lower -113" [ref=e2038] [cursor=pointer]:
+                  - generic [ref=e2039]: Lower
+                  - generic [ref=e2040]: "-113"
+            - img "prediction" [ref=e2043]
+          - generic [ref=e2045]:
+            - heading "Popular Picks" [level=2] [ref=e2047]
+            - generic [ref=e2048]:
+              - generic [ref=e2049]:
+                - button "athlete or team avatar Shohei Ohtani LAD @ LAA - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher 0.84x Lower 1.06x" [ref=e2050] [cursor=pointer]:
+                  - generic [ref=e2052]:
+                    - img "athlete or team avatar" [ref=e2059]
+                    - generic [ref=e2060]:
+                      - generic [ref=e2063]: Shohei Ohtani
+                      - generic [ref=e2064]:
+                        - img [ref=e2066]
+                        - paragraph [ref=e2068]:
+                          - strong [ref=e2069]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2070]:
+                    - generic [ref=e2071]:
+                      - button [ref=e2072]:
+                        - img [ref=e2074]
+                        - img [ref=e2077]
+                      - generic [ref=e2082]:
+                        - generic [ref=e2084]: "1.5"
+                        - generic [ref=e2085]: Hits + Runs + RBIs
+                    - generic [ref=e2088]:
+                      - button "Higher 0.84x" [ref=e2089]:
+                        - generic [ref=e2090]:
+                          - generic [ref=e2091]: Higher
+                          - generic [ref=e2092]: 0.84x
+                      - button "Lower 1.06x" [ref=e2093]:
+                        - generic [ref=e2094]:
+                          - generic [ref=e2095]: Lower
+                          - generic [ref=e2096]: 1.06x
+                - button "athlete or team avatar Justin Wrobleski LAD @ LAA - 6:38PM PDT 17.5 Pitching Outs Higher 0.78x Lower 1.05x" [ref=e2097] [cursor=pointer]:
+                  - generic [ref=e2099]:
+                    - img "athlete or team avatar" [ref=e2106]
+                    - generic [ref=e2107]:
+                      - generic [ref=e2110]: Justin Wrobleski
+                      - generic [ref=e2111]:
+                        - img [ref=e2113]
+                        - paragraph [ref=e2115]:
+                          - strong [ref=e2116]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2117]:
+                    - generic [ref=e2118]:
+                      - button [ref=e2119]:
+                        - img [ref=e2121]
+                        - img [ref=e2124]
+                      - generic [ref=e2129]:
+                        - generic [ref=e2131]: "17.5"
+                        - generic [ref=e2132]: Pitching Outs
+                    - generic [ref=e2135]:
+                      - button "Higher 0.78x" [ref=e2136]:
+                        - generic [ref=e2137]:
+                          - generic [ref=e2138]: Higher
+                          - generic [ref=e2139]: 0.78x
+                      - button "Lower 1.05x" [ref=e2140]:
+                        - generic [ref=e2141]:
+                          - generic [ref=e2142]: Lower
+                          - generic [ref=e2143]: 1.05x
+                - button "athlete or team avatar Freddie Freeman LAD @ LAA - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher 0.85x Lower 1.05x" [ref=e2144] [cursor=pointer]:
+                  - generic [ref=e2146]:
+                    - img "athlete or team avatar" [ref=e2153]
+                    - generic [ref=e2154]:
+                      - generic [ref=e2157]: Freddie Freeman
+                      - generic [ref=e2158]:
+                        - img [ref=e2160]
+                        - paragraph [ref=e2162]:
+                          - strong [ref=e2163]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2164]:
+                    - generic [ref=e2165]:
+                      - button [ref=e2166]:
+                        - img [ref=e2168]
+                        - img [ref=e2171]
+                      - generic [ref=e2176]:
+                        - generic [ref=e2178]: "1.5"
+                        - generic [ref=e2179]: Hits + Runs + RBIs
+                    - generic [ref=e2182]:
+                      - button "Higher 0.85x" [ref=e2183]:
+                        - generic [ref=e2184]:
+                          - generic [ref=e2185]: Higher
+                          - generic [ref=e2186]: 0.85x
+                      - button "Lower 1.05x" [ref=e2187]:
+                        - generic [ref=e2188]:
+                          - generic [ref=e2189]: Lower
+                          - generic [ref=e2190]: 1.05x
+                - button "athlete or team avatar Max Muncy LAD @ LAA - 6:38PM PDT 0.5 Home Runs Higher 2.33x" [ref=e2191] [cursor=pointer]:
+                  - generic [ref=e2193]:
+                    - img "athlete or team avatar" [ref=e2200]
+                    - generic [ref=e2201]:
+                      - generic [ref=e2204]: Max Muncy
+                      - generic [ref=e2205]:
+                        - img [ref=e2207]
+                        - paragraph [ref=e2209]:
+                          - strong [ref=e2210]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2211]:
+                    - generic [ref=e2216]:
+                      - generic [ref=e2218]: "0.5"
+                      - generic [ref=e2219]: Home Runs
+                    - button "Higher 2.33x" [ref=e2223]:
+                      - generic [ref=e2224]:
+                        - generic [ref=e2225]: Higher
+                        - generic [ref=e2226]: 2.33x
+                - button "athlete or team avatar Andy Pages LAD @ LAA - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher Lower" [ref=e2227] [cursor=pointer]:
+                  - generic [ref=e2229]:
+                    - img "athlete or team avatar" [ref=e2236]
+                    - generic [ref=e2237]:
+                      - generic [ref=e2240]: Andy Pages
+                      - generic [ref=e2241]:
+                        - img [ref=e2243]
+                        - paragraph [ref=e2245]:
+                          - strong [ref=e2246]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2247]:
+                    - generic [ref=e2248]:
+                      - button [ref=e2249]:
+                        - img [ref=e2251]
+                        - img [ref=e2254]
+                      - generic [ref=e2259]:
+                        - generic [ref=e2261]: "1.5"
+                        - generic [ref=e2262]: Hits + Runs + RBIs
+                    - generic [ref=e2265]:
+                      - button "Higher" [ref=e2266]:
+                        - generic [ref=e2268]: Higher
+                      - button "Lower" [ref=e2269]:
+                        - generic [ref=e2271]: Lower
+                - button "athlete or team avatar Mookie Betts LAD @ LAA - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher 0.86x Lower 1.06x" [ref=e2272] [cursor=pointer]:
+                  - generic [ref=e2274]:
+                    - img "athlete or team avatar" [ref=e2281]
+                    - generic [ref=e2282]:
+                      - generic [ref=e2285]: Mookie Betts
+                      - generic [ref=e2286]:
+                        - img [ref=e2288]
+                        - paragraph [ref=e2290]:
+                          - strong [ref=e2291]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2292]:
+                    - generic [ref=e2293]:
+                      - button [ref=e2294]:
+                        - img [ref=e2296]
+                        - img [ref=e2299]
+                      - generic [ref=e2304]:
+                        - generic [ref=e2306]: "1.5"
+                        - generic [ref=e2307]: Hits + Runs + RBIs
+                    - generic [ref=e2310]:
+                      - button "Higher 0.86x" [ref=e2311]:
+                        - generic [ref=e2312]:
+                          - generic [ref=e2313]: Higher
+                          - generic [ref=e2314]: 0.86x
+                      - button "Lower 1.06x" [ref=e2315]:
+                        - generic [ref=e2316]:
+                          - generic [ref=e2317]: Lower
+                          - generic [ref=e2318]: 1.06x
+                - button "athlete or team avatar Jorge Soler LAA vs LAD - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher 1.05x Lower 0.87x" [ref=e2319] [cursor=pointer]:
+                  - generic [ref=e2321]:
+                    - img "athlete or team avatar" [ref=e2328]
+                    - generic [ref=e2329]:
+                      - generic [ref=e2332]: Jorge Soler
+                      - generic [ref=e2333]:
+                        - img [ref=e2335]
+                        - paragraph [ref=e2337]:
+                          - strong [ref=e2338]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2339]:
+                    - generic [ref=e2340]:
+                      - button [ref=e2341]:
+                        - img [ref=e2343]
+                        - img [ref=e2346]
+                      - generic [ref=e2351]:
+                        - generic [ref=e2353]: "1.5"
+                        - generic [ref=e2354]: Hits + Runs + RBIs
+                    - generic [ref=e2357]:
+                      - button "Higher 1.05x" [ref=e2358]:
+                        - generic [ref=e2359]:
+                          - generic [ref=e2360]: Higher
+                          - generic [ref=e2361]: 1.05x
+                      - button "Lower 0.87x" [ref=e2362]:
+                        - generic [ref=e2363]:
+                          - generic [ref=e2364]: Lower
+                          - generic [ref=e2365]: 0.87x
+                - button "athlete or team avatar Zach Neto LAA vs LAD - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher 1.04x Lower 0.87x" [ref=e2366] [cursor=pointer]:
+                  - generic [ref=e2368]:
+                    - img "athlete or team avatar" [ref=e2375]
+                    - generic [ref=e2376]:
+                      - generic [ref=e2379]: Zach Neto
+                      - generic [ref=e2380]:
+                        - img [ref=e2382]
+                        - paragraph [ref=e2384]:
+                          - strong [ref=e2385]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2386]:
+                    - generic [ref=e2387]:
+                      - button [ref=e2388]:
+                        - img [ref=e2390]
+                        - img [ref=e2393]
+                      - generic [ref=e2398]:
+                        - generic [ref=e2400]: "1.5"
+                        - generic [ref=e2401]: Hits + Runs + RBIs
+                    - generic [ref=e2404]:
+                      - button "Higher 1.04x" [ref=e2405]:
+                        - generic [ref=e2406]:
+                          - generic [ref=e2407]: Higher
+                          - generic [ref=e2408]: 1.04x
+                      - button "Lower 0.87x" [ref=e2409]:
+                        - generic [ref=e2410]:
+                          - generic [ref=e2411]: Lower
+                          - generic [ref=e2412]: 0.87x
+                - button "athlete or team avatar Sebastián Rivero LAA vs LAD - 6:38PM PDT 0.5 Hits + Runs + RBIs Higher 0.78x Lower 1.04x" [ref=e2413] [cursor=pointer]:
+                  - generic [ref=e2415]:
+                    - img "athlete or team avatar" [ref=e2422]
+                    - generic [ref=e2423]:
+                      - generic [ref=e2426]: Sebastián Rivero
+                      - generic [ref=e2427]:
+                        - img [ref=e2429]
+                        - paragraph [ref=e2431]:
+                          - strong [ref=e2432]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2433]:
+                    - generic [ref=e2434]:
+                      - button [ref=e2435]:
+                        - img [ref=e2437]
+                        - img [ref=e2440]
+                      - generic [ref=e2445]:
+                        - generic [ref=e2447]: "0.5"
+                        - generic [ref=e2448]: Hits + Runs + RBIs
+                    - generic [ref=e2451]:
+                      - button "Higher 0.78x" [ref=e2452]:
+                        - generic [ref=e2453]:
+                          - generic [ref=e2454]: Higher
+                          - generic [ref=e2455]: 0.78x
+                      - button "Lower 1.04x" [ref=e2456]:
+                        - generic [ref=e2457]:
+                          - generic [ref=e2458]: Lower
+                          - generic [ref=e2459]: 1.04x
+                - button "athlete or team avatar Oswald Peraza LAA vs LAD - 6:38PM PDT 5.5 Scoring info Fantasy Points Higher Lower" [ref=e2460] [cursor=pointer]:
+                  - generic [ref=e2462]:
+                    - img "athlete or team avatar" [ref=e2469]
+                    - generic [ref=e2470]:
+                      - generic [ref=e2473]: Oswald Peraza
+                      - generic [ref=e2474]:
+                        - img [ref=e2476]
+                        - paragraph [ref=e2478]:
+                          - strong [ref=e2479]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2480]:
+                    - generic [ref=e2485]:
+                      - generic [ref=e2486]:
+                        - generic [ref=e2487]: "5.5"
+                        - button "Scoring info" [ref=e2488]:
+                          - img [ref=e2490]
+                      - generic [ref=e2492]: Fantasy Points
+                    - generic [ref=e2495]:
+                      - button "Higher" [ref=e2496]:
+                        - generic [ref=e2498]: Higher
+                      - button "Lower" [ref=e2499]:
+                        - generic [ref=e2501]: Lower
+              - generic [ref=e2502]:
+                - button "athlete or team avatar José Soriano LAA vs LAD - 6:38PM PDT 5.5 Strikeouts Higher Lower" [ref=e2503] [cursor=pointer]:
+                  - generic [ref=e2505]:
+                    - img "athlete or team avatar" [ref=e2512]
+                    - generic [ref=e2513]:
+                      - generic [ref=e2516]: José Soriano
+                      - generic [ref=e2517]:
+                        - img [ref=e2519]
+                        - paragraph [ref=e2521]:
+                          - strong [ref=e2522]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2523]:
+                    - generic [ref=e2524]:
+                      - button [ref=e2525]:
+                        - img [ref=e2527]
+                        - img [ref=e2530]
+                      - generic [ref=e2535]:
+                        - generic [ref=e2537]: "5.5"
+                        - generic [ref=e2538]: Strikeouts
+                    - generic [ref=e2541]:
+                      - button "Higher" [ref=e2542]:
+                        - generic [ref=e2544]: Higher
+                      - button "Lower" [ref=e2545]:
+                        - generic [ref=e2547]: Lower
+                - button "athlete or team avatar Mike Trout LAA vs LAD - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher 1.03x Lower 0.88x" [ref=e2548] [cursor=pointer]:
+                  - generic [ref=e2550]:
+                    - img "athlete or team avatar" [ref=e2557]
+                    - generic [ref=e2558]:
+                      - generic [ref=e2561]: Mike Trout
+                      - generic [ref=e2562]:
+                        - img [ref=e2564]
+                        - paragraph [ref=e2566]:
+                          - strong [ref=e2567]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2568]:
+                    - generic [ref=e2569]:
+                      - button [ref=e2570]:
+                        - img [ref=e2572]
+                        - img [ref=e2575]
+                      - generic [ref=e2580]:
+                        - generic [ref=e2582]: "1.5"
+                        - generic [ref=e2583]: Hits + Runs + RBIs
+                    - generic [ref=e2586]:
+                      - button "Higher 1.03x" [ref=e2587]:
+                        - generic [ref=e2588]:
+                          - generic [ref=e2589]: Higher
+                          - generic [ref=e2590]: 1.03x
+                      - button "Lower 0.88x" [ref=e2591]:
+                        - generic [ref=e2592]:
+                          - generic [ref=e2593]: Lower
+                          - generic [ref=e2594]: 0.88x
+                - button "athlete or team avatar Teoscar Hernández LAD @ LAA - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher 1.05x Lower 0.85x" [ref=e2595] [cursor=pointer]:
+                  - generic [ref=e2597]:
+                    - img "athlete or team avatar" [ref=e2604]
+                    - generic [ref=e2605]:
+                      - generic [ref=e2608]: Teoscar Hernández
+                      - generic [ref=e2609]:
+                        - img [ref=e2611]
+                        - paragraph [ref=e2613]:
+                          - strong [ref=e2614]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2615]:
+                    - generic [ref=e2616]:
+                      - button [ref=e2617]:
+                        - img [ref=e2619]
+                        - img [ref=e2622]
+                      - generic [ref=e2627]:
+                        - generic [ref=e2629]: "1.5"
+                        - generic [ref=e2630]: Hits + Runs + RBIs
+                    - generic [ref=e2633]:
+                      - button "Higher 1.05x" [ref=e2634]:
+                        - generic [ref=e2635]:
+                          - generic [ref=e2636]: Higher
+                          - generic [ref=e2637]: 1.05x
+                      - button "Lower 0.85x" [ref=e2638]:
+                        - generic [ref=e2639]:
+                          - generic [ref=e2640]: Lower
+                          - generic [ref=e2641]: 0.85x
+                - button "athlete or team avatar Jo Adell LAA vs LAD - 6:38PM PDT 0.5 Home Runs Higher 2.04x" [ref=e2642] [cursor=pointer]:
+                  - generic [ref=e2644]:
+                    - img "athlete or team avatar" [ref=e2651]
+                    - generic [ref=e2652]:
+                      - generic [ref=e2655]: Jo Adell
+                      - generic [ref=e2656]:
+                        - img [ref=e2658]
+                        - paragraph [ref=e2660]:
+                          - strong [ref=e2661]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2662]:
+                    - generic [ref=e2667]:
+                      - generic [ref=e2669]: "0.5"
+                      - generic [ref=e2670]: Home Runs
+                    - button "Higher 2.04x" [ref=e2674]:
+                      - generic [ref=e2675]:
+                        - generic [ref=e2676]: Higher
+                        - generic [ref=e2677]: 2.04x
+                - button "athlete or team avatar Will Smith LAD @ LAA - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher Lower" [ref=e2678] [cursor=pointer]:
+                  - generic [ref=e2680]:
+                    - img "athlete or team avatar" [ref=e2687]
+                    - generic [ref=e2688]:
+                      - generic [ref=e2691]: Will Smith
+                      - generic [ref=e2692]:
+                        - img [ref=e2694]
+                        - paragraph [ref=e2696]:
+                          - strong [ref=e2697]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2698]:
+                    - generic [ref=e2699]:
+                      - button [ref=e2700]:
+                        - img [ref=e2702]
+                        - img [ref=e2705]
+                      - generic [ref=e2710]:
+                        - generic [ref=e2712]: "1.5"
+                        - generic [ref=e2713]: Hits + Runs + RBIs
+                    - generic [ref=e2716]:
+                      - button "Higher" [ref=e2717]:
+                        - generic [ref=e2719]: Higher
+                      - button "Lower" [ref=e2720]:
+                        - generic [ref=e2722]: Lower
+                - button "athlete or team avatar Hyeseong Kim LAD @ LAA - 6:38PM PDT 0.5 Hits Higher 0.85x Lower 1.05x" [ref=e2723] [cursor=pointer]:
+                  - generic [ref=e2725]:
+                    - img "athlete or team avatar" [ref=e2732]
+                    - generic [ref=e2733]:
+                      - generic [ref=e2736]: Hyeseong Kim
+                      - generic [ref=e2737]:
+                        - img [ref=e2739]
+                        - paragraph [ref=e2741]:
+                          - strong [ref=e2742]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2743]:
+                    - generic [ref=e2744]:
+                      - button [ref=e2745]:
+                        - img [ref=e2747]
+                        - img [ref=e2750]
+                      - generic [ref=e2755]:
+                        - generic [ref=e2757]: "0.5"
+                        - generic [ref=e2758]: Hits
+                    - generic [ref=e2761]:
+                      - button "Higher 0.85x" [ref=e2762]:
+                        - generic [ref=e2763]:
+                          - generic [ref=e2764]: Higher
+                          - generic [ref=e2765]: 0.85x
+                      - button "Lower 1.05x" [ref=e2766]:
+                        - generic [ref=e2767]:
+                          - generic [ref=e2768]: Lower
+                          - generic [ref=e2769]: 1.05x
+                - button "athlete or team avatar Kyle Tucker LAD @ LAA - 6:38PM PDT 1.5 Hits + Runs + RBIs Higher Lower" [ref=e2770] [cursor=pointer]:
+                  - generic [ref=e2772]:
+                    - img "athlete or team avatar" [ref=e2779]
+                    - generic [ref=e2780]:
+                      - generic [ref=e2783]: Kyle Tucker
+                      - generic [ref=e2784]:
+                        - img [ref=e2786]
+                        - paragraph [ref=e2788]:
+                          - strong [ref=e2789]: LAD
+                          - text: "@ LAA - 6:38PM PDT"
+                  - generic [ref=e2790]:
+                    - generic [ref=e2791]:
+                      - button [ref=e2792]:
+                        - img [ref=e2794]
+                        - img [ref=e2797]
+                      - generic [ref=e2802]:
+                        - generic [ref=e2804]: "1.5"
+                        - generic [ref=e2805]: Hits + Runs + RBIs
+                    - generic [ref=e2808]:
+                      - button "Higher" [ref=e2809]:
+                        - generic [ref=e2811]: Higher
+                      - button "Lower" [ref=e2812]:
+                        - generic [ref=e2814]: Lower
+                - button "athlete or team avatar Vaughn Grissom LAA vs LAD - 6:38PM PDT 4.5 Scoring info Fantasy Points Higher Lower" [ref=e2815] [cursor=pointer]:
+                  - generic [ref=e2817]:
+                    - img "athlete or team avatar" [ref=e2824]
+                    - generic [ref=e2825]:
+                      - generic [ref=e2828]: Vaughn Grissom
+                      - generic [ref=e2829]:
+                        - img [ref=e2831]
+                        - paragraph [ref=e2833]:
+                          - strong [ref=e2834]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2835]:
+                    - generic [ref=e2836]:
+                      - button [ref=e2837]:
+                        - img [ref=e2839]
+                        - img [ref=e2842]
+                      - generic [ref=e2847]:
+                        - generic [ref=e2848]:
+                          - generic [ref=e2849]: "4.5"
+                          - button "Scoring info" [ref=e2850]:
+                            - img [ref=e2852]
+                        - generic [ref=e2854]: Fantasy Points
+                    - generic [ref=e2857]:
+                      - button "Higher" [ref=e2858]:
+                        - generic [ref=e2860]: Higher
+                      - button "Lower" [ref=e2861]:
+                        - generic [ref=e2863]: Lower
+                - button "athlete or team avatar Yoán Moncada LAA vs LAD - 6:38PM PDT 0.5 Hits + Runs + RBIs Higher 0.79x Lower 1.08x" [ref=e2864] [cursor=pointer]:
+                  - generic [ref=e2866]:
+                    - img "athlete or team avatar" [ref=e2873]
+                    - generic [ref=e2874]:
+                      - generic [ref=e2877]: Yoán Moncada
+                      - generic [ref=e2878]:
+                        - img [ref=e2880]
+                        - paragraph [ref=e2882]:
+                          - strong [ref=e2883]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2884]:
+                    - generic [ref=e2885]:
+                      - button [ref=e2886]:
+                        - img [ref=e2888]
+                        - img [ref=e2891]
+                      - generic [ref=e2896]:
+                        - generic [ref=e2898]: "0.5"
+                        - generic [ref=e2899]: Hits + Runs + RBIs
+                    - generic [ref=e2902]:
+                      - button "Higher 0.79x" [ref=e2903]:
+                        - generic [ref=e2904]:
+                          - generic [ref=e2905]: Higher
+                          - generic [ref=e2906]: 0.79x
+                      - button "Lower 1.08x" [ref=e2907]:
+                        - generic [ref=e2908]:
+                          - generic [ref=e2909]: Lower
+                          - generic [ref=e2910]: 1.08x
+                - button "athlete or team avatar Bryce Teodosio LAA vs LAD - 6:38PM PDT 0.5 Hits Higher 0.87x Lower 1.04x" [ref=e2911] [cursor=pointer]:
+                  - generic [ref=e2913]:
+                    - img "athlete or team avatar" [ref=e2920]
+                    - generic [ref=e2921]:
+                      - generic [ref=e2924]: Bryce Teodosio
+                      - generic [ref=e2925]:
+                        - img [ref=e2927]
+                        - paragraph [ref=e2929]:
+                          - strong [ref=e2930]: LAA
+                          - text: vs LAD - 6:38PM PDT
+                  - generic [ref=e2931]:
+                    - generic [ref=e2932]:
+                      - button [ref=e2933]:
+                        - img [ref=e2935]
+                        - img [ref=e2938]
+                      - generic [ref=e2943]:
+                        - generic [ref=e2945]: "0.5"
+                        - generic [ref=e2946]: Hits
+                    - generic [ref=e2949]:
+                      - button "Higher 0.87x" [ref=e2950]:
+                        - generic [ref=e2951]:
+                          - generic [ref=e2952]: Higher
+                          - generic [ref=e2953]: 0.87x
+                      - button "Lower 1.04x" [ref=e2954]:
+                        - generic [ref=e2955]:
+                          - generic [ref=e2956]: Lower
+                          - generic [ref=e2957]: 1.04x
+      - generic [ref=e554]:
+        - button [ref=e556] [cursor=pointer]:
+          - img [ref=e560]
+        - generic [ref=e562]:
+          - heading "Add picks" [level=2] [ref=e563]
+          - paragraph [ref=e564]: Add picks to start playing.
+        - generic [ref=e566]:
+          - generic [ref=e568]:
+            - generic [ref=e569]:
+              - img [ref=e571]
+              - heading "Champions entry amount" [level=3] [ref=e573]
+              - button [ref=e574] [cursor=pointer]:
+                - img [ref=e578]
+            - button [ref=e581] [cursor=pointer]:
+              - img [ref=e585]
+          - generic [ref=e587]:
+            - paragraph [ref=e590]: Rewards
+            - generic [ref=e592]:
+              - generic [ref=e593]:
+                - button "New Customer Gimme 🎁" [ref=e595] [cursor=pointer]:
+                  - generic [ref=e596]:
+                    - img [ref=e599]
+                    - paragraph [ref=e602]: New Customer Gimme 🎁
+                - button "Extender 20% Boost" [ref=e604] [cursor=pointer]:
+                  - generic [ref=e605]:
+                    - img [ref=e608]
+                    - paragraph [ref=e611]: Extender 20% Boost
+                - button "40% Boost" [ref=e613] [cursor=pointer]:
+                  - generic [ref=e614]:
+                    - img [ref=e617]
+                    - paragraph [ref=e620]: 40% Boost
+                - button "30% MMA Boost" [ref=e622] [cursor=pointer]:
+                  - generic [ref=e623]:
+                    - img [ref=e626]
+                    - paragraph [ref=e629]: 30% MMA Boost
+                - button "30% PGA Boost" [ref=e631] [cursor=pointer]:
+                  - generic [ref=e632]:
+                    - img [ref=e635]
+                    - paragraph [ref=e638]: 30% PGA Boost
+                - button "30% Soccer Boost" [ref=e640] [cursor=pointer]:
+                  - generic [ref=e641]:
+                    - img [ref=e644]
+                    - paragraph [ref=e647]: 30% Soccer Boost
+                - button "30% MLB Boost" [ref=e649] [cursor=pointer]:
+                  - generic [ref=e650]:
+                    - img [ref=e653]
+                    - paragraph [ref=e656]: 30% MLB Boost
+              - button [ref=e658] [cursor=pointer]:
+                - img [ref=e660]
+            - generic [ref=e663]:
+              - generic [ref=e665]: Predictions powered by UDM Services, LLC | Crypto.com
+              - paragraph [ref=e666]: Sports Event Trading is a derivatives product offered by Crypto.com | Derivatives North America, a CFTC-regulated exchange. Trading on CDNA involves risk and may not be appropriate for all. By trading you risk losing your cost to enter any transaction, including fees. You should carefully consider whether trading on CDNA is appropriate for you in light of your investment experience and financial resources. Any trading decisions you make are solely your responsibility and at your own risk. The Event Contract has not been endorsed by any Association, any Association Participant that is part of such Association, or any Individual in any Association. The use of the name of any Association, Association Participant or Individual in any Association does not indicate any endorsement of this tradeable financial instrument. For Crypto.com Predictions, "pick" refers to a product traded on CDNA.
+              - paragraph [ref=e667]:
+                - text: The Sports Event Trading contract specifications are available
+                - link "here" [ref=e669] [cursor=pointer]:
+                  - /url: https://www.nadex.com/rules/
+                - text: . Rules are available
+                - link "here" [ref=e671] [cursor=pointer]:
+                  - /url: https://www.cftc.gov/sites/default/files/filings/ptc/25/05/ptc05072520850.pdf
+                - text: .
+            - button "Show more" [ref=e673] [cursor=pointer]:
+              - generic [ref=e675]: Show more
+            - generic [ref=e680]:
+              - img [ref=e682]
+              - textbox "Enter amount" [ref=e684]
+          - generic [ref=e686]:
+            - paragraph [ref=e689]: Standard
+            - generic [ref=e691] [cursor=pointer]:
+              - paragraph [ref=e692]: Flex
+              - button [ref=e693]:
+                - img [ref=e697]
+          - button "Play" [disabled] [ref=e700]:
+            - generic [ref=e703]: Play
+  - generic:
+    - img:
+      - generic:
+        - generic "basketball-icon"
+  - iframe [ref=e704]:
+    
+  - button "Open Intercom Messenger" [ref=e705] [cursor=pointer]:
+    - generic:
+      - img

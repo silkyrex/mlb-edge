@@ -1,0 +1,25 @@
+- generic [ref=e28]:
+  - generic [ref=e29]:
+    - link "ChatGPT" [ref=e30] [cursor=pointer]:
+      - /url: https://chatgpt.com
+      - img "ChatGPT" [ref=e31]
+    - heading "Select a method to verify your identity" [level=1] [ref=e40]
+  - generic [ref=e41]:
+    - link "Passkey" [ref=e43] [cursor=pointer]:
+      - /url: /mfa-challenge/69dee8a726b8819193c7a57c175bdeaf
+      - img [ref=e45]
+      - text: Passkey
+    - link "Push notification" [ref=e48] [cursor=pointer]:
+      - /url: /mfa-challenge/device-notification
+      - img [ref=e50]
+      - text: Push notification
+    - link "Email" [ref=e53] [cursor=pointer]:
+      - /url: /mfa-challenge/email-otp
+      - img [ref=e55]
+      - text: Email
+  - generic [ref=e58]:
+    - link "Terms of Use" [ref=e59] [cursor=pointer]:
+      - /url: https://openai.com/policies/terms-of-use
+    - generic [ref=e60]: "|"
+    - link "Privacy Policy" [ref=e61] [cursor=pointer]:
+      - /url: https://openai.com/policies/privacy-policy
