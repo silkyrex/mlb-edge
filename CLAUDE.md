@@ -82,7 +82,7 @@ noon PT Discord lean signal
 | `player.py` | Per-pitcher start log / per-batter game log + splits / head-to-head. |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player. |
 | `notion_sync.py` | Sync slips + P&L to Notion. Auto-triggered by sliplog.py result. |
-| `settle.py` | Show stats + settle open bets. `--id N --settle W/L`. WIN: pushes `type=mlb_bet_settled` to OB1. LOSS: same + prompts for lesson (shows FIP flags), captures `type=bet_loss_lesson` to OB1 + sports/insights.md. |
+| `settle.py` | Show stats + settle open bets. `--id N --settle W/L`. Pushes `type=mlb_bet_settled` to OB1, then prompts for a lesson on every settle (WIN or LOSS). Lesson captures `type=bet_lesson` to OB1 + sports/insights.md. FIP flags shown for context. |
 | `ob1.py` | Shared OB1 push helper. `from ob1 import ob1_push`. All scripts use this -- never the HTTP MCP path. |
 
 ---

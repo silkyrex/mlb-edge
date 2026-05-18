@@ -362,9 +362,10 @@ def append_rubric_log(bet: dict, result: str, profit: float | None):
         print(f"Rubric log append failed: {e}")
 
 
-def capture_loss_lesson(bet: dict, profit: float | None) -> None:
-    """Prompt for a lesson-learned on a losing bet and capture to OB1 + second brain."""
-    print("\n--- LOSS REVIEW ---")
+def capture_bet_lesson(bet: dict, result: str, profit: float | None) -> None:
+    """Prompt for a lesson on any settled bet and capture to OB1 + second brain."""
+    label = "WIN REVIEW" if result == "W" else "LOSS REVIEW"
+    print(f"\n--- {label} ---")
     print(f"Signal: {bet.get('signal', 'n/a')}  |  Pick: {bet['bet_on'].replace(chr(10), ' + ')}")
 
     # Pull FIP flags for context
@@ -399,12 +400,13 @@ def capture_loss_lesson(bet: dict, profit: float | None) -> None:
 
     profit_str = f"{profit:.2f}" if profit is not None else "n/a"
     content = (
-        f"[{bet['date']}] bet loss lesson: {bet['matchup']} | "
+        f"[{bet['date']}] bet {result} lesson: {bet['matchup']} | "
         f"signal={bet.get('signal', '?')} | pick={bet['bet_on'].replace(chr(10), ' + ')} | "
         f"profit={profit_str} | lesson={lesson or 'none'}"
     )
     ok = ob1_push(content, {
-        "type": "bet_loss_lesson",
+        "type": "bet_lesson",
+        "result": result,
         "matchup": bet["matchup"],
         "signal": bet.get("signal", ""),
         "pick": bet["bet_on"],
@@ -420,7 +422,7 @@ def capture_loss_lesson(bet: dict, profit: float | None) -> None:
         sb_path = Path.home() / "second-brain/sports/insights.md"
         if sb_path.exists():
             entry = (
-                f"## {bet['date']} -- Loss: {bet['matchup']}\n"
+                f"## {bet['date']} -- {'Win' if result == 'W' else 'Loss'}: {bet['matchup']}\n"
                 f"**Signal:** {bet.get('signal', '?')}  |  **Pick:** {bet['bet_on'].replace(chr(10), ' + ')}\n"
                 f"**Lesson:** {lesson}\n\n---\n\n"
             )
@@ -476,8 +478,7 @@ def settle_bet(bet_id: int, result: str):
     print(f"OB1 capture: {'ok' if ok else 'failed'}")
     append_rubric_log(bet_row, result, profit)
 
-    if result == "L":
-        capture_loss_lesson(bet_row, profit)
+    capture_bet_lesson(bet_row, result, profit)
 
 
 def post_discord(message: str):
