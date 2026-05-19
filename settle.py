@@ -1,11 +1,11 @@
 """
-settle.py -- show live/final stats for open bets, prompt for settlement
+settle.py -- show live/final stats for open slips, prompt for settlement
 
 Usage:
-    python settle.py                      # show all open bets with box score stats
-    python settle.py --id 1               # show specific bet
-    python settle.py --id 1 --settle W    # settle bet as win
-    python settle.py --post-discord       # post settlement status to Discord (used by daily.sh)
+    python settle.py                      # show all open slips with box score stats
+    python settle.py --id 1               # show specific slip
+    python settle.py --id 1 --settle W    # settle slip as win
+    python settle.py --post-discord       # post final-game summaries to Discord (used by daily.sh)
 """
 
 import argparse
@@ -33,11 +33,24 @@ def get_open_bets(bet_id: int | None = None) -> list[dict]:
     conn = sqlite3.connect(BETLOG_DB)
     conn.row_factory = sqlite3.Row
     if bet_id:
-        rows = conn.execute("SELECT * FROM bets WHERE id=? AND (result='open' OR result IS NULL)", (bet_id,)).fetchall()
+        slips = conn.execute(
+            "SELECT * FROM slips WHERE id=? AND status='open'", (bet_id,)
+        ).fetchall()
     else:
-        rows = conn.execute("SELECT * FROM bets WHERE result='open' OR result IS NULL ORDER BY id").fetchall()
+        slips = conn.execute(
+            "SELECT * FROM slips WHERE status='open' ORDER BY id"
+        ).fetchall()
+
+    result = []
+    for s in slips:
+        slip = dict(s)
+        picks = conn.execute(
+            "SELECT * FROM slip_picks WHERE slip_id=? ORDER BY id", (slip["id"],)
+        ).fetchall()
+        slip["picks"] = [dict(p) for p in picks]
+        result.append(slip)
     conn.close()
-    return [dict(r) for r in rows]
+    return result
 
 
 def find_game_pk(matchup: str, game_date: str) -> int | None:
@@ -185,13 +198,32 @@ def extract_player_stats(bet_on: str, box: dict) -> list[str]:
 
 
 
+def _slip_players_str(bet: dict) -> str:
+    """Return a display string of players from picks or players JSON."""
+    if bet["picks"]:
+        return " + ".join(p["player"] for p in bet["picks"])
+    try:
+        return " + ".join(json.loads(bet["players"]))
+    except Exception:
+        return bet.get("players", "?")
+
+
+def _slip_games_str(bet: dict) -> str:
+    """Return unique games from picks, or 'unknown'."""
+    games = list(dict.fromkeys(p["game"] for p in bet["picks"] if p.get("game")))
+    return " / ".join(games) if games else "unknown"
+
+
 def build_ob1_content(bet: dict, result: str, profit: float | None) -> str:
     sign = "+" if profit and profit > 0 else ""
     profit_str = f"{sign}{profit:.2f}" if profit is not None else "n/a"
     result_label = "WIN" if result == "W" else "LOSS"
+    players_str = _slip_players_str(bet)
+    games_str = _slip_games_str(bet)
 
-    # Pull FIP/WAR context for pitchers named in the bet
+    # Pull FIP/WAR context for pitchers named in this slip
     fip_context = []
+    player_names_lower = [p["player"].lower() for p in bet["picks"]] if bet["picks"] else []
     try:
         conn = sqlite3.connect(PICKS_DB)
         conn.row_factory = sqlite3.Row
@@ -203,7 +235,8 @@ def build_ob1_content(bet: dict, result: str, profit: float | None) -> str:
         """, (bet["date"],)).fetchall()
         conn.close()
         for r in rows:
-            if r["player"].split()[-1].lower() in bet["bet_on"].lower():
+            last = r["player"].split()[-1].lower()
+            if any(last in n for n in player_names_lower) or last in players_str.lower():
                 era = r["season_era"]
                 fip = r["espn_fip"]
                 war = r["espn_war"]
@@ -214,10 +247,9 @@ def build_ob1_content(bet: dict, result: str, profit: float | None) -> str:
         pass
 
     lines = [
-        f"MLB bet settled [{result_label}]: {bet['matchup']} ({bet['date']})",
-        f"Lean: {bet.get('signal', 'n/a')}",
-        f"Pick: {bet['bet_on']}",
-        f"Result: {result_label} | Profit: {profit_str} | Stake: ${bet['stake']:.0f} | Line: {bet['line']:+d}",
+        f"MLB slip settled [{result_label}]: {games_str} ({bet['date']})",
+        f"Picks: {players_str}",
+        f"Result: {result_label} | Profit: {profit_str} | Entry: ${bet['entry']:.0f} | Payout: ${bet['payout']:.2f}",
         f"Agent: mlb-edge",
     ]
     if fip_context:
@@ -273,29 +305,23 @@ def _get_actual_from_box(matched_name: str, stat_key: str, box: dict) -> float |
 
 
 def auto_observe_picks(bet: dict, box: dict, result: str) -> None:
-    """Parse bet_on string and call pick_lessons.observe for each pick with box data."""
-    raw_picks = re.split(r"\s*\+\s*|\n", bet["bet_on"])
-    game = bet["matchup"].split("/")[0].strip()
+    """Call pick_lessons.observe for each structured pick using box score data."""
+    if not bet["picks"]:
+        print("  [pick_lessons] no per-pick structure -- skipped")
+        return
 
-    for raw in raw_picks:
-        raw = raw.strip()
-        m = _PICK_RE.search(raw)
-        if not m:
-            continue
-        name_hint = m.group("name").split()[-1].lower()
-        stat_abbrev = m.group("stat").lower()
-        line = float(m.group("line"))
-        side = m.group("side").capitalize()
+    for pick in bet["picks"]:
+        player = pick["player"]
+        stat_key = pick["stat"]
+        line = float(pick["line"])
+        side = pick["side"]
+        player_type = pick.get("player_type", "pitcher")
+        game = pick.get("game", "")
 
-        stat_key, player_type = _STAT_ABBREVS.get(stat_abbrev, (None, "pitcher"))
-        if not stat_key:
-            continue
-
-        matched_name = next(
-            (n for n in box if name_hint in n.lower()), None
-        )
+        name_hint = player.split()[-1].lower()
+        matched_name = next((n for n in box if name_hint in n.lower()), None)
         if not matched_name:
-            print(f"  [pick_lessons] no box match for {name_hint} -- skipped")
+            print(f"  [pick_lessons] no box match for {player} -- skipped")
             continue
 
         actual = _get_actual_from_box(matched_name, stat_key, box)
@@ -322,9 +348,13 @@ RUBRIC_LOG = Path.home() / ".claude/skills/bet-score/mlb-rubric.md"
 
 
 def append_rubric_log(bet: dict, result: str, profit: float | None):
-    """Append a settled bet row to the mlb-rubric.md Data Log."""
+    """Append a settled slip row to the mlb-rubric.md Data Log."""
     try:
+        players_str = _slip_players_str(bet)
+        games_str = _slip_games_str(bet)
+
         fip_flags = []
+        player_names_lower = [p["player"].lower() for p in bet["picks"]] if bet["picks"] else []
         conn = sqlite3.connect(PICKS_DB)
         conn.row_factory = sqlite3.Row
         rows = conn.execute("""
@@ -334,7 +364,8 @@ def append_rubric_log(bet: dict, result: str, profit: float | None):
         """, (bet["date"],)).fetchall()
         conn.close()
         for r in rows:
-            if r["player"].split()[-1].lower() in bet["bet_on"].lower():
+            last = r["player"].split()[-1].lower()
+            if any(last in n for n in player_names_lower) or last in players_str.lower():
                 era, fip = r["season_era"], r["espn_fip"]
                 if era and fip and abs(fip - era) > 0.5:
                     fip_flags.append(f"{'ERA LUCKY' if fip > era else 'ERA UNLUCKY'} {r['player']}")
@@ -342,10 +373,9 @@ def append_rubric_log(bet: dict, result: str, profit: float | None):
         sign = "+" if profit and profit > 0 else ""
         profit_str = f"{sign}{profit:.2f}" if profit is not None else "n/a"
         fip_str = " / ".join(fip_flags) if fip_flags else "none"
-        picks = bet["bet_on"].replace("\n", " + ")
         row = (
-            f"| {bet['date']} | {bet['matchup']} | {bet.get('signal','?')} "
-            f"| {picks} | -- | -- | -- | {result} | {profit_str} | {fip_str} | auto-logged |"
+            f"| {bet['date']} | {games_str} | -- "
+            f"| {players_str} | -- | -- | -- | {result} | {profit_str} | {fip_str} | auto-logged |"
         )
 
         text = RUBRIC_LOG.read_text()
@@ -353,23 +383,24 @@ def append_rubric_log(bet: dict, result: str, profit: float | None):
         header_end = text.find(marker)
         if header_end == -1:
             return
-        # Find end of header row + separator row, insert after
         insert_after = text.find("\n", text.find("\n", header_end) + 1) + 1
         new_text = text[:insert_after] + row + "\n" + text[insert_after:]
         RUBRIC_LOG.write_text(new_text)
-        print(f"Rubric log updated.")
+        print("Rubric log updated.")
     except Exception as e:
         print(f"Rubric log append failed: {e}")
 
 
 def capture_bet_lesson(bet: dict, result: str, profit: float | None) -> None:
-    """Prompt for a lesson on any settled bet and capture to OB1 + second brain."""
+    """Prompt for a lesson on any settled slip and capture to OB1 + second brain."""
     label = "WIN REVIEW" if result == "W" else "LOSS REVIEW"
+    players_str = _slip_players_str(bet)
+    games_str = _slip_games_str(bet)
     print(f"\n--- {label} ---")
-    print(f"Signal: {bet.get('signal', 'n/a')}  |  Pick: {bet['bet_on'].replace(chr(10), ' + ')}")
+    print(f"Picks: {players_str}  |  Games: {games_str}")
 
-    # Pull FIP flags for context
     fip_lines = []
+    player_names_lower = [p["player"].lower() for p in bet["picks"]] if bet["picks"] else []
     try:
         conn = sqlite3.connect(PICKS_DB)
         conn.row_factory = sqlite3.Row
@@ -380,7 +411,8 @@ def capture_bet_lesson(bet: dict, result: str, profit: float | None) -> None:
         """, (bet["date"],)).fetchall()
         conn.close()
         for r in rows:
-            if r["player"].split()[-1].lower() in bet["bet_on"].lower():
+            last = r["player"].split()[-1].lower()
+            if any(last in n for n in player_names_lower) or last in players_str.lower():
                 era, fip = r["season_era"], r["espn_fip"]
                 if era and fip and abs(fip - era) > 0.5:
                     flag = "ERA LUCKY (regression risk)" if fip > era else "ERA UNLUCKY"
@@ -400,30 +432,30 @@ def capture_bet_lesson(bet: dict, result: str, profit: float | None) -> None:
 
     profit_str = f"{profit:.2f}" if profit is not None else "n/a"
     content = (
-        f"[{bet['date']}] bet {result} lesson: {bet['matchup']} | "
-        f"signal={bet.get('signal', '?')} | pick={bet['bet_on'].replace(chr(10), ' + ')} | "
+        f"[{bet['date']}] slip {result} lesson: {games_str} | "
+        f"picks={players_str} | "
         f"profit={profit_str} | lesson={lesson or 'none'}"
     )
     ok = ob1_push(content, {
         "type": "bet_lesson",
         "result": result,
-        "matchup": bet["matchup"],
-        "signal": bet.get("signal", ""),
-        "pick": bet["bet_on"],
+        "matchup": games_str,
+        "signal": "",
+        "pick": players_str,
         "profit": profit,
         "fip_flags": len(fip_lines),
         "lesson": lesson,
         "outcome": "captured" if lesson else "skipped",
         "moved": False,
     })
-    print(f"Loss lesson OB1: {'captured' if ok else 'failed'}")
+    print(f"Lesson OB1: {'captured' if ok else 'failed'}")
 
     if lesson:
         sb_path = Path.home() / "second-brain/sports/insights.md"
         if sb_path.exists():
             entry = (
-                f"## {bet['date']} -- {'Win' if result == 'W' else 'Loss'}: {bet['matchup']}\n"
-                f"**Signal:** {bet.get('signal', '?')}  |  **Pick:** {bet['bet_on'].replace(chr(10), ' + ')}\n"
+                f"## {bet['date']} -- {'Win' if result == 'W' else 'Loss'}: {games_str}\n"
+                f"**Picks:** {players_str}\n"
                 f"**Lesson:** {lesson}\n\n---\n\n"
             )
             sb_path.write_text(entry + sb_path.read_text())
@@ -433,46 +465,43 @@ def capture_bet_lesson(bet: dict, result: str, profit: float | None) -> None:
 def settle_bet(bet_id: int, result: str):
     conn = sqlite3.connect(BETLOG_DB)
     conn.row_factory = sqlite3.Row
-    bet = conn.execute("SELECT * FROM bets WHERE id=?", (bet_id,)).fetchone()
-    if not bet:
-        print(f"Bet {bet_id} not found.")
+    slip = conn.execute("SELECT * FROM slips WHERE id=?", (bet_id,)).fetchone()
+    if not slip:
+        print(f"Slip {bet_id} not found.")
         conn.close()
         return
 
-    stake = bet["stake"]
-    line = bet["line"]
-    profit = None
-
-    if result == "W":
-        if line > 0:
-            profit = round(stake * line / 100, 2)
-        else:
-            profit = round(stake * 100 / abs(line), 2)
-    elif result == "L":
-        profit = -stake
+    entry = slip["entry"]
+    payout = slip["payout"]
+    profit = round(payout - entry, 2) if result == "W" else round(-entry, 2)
+    status = "win" if result == "W" else "loss"
 
     conn.execute(
-        "UPDATE bets SET result=?, profit=? WHERE id=?",
-        (result, profit, bet_id)
+        "UPDATE slips SET status=?, profit=? WHERE id=?",
+        (status, profit, bet_id)
     )
     conn.commit()
 
-    bet_row = dict(conn.execute("SELECT * FROM bets WHERE id=?", (bet_id,)).fetchone())
+    picks = conn.execute(
+        "SELECT * FROM slip_picks WHERE slip_id=? ORDER BY id", (bet_id,)
+    ).fetchall()
+    bet_row = dict(slip)
+    bet_row["picks"] = [dict(p) for p in picks]
     conn.close()
 
-    sign = "+" if profit and profit > 0 else ""
-    print(f"Bet #{bet_id} settled: {result}  profit={sign}{profit}")
+    sign = "+" if profit > 0 else ""
+    print(f"Slip #{bet_id} settled: {result}  profit={sign}{profit:.2f}")
 
     content = build_ob1_content(bet_row, result, profit)
     metadata = {
         "type": "mlb_bet_settled",
         "outcome": "WIN" if result == "W" else "LOSS",
         "profit": profit,
-        "stake": bet_row["stake"],
-        "line": bet_row["line"],
-        "matchup": bet_row["matchup"],
-        "signal": bet_row.get("signal", ""),
-        "moved": profit is not None and profit > 0,
+        "entry": bet_row["entry"],
+        "payout": bet_row["payout"],
+        "matchup": _slip_games_str(bet_row),
+        "signal": "",
+        "moved": profit > 0,
     }
     ok = ob1_push(content, metadata)
     print(f"OB1 capture: {'ok' if ok else 'failed'}")
@@ -489,39 +518,40 @@ def post_discord(message: str):
 
 
 def build_bet_summary(bet: dict) -> tuple[str, str]:
-    """Returns (terminal_text, discord_text) for a single bet."""
-    game_pk = find_game_pk(bet["matchup"], bet["date"])
-    if not game_pk:
-        return f"Bet #{bet['id']}: could not locate game", ""
+    """Returns (terminal_text, discord_text) for a single slip."""
+    players_str = _slip_players_str(bet)
+    games_str = _slip_games_str(bet)
+    unique_games = list(dict.fromkeys(p["game"] for p in bet["picks"] if p.get("game")))
 
-    status = get_game_status(game_pk)
-    score_data = get_linescore(game_pk)
-    box = get_box_stats(game_pk)
-    stat_lines = extract_player_stats(bet["bet_on"], box)
+    terminal_lines = [f"\nSlip #{bet['id']} | {bet['date']} | {players_str}"]
+    discord_lines = []
+    all_final = bool(unique_games)
 
-    score_str = score_data.get("score", "")
-    stats_str = "\n".join(stat_lines)
+    for game_str in unique_games:
+        game_pk = find_game_pk(game_str, bet["date"])
+        if not game_pk:
+            terminal_lines.append(f"  {game_str}: game not found")
+            all_final = False
+            continue
+        status = get_game_status(game_pk)
+        score_data = get_linescore(game_pk)
+        score_str = score_data.get("score", "")
+        terminal_lines.append(f"  {game_str} [{status}] {score_str}")
+        discord_lines.append(f"{game_str}: {score_str} [{status}]")
+        if status != "FINAL":
+            all_final = False
 
-    terminal = (
-        f"\nBet #{bet['id']} | {bet['matchup']} | {status}\n"
-        f"  {score_str}\n"
-        f"  Bet: {bet['bet_on']}\n"
-        f"{stats_str}"
-    )
-
-    if status == "FINAL":
-        settle_hint = f"  → `python settle.py --id {bet['id']} --settle W/L`"
+    discord = ""
+    if all_final:
+        settle_hint = f"→ Settle: `python settle.py --id {bet['id']} --settle W/L`"
         discord = (
-            f"**Bet #{bet['id']} -- FINAL** | {bet['matchup']}\n"
-            f"Score: {score_str}\n"
-            f"Bet: {bet['bet_on']} (line {bet['line']:+d}, stake ${bet['stake']:.0f})\n"
-            f"{chr(10).join(stat_lines)}\n"
+            f"**Slip #{bet['id']} -- FINAL** | {players_str}\n"
+            + "\n".join(discord_lines) + "\n"
+            f"Entry ${bet['entry']:.0f} | Payout ${bet['payout']:.2f}\n"
             f"{settle_hint}"
         )
-    else:
-        discord = ""
 
-    return terminal, discord
+    return "\n".join(terminal_lines), discord
 
 
 def main():
@@ -539,50 +569,84 @@ def main():
     discord_posts = []
 
     for bet in bets:
+        players_str = _slip_players_str(bet)
+        games_str = _slip_games_str(bet)
         print(f"\n{'='*60}")
-        print(f"Bet #{bet['id']}  |  {bet['date']}  |  {bet['matchup']}")
-        print(f"Signal: {bet['signal']}")
-        print(f"Bet:    {bet['bet_on']}")
-        print(f"Line:   {bet['line']:+d}  |  Stake: ${bet['stake']}")
+        print(f"Slip #{bet['id']}  |  {bet['date']}  |  {bet['platform']}")
+        print(f"Picks:  {players_str}")
+        print(f"Entry:  ${bet['entry']:.0f}  |  Payout: ${bet['payout']:.2f}")
+        if bet["boost"]:
+            print(f"Boost:  {bet['boost']}")
 
-        game_pk = find_game_pk(bet["matchup"], bet["date"])
-        if not game_pk:
-            print("  Could not locate game in MLB API.")
-            continue
+        # Per-pick box score lookup -- use unique games from slip_picks
+        unique_games = list(dict.fromkeys(p["game"] for p in bet["picks"] if p.get("game")))
+        if not unique_games and not bet["picks"]:
+            # Legacy slip: no per-pick data, best-effort game lookup skipped
+            print("  (legacy slip -- no per-pick structure, box score unavailable)")
+            unique_games = []
 
-        status = get_game_status(game_pk)
-        score_data = get_linescore(game_pk)
-        print(f"\nGame status: {status}")
-        if score_data.get("score"):
-            print(f"Score: {score_data['score']}")
+        all_final = True
+        all_boxes: dict[str, dict] = {}
+        discord_score_lines = []
 
-        box = get_box_stats(game_pk)
-        stat_lines = extract_player_stats(bet["bet_on"], box)
-        print("\nPick stats:")
-        for line in stat_lines:
-            print(line)
+        for game_str in unique_games:
+            game_pk = find_game_pk(game_str, bet["date"])
+            if not game_pk:
+                print(f"  Could not locate game '{game_str}' in MLB API.")
+                all_final = False
+                continue
 
-        if status == "FINAL":
+            status = get_game_status(game_pk)
+            score_data = get_linescore(game_pk)
+            box = get_box_stats(game_pk)
+            all_boxes.update(box)
+
+            print(f"\n{game_str}  [{status}]")
+            if score_data.get("score"):
+                print(f"  Score: {score_data['score']}")
+                discord_score_lines.append(f"{game_str}: {score_data['score']} [{status}]")
+
+            # Show stats for picks in this game
+            game_picks = [p for p in bet["picks"] if p.get("game") == game_str]
+            for pick in game_picks:
+                name_hint = pick["player"].split()[-1].lower()
+                matched = next((n for n in box if name_hint in n.lower()), None)
+                if matched:
+                    stat_lines = extract_player_stats(
+                        f"{pick['player']} {pick['stat']} {pick['line']} {pick['side']}", box
+                    )
+                    for s in stat_lines:
+                        print(s)
+                else:
+                    print(f"  {pick['player']}: not found in box score")
+
+            if status != "FINAL":
+                all_final = False
+
+        if not unique_games:
+            all_final = False
+
+        if all_final or (not unique_games and args.settle):
             if args.settle:
                 settle_bet(bet["id"], args.settle)
-                print("\nAuto-trigger: pick_lessons.observe per pick:")
-                auto_observe_picks(bet, box, args.settle)
+                if all_boxes:
+                    print("\nAuto-trigger: pick_lessons.observe per pick:")
+                    auto_observe_picks(bet, all_boxes, args.settle)
             else:
-                print(f"\nGame is FINAL. Settle with:")
+                print(f"\nAll games FINAL. Settle with:")
                 print(f"  python settle.py --id {bet['id']} --settle W")
                 print(f"  python settle.py --id {bet['id']} --settle L")
 
             if args.post_discord:
                 msg = (
-                    f"**Bet #{bet['id']} -- FINAL** | {bet['matchup']}\n"
-                    f"Score: {score_data.get('score', '?')}\n"
-                    f"Bet: {bet['bet_on']} (line {bet['line']:+d}, stake ${bet['stake']:.0f})\n"
-                    + "\n".join(stat_lines) + "\n"
+                    f"**Slip #{bet['id']} -- FINAL** | {players_str}\n"
+                    + "\n".join(discord_score_lines) + "\n"
+                    f"Entry ${bet['entry']:.0f} | Payout ${bet['payout']:.2f}\n"
                     f"→ Settle: `python settle.py --id {bet['id']} --settle W/L`"
                 )
                 discord_posts.append(msg)
-        else:
-            print(f"\nGame in progress ({status}). Re-run when final.")
+        elif unique_games:
+            print(f"\nGames still in progress. Re-run when final.")
 
     for msg in discord_posts:
         post_discord(msg)
