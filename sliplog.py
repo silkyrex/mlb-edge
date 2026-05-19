@@ -260,7 +260,7 @@ def cmd_result(args):
                     "actual": actual,
                     "hit": hit,
                     "game": sp["game"] or "",
-                    "reason": sp["reason"] or "",
+                    "reason": sp.get("reason") or "",
                 })
             conn.commit()
 
@@ -335,17 +335,18 @@ def cmd_list(args):
         print(f"{r['id']:<4} {r['date']:<12} {r['picks_count']:<6} {players:<35} {boost:<14} ${r['entry']:>6.2f} ${r['payout']:>8.2f} {r['status']:<8} {pnl}")
         if args.detailed:
             picks = conn.execute(
-                "SELECT player, player_type, stat, line, side, game, actual, hit "
+                "SELECT player, player_type, stat, line, side, game, actual, hit, reason "
                 "FROM slip_picks WHERE slip_id=? ORDER BY id", (r["id"],)
             ).fetchall()
             if picks:
-                for sp in picks:
+                for _sp in picks:
+                    sp = dict(_sp)
                     result_tag = ""
                     if sp["hit"] is not None:
                         result_tag = " HIT" if sp["hit"] else " MISS"
                     actual_tag = f"  -> {sp['actual']}" if sp["actual"] is not None else ""
                     game_tag = f"  ({sp['game']})" if sp["game"] else ""
-                    reason_tag = f"  [{sp['reason']}]" if sp["reason"] else ""
+                    reason_tag = f"  [{sp.get('reason')}]" if sp.get("reason") else ""
                     print(f"      {sp['player']:<28} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}{reason_tag}")
             else:
                 print(f"      (no per-pick structure -- legacy slip, retrofit via 'add-picks')")
@@ -370,13 +371,14 @@ def cmd_picks(args):
     if not picks:
         print("  (no per-pick structure -- legacy slip, retrofit via 'sliplog.py add-picks')")
         return
-    for sp in picks:
+    for _sp in picks:
+        sp = dict(_sp)
         result_tag = ""
         if sp["hit"] is not None:
             result_tag = "  HIT" if sp["hit"] else "  MISS"
         actual_tag = f"  -> {sp['actual']}" if sp["actual"] is not None else "  (pending)"
         game_tag = f"  ({sp['game']})" if sp["game"] else ""
-        reason_tag = f"\n    reason: {sp['reason']}" if sp["reason"] else ""
+        reason_tag = f"\n    reason: {sp.get('reason')}" if sp.get("reason") else ""
         print(f"  {sp['player']:<28} {sp['player_type']:<8} {sp['stat']:<22} {sp['line']:>5} {sp['side']:<7}{actual_tag}{result_tag}{game_tag}{reason_tag}")
 
 
