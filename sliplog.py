@@ -260,7 +260,7 @@ def cmd_result(args):
                     "actual": actual,
                     "hit": hit,
                     "game": sp["game"] or "",
-                    "reason": sp.get("reason") or "",
+                    "reason": sp["reason"] or "",
                 })
             conn.commit()
 
