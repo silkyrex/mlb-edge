@@ -96,6 +96,18 @@ noon PT Discord lean signal (or top-N from prescan)
 
 ## Hard Rules
 
+- **Never click Confirm on an Underdog bet.** Build the slip and enter the amount, then stop. Raymond confirms all bets himself.
+- **Bankroll tiers — run `python sliplog.py summary` before recommending entry size:**
+
+  | Balance     | Max entry/slip |
+  |-------------|----------------|
+  | < $220      | $10            |
+  | $220–$329   | $20            |
+  | $330–$439   | $30            |
+  | $440–$549   | $40            |
+  | $550+       | $50            |
+
+  Never recommend an entry above the tier for the current balance.
 - Never edit mlb.db schema without updating `schema/schema.sql` first.
 - sliplog.db is append-only -- never delete or update settled rows.
 - All Underdog scraping goes through Claude skills (Playwright). No Python scraping.

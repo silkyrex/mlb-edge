@@ -93,7 +93,8 @@ Hard stops -- skip regardless of score:
 
 Slip construction rules:
 - Picks from 2+ different teams
-- Max $50 Flex, max $20 Standard/Power
+- Entry size is bankroll-gated (run `python sliplog.py summary` to check balance):
+  `<$220 → $10 | $220–$329 → $20 | $330–$439 → $30 | $440–$549 → $40 | $550+ → $50`
 - 3-pick on top of 2-pick only if `P(new leg hits | base legs hit) > 1 - (base_mult / new_mult)`
 
 ---
