@@ -33,9 +33,11 @@ noon-1pm  /playwright-underdog        -- log into Underdog (2FA required)
 # Prep and analyze
 python prep.py                              # cache all data for today's games
 python prep.py --check                      # status table: + cached, - missing
-python closer.py                            # 3-agent final round critique
+python closer.py                            # 3-agent debate: Scout+Skeptic (haiku) → Closer (sonnet)
 python closer.py --dry-run                  # verify data brief before agents run
 python closer.py --game "SF Giants @ ATH"   # single game
+python closer.py --model haiku              # full budget run (all agents haiku)
+python closer.py --model opus               # premium run (Closer on opus)
 
 # Log and settle
 python sliplog.py add --entry 20 --payout TBD --picks '[{...}]'

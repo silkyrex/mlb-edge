@@ -75,7 +75,7 @@ noon PT Discord lean signal (or top-N from prescan)
 |---|---|
 | `prescan.py` | Pre-scrape game ranker. Pulls full slate + ESPN FIP + team stats, scores 4-factor rubric, writes `pre_scan_scores`. Run BEFORE Playwright opens to pick top-N games. `--date`, `--top`. |
 | `prep.py` | One-command cache runner. Finds today's scraped games, runs cache_stats → cache_espn (sequential) + cache_news + cache_team (parallel). `--check` for status-only. |
-| `closer.py` | 3-agent final round critique. Scout/Skeptic/Closer + live Statcast + ump + lineup + days rest. `--dry-run`, `--game`, `--model haiku`. |
+| `closer.py` | 3-agent final round critique. Scout/Skeptic always haiku (executor); Closer uses `--model` (default sonnet, critic). Live Statcast + ump + lineup + days rest. `--dry-run`, `--game`, `--model haiku/opus`. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles. |
 | `cache_stats.py` | MLB Stats API → player_recent_stats. Idempotent. |
 | `cache_espn.py` | ESPN API → espn_fip, espn_war, espn_k_bb on player_recent_stats. Run after cache_stats.py. |

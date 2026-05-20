@@ -42,7 +42,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
     p.add_argument("--game", default=None, help="Filter to single game (substring match)")
     p.add_argument("--dry-run", action="store_true", help="Print data brief only, skip agents")
-    p.add_argument("--model", default="sonnet", choices=list(MODEL_IDS), help="Claude model tier")
+    p.add_argument("--model", default="sonnet", choices=list(MODEL_IDS), help="Closer (critic) model tier -- Scout and Skeptic always use haiku")
     return p.parse_args()
 
 
@@ -302,17 +302,30 @@ def run_agent(prompt: str, label: str, model_id: str) -> str:
         print(f"[closer] 'claude' not found in PATH -- cannot run {label}", file=sys.stderr)
         sys.exit(1)
 
-    print(f"[closer] Running {label}...", end=" ", flush=True)
-    result = subprocess.run(
-        [claude_bin, "-p", prompt, "--model", model_id],
-        text=True,
-        capture_output=True,
-        timeout=300,
-    )
-    print("done." if result.returncode == 0 else f"exit {result.returncode}.")
-    if result.returncode != 0 and result.stderr:
-        print(result.stderr[:400], file=sys.stderr)
-    return result.stdout.strip()
+    for attempt in range(2):
+        suffix = " (retry)" if attempt else ""
+        print(f"[closer] Running {label}{suffix}...", end=" ", flush=True)
+        result = subprocess.run(
+            [claude_bin, "-p", prompt, "--model", model_id],
+            text=True,
+            capture_output=True,
+            timeout=300,
+        )
+        print("done." if result.returncode == 0 else f"exit {result.returncode}.")
+        if result.returncode == 0:
+            return result.stdout.strip()
+        stderr_lower = (result.stderr or "").lower()
+        transient = any(x in stderr_lower for x in ["timeout", "connection", "429", "503"])
+        if result.stderr:
+            print(result.stderr[:800], file=sys.stderr)
+        if not transient:
+            print(f"[closer] {label} permanent failure -- aborting.", file=sys.stderr)
+            sys.exit(1)
+        if attempt == 0:
+            print(f"[closer] {label} transient failure -- retrying once...", file=sys.stderr)
+
+    print(f"[closer] {label} failed after 2 attempts -- aborting.", file=sys.stderr)
+    sys.exit(1)
 
 
 SCOUT_PROMPT = """You are a sharp MLB prop analyst with years of experience finding edges in player prop lines.
@@ -529,9 +542,12 @@ def _match_game_ctx(game_str: str, ctx_map: dict[str, dict]) -> dict | None:
         return ctx_map[game_str]
     game_lower = game_str.lower()
     for ctx in ctx_map.values():
-        away_last = ctx.get("away_name", "").split()[-1].lower()
-        home_last = ctx.get("home_name", "").split()[-1].lower()
-        if away_last and home_last and away_last in game_lower and home_last in game_lower:
+        away_words = ctx.get("away_name", "").lower().split()[-2:]
+        home_words = ctx.get("home_name", "").lower().split()[-2:]
+        if not away_words or not home_words:
+            continue
+        if (any(re.search(rf"\b{re.escape(w)}\b", game_lower) for w in away_words) and
+                any(re.search(rf"\b{re.escape(w)}\b", game_lower) for w in home_words)):
             return ctx
     return None
 
@@ -717,15 +733,15 @@ def build_savant_supplement(candidates: list[tuple[str, str, int]]) -> str:
     return "\n".join(lines)
 
 
-def run_scout(data_brief: str, model_id: str) -> str:
-    return run_agent(SCOUT_PROMPT.format(data_brief=data_brief), "Scout", model_id)
+def run_scout(data_brief: str) -> str:
+    return run_agent(SCOUT_PROMPT.format(data_brief=data_brief), "Scout", MODEL_IDS["haiku"])
 
 
-def run_skeptic(data_brief: str, scout_output: str, model_id: str) -> str:
+def run_skeptic(data_brief: str, scout_output: str) -> str:
     return run_agent(
         SKEPTIC_PROMPT.format(data_brief=data_brief, scout_output=scout_output),
         "Skeptic",
-        model_id,
+        MODEL_IDS["haiku"],
     )
 
 
@@ -810,7 +826,8 @@ def print_results(picks: list[dict], scout_output: str, skeptic_output: str) -> 
             print(_wrap(reason))
 
     # Debate summary: count Scout's proposed picks from numbered list
-    numbered = re.findall(r"^\s*\d+\.", scout_output, re.MULTILINE)
+    # matches "1.", "1)", "**1.**", "**1)**" -- Scout varies format run to run
+    numbered = re.findall(r"^\s*\*{0,2}\d+[.)]\*{0,2}", scout_output, re.MULTILINE)
     proposed = len(numbered) if numbered else "?"
     dropped = (proposed - len(picks)) if isinstance(proposed, int) else "?"
     print()
@@ -844,8 +861,8 @@ def main() -> None:
         print(data_brief)
         return
 
-    scout = run_scout(data_brief, model_id)
-    skeptic = run_skeptic(data_brief, scout, model_id)
+    scout = run_scout(data_brief)
+    skeptic = run_skeptic(data_brief, scout)
     candidates = extract_candidate_players(scout, target_date)
     savant = build_savant_supplement(candidates)
     picks = run_closer(data_brief, scout, skeptic, savant, model_id)
