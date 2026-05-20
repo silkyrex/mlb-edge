@@ -90,4 +90,13 @@ python pick_lessons.py edit --rule-key K --hypothesis "revised text"
 
 `closer.py` passes all confirmed rules to Scout in the data brief. Scout uses them as positive evidence for matching picks; Skeptic can challenge if the rule is thin. Closer includes rule confirmation in the `reason` string.
 
-`underdog-mlb-analyze` applies confirmed rules as score modifiers (+15 confirmed / -15 contradicted) -- active once rules exist.
+`underdog-mlb-analyze` applies a data-driven Rule History modifier (Step 1.6 + Step 4):
+
+```
+n = occurrences + counters
+hit_rate = occurrences / n
+confidence = min(n, 15) / 15      # scales from 0 → 1.0 at 15+ observations
+modifier = round(confidence * (hit_rate - 0.5) * 20)   # max +/-10
+```
+
+0 if no matching rule exists. Modifier is shown inline in the pick output so you can see what fired.

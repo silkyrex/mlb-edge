@@ -20,7 +20,10 @@ Signal logic (`matchup.py`): OVER = ELITE offense vs FADE pitcher; UNDER = ELITE
 base = 50
 lean alignment:    +25 aligned / -25 opposed
 market mult:       +10 if >1.04x / +5 if 1.00-1.04x / -5 if 0.95-1.00x / -10 if <0.90x
-research confirm:  +15 confirmed rule / -15 contradicted
+research confirm:  +15 stats/trends confirm / -15 contradict
+rule history:      confidence * (hit_rate - 0.5) * 20, capped +/-10
+                   where confidence = min(n, 15) / 15, n = occurrences + counters
+                   0 if no matching rule in pick_lessons
 grade bonus:       +10 for ELITE pitcher K/PO Higher, FADE offense batter Lower, FADE pitcher ERA Higher
 IL return penalty: -10 for IL-return-today or IL-return-Nd (N <= 7)
 ```
