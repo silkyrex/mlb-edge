@@ -3,8 +3,7 @@
 watch.py -- Three-layer live MLB game scout.
 
 Layer 1  Haiku  : raw field observation on every meaningful event
-Layer 2  Sonnet : betting interpretation at 3-inning checkpoints (after inn 3, 6, 9, extras)
-Layer 3  Sonnet : final analysis + opinionated critical read at game end
+Layer 2  Sonnet : final analysis + opinionated critical read at game end
 
 All output goes to mlb.db (game_scout_log + game_scout_summary) and
 ~/mlb-edge/scout_logs/YYYY-MM-DD_{away}_{home}.md.
@@ -42,9 +41,6 @@ POLL_INTERVAL = 300
 MODEL_HAIKU = "claude-haiku-4-5-20251001"
 MODEL_SONNET = "claude-sonnet-4-6"
 
-# Sonnet fires at the start of these innings (meaning the previous 3-inning block ended)
-SONNET_CHECKPOINTS = {4, 7, 10}
-
 # ---------------------------------------------------------------------------
 # Prompt templates
 # ---------------------------------------------------------------------------
@@ -71,28 +67,6 @@ INSTRUCTIONS BY TRIGGER TYPE:
 - final: One sentence final summary. Include final K totals if pitchers had props going.
 
 Write only the scout note. No headers, no labels."""
-
-SONNET_CHECKPOINT_PROMPT = """You are a sharp MLB betting analyst reviewing a game in progress.
-Read the complete scout log below and give your current betting read.
-
-PRE-GAME CONTEXT:
-{pregame_ctx}
-
-SCOUT LOG (Haiku field observations so far):
-{all_haiku_notes}
-
-CURRENT STATE:
-  Game: {game_str}
-  End of Inning: {checkpoint_inning} | Score: {away_score} - {home_score} (Away - Home)
-  Current pitchers -> Away: {pitcher_away} | Home: {pitcher_home}
-
-Write 4-6 sentences. Cover:
-- What trend is building from these notes?
-- Which pitcher props are still live vs dead at this point?
-- If you were live-betting right now, what is your read?
-- Be specific. Cite numbers from the notes or pre-game context.
-
-Write only the interpretation. No headers, no labels."""
 
 FINAL_ANALYSIS_PROMPT = """You are a professional MLB game analyst. The game is final.
 Read the complete scout log and write the definitive game summary.
@@ -407,22 +381,6 @@ def build_haiku_prompt(
     )
 
 
-def build_sonnet_checkpoint_prompt(
-    game_str: str, current: dict, pregame_ctx: str,
-    all_haiku_notes: str, checkpoint_inning: int
-) -> str:
-    return SONNET_CHECKPOINT_PROMPT.format(
-        pregame_ctx=pregame_ctx,
-        all_haiku_notes=all_haiku_notes or "[no Haiku notes yet]",
-        game_str=game_str,
-        checkpoint_inning=checkpoint_inning,
-        away_score=current["away_score"],
-        home_score=current["home_score"],
-        pitcher_away=current["pitcher_away"] or "unknown",
-        pitcher_home=current["pitcher_home"] or "unknown",
-    )
-
-
 def build_final_analysis_prompt(
     game_str: str, current: dict, pregame_ctx: str, all_notes: str
 ) -> str:
@@ -612,19 +570,6 @@ def write_md_entry(
             f.write("\n**Scout (Haiku):** " + scout_note + "\n")
 
 
-def write_md_checkpoint(
-    log_path: Path, current: dict, checkpoint_inning: int, sonnet_note: str
-) -> None:
-    ts = datetime.now().strftime("%H:%M")
-    with log_path.open("a") as f:
-        f.write(f"\n---\n")
-        f.write(
-            f"### [{ts}] Checkpoint: End Inn {checkpoint_inning} | "
-            f"{current['away_score']} - {current['home_score']}\n\n"
-        )
-        f.write(f"**Sonnet Interpretation:**\n{sonnet_note}\n")
-
-
 def write_md_final_sections(
     log_path: Path, final_analysis: str, critical_read: str
 ) -> None:
@@ -700,13 +645,12 @@ def main() -> None:
 
     prev_state: dict | None = None
     seen_innings: set[int] = set()
-    sonnet_fired_after: set[int] = set()
     tick = 0
     interval = args.interval
 
     print(f"[watch] Watching: {game_str} (game_pk={game_pk}) on {game_date}")
     print(f"[watch] Log: {log_path}")
-    print(f"[watch] Haiku: per-event | Sonnet: checkpoints after inn 3/6/9/extras")
+    print(f"[watch] Haiku: per-event | Sonnet: final analysis + critical read only")
     print(f"[watch] Polling every {interval}s. Ctrl-C to abort.")
 
     while True:
@@ -757,36 +701,6 @@ def main() -> None:
                 f"[{event_type}]\n{scout_note}")
 
         prev_state = current
-
-        # --- Layer 2: Sonnet 3-inning checkpoint ---
-        sonnet_trigger = (
-            (current["inning"] in SONNET_CHECKPOINTS and
-             current["inning"] not in sonnet_fired_after) or
-            (current["inning"] > 9 and current["inning"] not in sonnet_fired_after)
-        )
-        if sonnet_trigger and event_type != "final":
-            sonnet_fired_after.add(current["inning"])
-            checkpoint_inning = current["inning"] - 1
-            all_haiku = get_all_scout_notes(conn, game_pk)
-            s_prompt = build_sonnet_checkpoint_prompt(
-                game_str, current, pregame_ctx, all_haiku, checkpoint_inning
-            )
-            print(
-                f"[watch] Sonnet checkpoint (after inn {checkpoint_inning})...",
-                end=" ", flush=True,
-            )
-            sonnet_note = call_model(s_prompt, MODEL_SONNET, "Sonnet-checkpoint", 120)
-            print("done." if sonnet_note else "failed.")
-            if sonnet_note:
-                write_db_row(conn, game_pk, game_str, current,
-                             "sonnet_checkpoint", None, sonnet_note)
-                conn.commit()
-                write_md_checkpoint(log_path, current, checkpoint_inning, sonnet_note)
-                if webhook:
-                    discord_push(webhook,
-                        f"**Checkpoint: After Inn {checkpoint_inning} | "
-                        f"{game_str} {current['away_score']}-{current['home_score']}**\n"
-                        f"{sonnet_note}")
 
         # --- Game over ---
         if event_type == "final" or current["inning"] > 18:
