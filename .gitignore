@@ -1,4 +1,5 @@
 mlb.db
+scout_logs/*.md
 sliplog.db
 picks.db
 betlog.db
