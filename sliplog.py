@@ -78,6 +78,23 @@ CREATE TABLE IF NOT EXISTS cash_txns (
     notes       TEXT,
     logged_at   TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS edge_performance (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    edge_key      TEXT NOT NULL,
+    slip_pick_id  INTEGER REFERENCES slip_picks(id),
+    date          TEXT NOT NULL,
+    batter        TEXT,
+    pitcher       TEXT,
+    stat          TEXT,
+    side          TEXT,
+    hit           INTEGER,
+    notes         TEXT,
+    tier_grades   TEXT,
+    logged_at     TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_ep_edge_key ON edge_performance(edge_key);
+CREATE INDEX IF NOT EXISTS idx_ep_pick_id  ON edge_performance(slip_pick_id);
 """
 
 
@@ -117,6 +134,31 @@ def _insert_slip_picks(conn, slip_id: int, picks: list[dict]) -> None:
             "INSERT OR IGNORE INTO slip_picks (slip_id, player, player_type, stat, line, side, game, reason) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (slip_id, v["player"], v["player_type"], v["stat"], v["line"], v["side"], v["game"], v["reason"]),
+        )
+    conn.commit()
+
+
+def _insert_edge_performance(conn, slip_id: int, picks: list[dict],
+                              edge_key: str, bet_date: str) -> None:
+    """Insert pending edge_performance rows for each pick in the slip."""
+    pick_rows = conn.execute(
+        "SELECT id, player, player_type, stat, side, game FROM slip_picks WHERE slip_id=?",
+        (slip_id,)
+    ).fetchall()
+    pick_id_map = {r["player"]: r["id"] for r in pick_rows}
+    for p in picks:
+        player = p["player"]
+        # Determine batter/pitcher names for the row
+        batter  = player if p["player_type"] == "batter" else None
+        pitcher = player if p["player_type"] == "pitcher" else None
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO edge_performance
+                (edge_key, slip_pick_id, date, batter, pitcher, stat, side)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (edge_key, pick_id_map.get(player), bet_date,
+             batter, pitcher, p["stat"], p["side"]),
         )
     conn.commit()
 
@@ -164,6 +206,10 @@ def cmd_add(args):
 
     if picks:
         _insert_slip_picks(conn, slip_id, picks)
+
+    if picks and getattr(args, "edge_key", None):
+        _insert_edge_performance(conn, slip_id, picks, args.edge_key,
+                                 args.date or date.today().isoformat())
 
     boost_str = f" [{boost}]" if boost else ""
     slip_date = args.date or date.today().isoformat()
@@ -268,11 +314,12 @@ def cmd_result(args):
     conn.close()
 
     # Call pick_lessons.observe per pick (post-commit, so DB state is consistent)
+    lesson_map: dict[str, str] = {}  # player -> lesson text for edge_performance
     if triggered_picks:
         print(f"\nAuto-trigger: pick_lessons.observe for {len(triggered_picks)} pick(s):")
         for tp in triggered_picks:
             ctx = json.dumps({"reason": tp["reason"]}) if tp.get("reason") else None
-            _pl_observe(
+            result = _pl_observe(
                 player=tp["player"],
                 player_type=tp["player_type"],
                 stat=tp["stat"],
@@ -284,6 +331,12 @@ def cmd_result(args):
                 date_str=slip["date"],
                 extra_context=json.loads(ctx) if ctx else None,
             )
+            if result:
+                rule_key, pl_status = result
+                lesson_map[tp["player"]] = f"{rule_key} | {pl_status}"
+
+    # Close edge_performance rows for settled picks
+    _close_edge_performance(triggered_picks, lesson_map)
 
     try:
         _notion.sync_slip(args.id)
@@ -306,6 +359,30 @@ def cmd_result(args):
         _sync_sb.sync()
     except Exception as e:
         print(f"SB sync failed (non-fatal): {e}")
+
+
+def _close_edge_performance(triggered_picks: list[dict], lesson_map: dict[str, str]) -> None:
+    """Update edge_performance rows with hit result + lesson note after settle."""
+    if not triggered_picks:
+        return
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    for tp in triggered_picks:
+        notes = lesson_map.get(tp["player"])
+        conn.execute(
+            """
+            UPDATE edge_performance
+               SET hit = ?, notes = COALESCE(?, notes)
+             WHERE slip_pick_id = (
+                 SELECT id FROM slip_picks WHERE player = ? AND hit IS NOT NULL
+                 ORDER BY id DESC LIMIT 1
+             )
+               AND hit IS NULL
+            """,
+            (1 if tp["hit"] else 0, notes, tp["player"]),
+        )
+    conn.commit()
+    conn.close()
 
 
 def _lookup_outcome(outcomes: dict, player_name: str) -> float | None:
@@ -483,6 +560,9 @@ def main():
     p_add.add_argument("--multiplier", default=None, help="e.g. '9.42x'")
     p_add.add_argument("--date", default=None, help="YYYY-MM-DD (default: today)")
     p_add.add_argument("--notes", default=None)
+    p_add.add_argument("--edge-key", default=None,
+                       help='Edge key from mismatch.py e.g. "elite_batter_fade_pitcher__hrbi_higher". '
+                            'Inserts a pending row in edge_performance per pick.')
 
     p_ap = sub.add_parser("add-picks", help="Retrofit per-pick structure to an existing slip")
     p_ap.add_argument("--slip-id", type=int, required=True)

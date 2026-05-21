@@ -219,6 +219,25 @@ def _build_prescan_block(game_date: str, conn_path: Path) -> str:
     return "\n".join(lines)
 
 
+def _build_edge_track_block() -> str:
+    """Return a compact PRESS/HOLD/DROP edge status block for Discord."""
+    try:
+        from edge_track import compute_edge_status, EDGE_KEY_LABELS, _signal_emoji
+        results = compute_edge_status()
+        if not any(r["total"] > 0 for r in results):
+            return ""
+        lines = ["\n**📊 Edge Tracker**"]
+        for r in results:
+            label = EDGE_KEY_LABELS.get(r["edge_key"], r["edge_key"])[:40]
+            sig = _signal_emoji(r["signal"])
+            n_str = f"{r['wins']}/{r['total']}" if r["total"] else "0/0"
+            pct = f"{r['hit_pct']:.0f}%" if r["total"] else "--"
+            lines.append(f"  {sig}  {label:<40}  {n_str:>5}  {pct}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"\n_Edge tracker unavailable: {e}_"
+
+
 def build_brief(game_date: str) -> str:
     games = get_schedule(game_date)
     if not games:
@@ -324,6 +343,11 @@ def build_brief(game_date: str) -> str:
     prescan_block = _build_prescan_block(game_date, conn_path=PICKS_DB)
     if prescan_block:
         lines.append(prescan_block)
+
+    # Edge tracker: PRESS / HOLD / DROP per edge key
+    edge_block = _build_edge_track_block()
+    if edge_block:
+        lines.append(edge_block)
 
     brief_text = "\n".join(lines)
 

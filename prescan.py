@@ -337,7 +337,40 @@ def score_game(game: dict, season: str, espn_map: dict[str, dict]) -> dict:
     if rainout_risk:
         certainty = min(certainty, 2)  # collapse certainty
 
-    total = pitcher_edge * 0.35 + k_gap * 0.25 + venue_score * 0.20 + certainty * 0.20
+    # 5. Mismatch bonus (additive, up to +4.0):
+    # Rewards FADE pitcher + contact lineup (H+R+RBI edge) and ELITE pitcher + K-prone lineup.
+    # Fixes a gap in the original formula: pitcher_edge penalizes FADE pitchers,
+    # but FADE pitcher games are exactly where H+R+RBI props have edge.
+    mismatch_bonus = 0.0
+    mismatch_type = None
+    fade_grade = min(g1, g2)
+    elite_grade = max(g1, g2)
+
+    if fade_grade <= 3:
+        # FADE pitcher present — identify which offense faces them
+        if g1 <= 3:
+            batter_k_pct = ht_k_pct  # away pitcher is FADE, home team bats
+        else:
+            batter_k_pct = at_k_pct  # home pitcher is FADE, away team bats
+        batter_k = batter_k_pct if batter_k_pct is not None else 22.0
+        # Contact bonus: 22% K = baseline; every pp below adds 0.25 (max +2.5 at 12%)
+        contact_bonus = max(0.0, (22.0 - batter_k) * 0.25)
+        mismatch_bonus = 1.5 + contact_bonus  # base 1.5 + up to 2.5
+        mismatch_type = "hrbi_edge"
+
+    if elite_grade >= 9:
+        # ELITE pitcher present — check if opposing lineup is K-prone
+        if g1 >= 9:
+            opposing_k = ht_k_pct  # away is elite, home bats
+        else:
+            opposing_k = at_k_pct  # home is elite, away bats
+        if opposing_k is not None and opposing_k >= 24.0:
+            k_bonus = 1.5
+            if mismatch_bonus < k_bonus:
+                mismatch_bonus = k_bonus
+                mismatch_type = "bk_edge"
+
+    total = pitcher_edge * 0.35 + k_gap * 0.25 + venue_score * 0.20 + certainty * 0.20 + mismatch_bonus
     if rainout_risk:
         total *= 0.3  # rainout dampener -- skip these games
 
@@ -361,6 +394,8 @@ def score_game(game: dict, season: str, espn_map: dict[str, dict]) -> dict:
             "postponed": postponed,
             "weather": weather,
             "rainout_risk": rainout_risk,
+            "mismatch_bonus": round(mismatch_bonus, 2),
+            "mismatch_type": mismatch_type,
         },
     }
 
@@ -394,7 +429,13 @@ def generate_reason(row: dict) -> str:
         venue_str = "neutral park"
 
     rain = " | ⚠️ rain risk" if c.get("rainout_risk") else ""
-    return f"{away_p} ({away_tier}) vs {home_p} ({home_tier}) | {k_gap_str} | {venue_str}{rain}"
+    mismatch = c.get("mismatch_type")
+    mismatch_str = ""
+    if mismatch == "hrbi_edge":
+        mismatch_str = " | ⚡ H+R+RBI edge"
+    elif mismatch == "bk_edge":
+        mismatch_str = " | ⚡ Batter K edge"
+    return f"{away_p} ({away_tier}) vs {home_p} ({home_tier}) | {k_gap_str} | {venue_str}{mismatch_str}{rain}"
 
 
 def persist(target_date: str, results: list[dict]):

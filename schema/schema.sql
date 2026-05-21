@@ -277,3 +277,44 @@ CREATE TABLE IF NOT EXISTS game_scout_summary (
     critical_read  TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_gss_game_pk ON game_scout_summary(game_pk);
+
+-- Mismatch candidates (mlb.db, managed by mismatch.py)
+-- Pre-game ELITE vs FADE pairings. Written by mismatch.py before closer.py runs.
+-- Closer.py reads this as Scout candidate input instead of full-slate search.
+CREATE TABLE IF NOT EXISTS mismatch_candidates (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    date          TEXT NOT NULL,
+    game          TEXT NOT NULL,
+    player        TEXT NOT NULL,
+    player_type   TEXT NOT NULL,       -- 'pitcher' | 'batter'
+    edge_key      TEXT NOT NULL,       -- e.g. 'elite_batter_fade_pitcher__hrbi_higher'
+    bet_category  TEXT NOT NULL,       -- e.g. 'Hits + Runs + RBIs'
+    bet_direction TEXT NOT NULL,       -- 'Higher' | 'Lower'
+    rank          INTEGER NOT NULL,    -- 1 = highest priority
+    tier_grades   TEXT,                -- JSON: {batter_tier, pitcher_tier, l15_hrbi, era, fip, ...}
+    created_at    TEXT DEFAULT (datetime('now')),
+    UNIQUE(date, game, player, edge_key)
+);
+CREATE INDEX IF NOT EXISTS idx_mc_date    ON mismatch_candidates(date);
+CREATE INDEX IF NOT EXISTS idx_mc_game    ON mismatch_candidates(game, date);
+
+-- Edge performance tracker (sliplog.db, managed by sliplog.py + edge_track.py)
+-- Every placed pick tagged with edge_key. Settled by sliplog.py result.
+-- pick_lessons lesson text written back after settle.
+-- NOTE: lives in sliplog.db, not mlb.db. Shown here for reference.
+CREATE TABLE IF NOT EXISTS edge_performance (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    edge_key      TEXT NOT NULL,
+    slip_pick_id  INTEGER,             -- FK -> slip_picks.id (set on add)
+    date          TEXT NOT NULL,
+    batter        TEXT,
+    pitcher       TEXT,
+    stat          TEXT,
+    side          TEXT,
+    hit           INTEGER,             -- NULL=pending, 1=win, 0=loss
+    notes         TEXT,                -- lesson text from pick_lessons after settle
+    tier_grades   TEXT,                -- JSON snapshot of tier grades at time of bet
+    logged_at     TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_ep_edge_key  ON edge_performance(edge_key);
+CREATE INDEX IF NOT EXISTS idx_ep_pick_id   ON edge_performance(slip_pick_id);
