@@ -110,6 +110,7 @@ noon PT Discord lean signal (or top-N from prescan)
   | $550+       | $50            |
 
   Never recommend an entry above the tier for the current balance.
+- **Any auto-running job must have a failure alert before it is considered done.** Silent failure = not shipped. Discord ping, health check, or EXIT trap -- pick one. If it runs unattended and nothing tells you it failed, the build is incomplete.
 - Never edit mlb.db schema without updating `schema/schema.sql` first.
 - sliplog.db is append-only -- never delete or update settled rows.
 - All Underdog scraping goes through Claude skills (Playwright). No Python scraping.
