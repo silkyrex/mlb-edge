@@ -223,13 +223,15 @@ def cmd_add(args):
             print(f"    {p['player']} {p['stat']} {p['line']} {p['side']}{game_tag}{reason_tag}")
     conn.close()
 
+    edge_key = getattr(args, "edge_key", None)
     _ob1_push(
         f"underdog slip placed: {', '.join(players)} | date={slip_date} slip_id={slip_id} "
         f"picks={len(players)} entry=${args.entry:.0f} payout=${args.payout:.2f} "
-        f"boost={boost or 'none'} multiplier={args.multiplier or '--'}",
+        f"boost={boost or 'none'} multiplier={args.multiplier or '--'}"
+        + (f" edge_key={edge_key}" if edge_key else ""),
         {"type": "underdog_slip_placed", "slip_id": slip_id, "date": slip_date,
          "players": players, "picks_count": len(players), "entry": args.entry,
-         "payout": args.payout, "boost": boost, "agent": "sliplog"},
+         "payout": args.payout, "boost": boost, "edge_key": edge_key, "agent": "sliplog"},
     )
 
 
@@ -346,13 +348,24 @@ def cmd_result(args):
         print(f"Notion sync failed (non-fatal): {e}")
 
     players = json.loads(slip["players"])
+    # Pull edge_key from edge_performance if this slip has one
+    conn_ep = sqlite3.connect(DB_PATH)
+    ep_row = conn_ep.execute(
+        "SELECT edge_key FROM edge_performance WHERE slip_pick_id IN "
+        "(SELECT id FROM slip_picks WHERE slip_id=?) LIMIT 1", (args.id,)
+    ).fetchone()
+    conn_ep.close()
+    slip_edge_key = ep_row["edge_key"] if ep_row else None
+
     _ob1_push(
         f"underdog slip outcome: {', '.join(players)} | date={slip['date']} slip_id={args.id} "
         f"picks={slip['picks_count']} entry=${slip['entry']:.0f} payout=${slip['payout']:.2f} "
-        f"result={result} profit={sign}${abs(profit):.2f} boost={slip['boost'] or 'none'}",
+        f"result={result} profit={sign}${abs(profit):.2f} boost={slip['boost'] or 'none'}"
+        + (f" edge_key={slip_edge_key}" if slip_edge_key else ""),
         {"type": "underdog_slip_outcome", "slip_id": args.id, "date": slip["date"],
          "players": players, "result": result, "profit": profit,
-         "entry": slip["entry"], "payout": slip["payout"], "agent": "sliplog"},
+         "entry": slip["entry"], "payout": slip["payout"],
+         "edge_key": slip_edge_key, "agent": "sliplog"},
     )
 
     try:
