@@ -89,7 +89,9 @@ noon PT Discord lean signal (or top-N from prescan)
 | `player.py` | Per-pitcher start log / per-batter game log + splits / head-to-head. |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player. |
 | `notion_sync.py` | Sync slips + P&L to Notion. Auto-triggered by sliplog.py result. |
-| `settle.py` | Show stats + settle open bets. `--id N --settle W/L`. Pushes `type=mlb_bet_settled` to OB1, then prompts for a lesson on every settle (WIN or LOSS). Lesson captures `type=bet_lesson` to OB1 + sports/insights.md. FIP flags shown for context. |
+| `settle.py` | Show stats + settle open bets. `--id N --settle W/L [--payout X]`. `--payout` overrides stored payout for flex/partial wins. Pushes `type=mlb_bet_settled` to OB1, prompts for lesson on every settle. |
+| `mlb_api.py` | MLB Stats API helpers. `find_game_pk`, `get_box_stats`, `get_game_status`, `get_linescore`. Team abbreviations resolved at runtime from `/api/v1/teams` (handles relocations). Import from here, not settle.py. |
+| `box_stats.py` | Box score stat extraction + pick_lessons observation. `extract_player_stats`, `get_actual_from_box`, `auto_observe_picks`. |
 | `ob1.py` | Shared OB1 push helper. `from ob1 import ob1_push`. All scripts use this -- never the HTTP MCP path. |
 
 ---

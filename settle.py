@@ -11,21 +11,19 @@ Usage:
 import argparse
 import json
 import os
-import re
-import requests
 import sqlite3
 from datetime import date as date_cls
 from pathlib import Path
 from dotenv import load_dotenv
 
-from pick_lessons import observe as _pl_observe
 from ob1 import ob1_push
+from mlb_api import find_game_pk, get_box_stats, get_game_status, get_linescore
+from box_stats import extract_player_stats, get_actual_from_box, auto_observe_picks
 
 load_dotenv(Path(__file__).parent / ".env")
 
 BETLOG_DB = Path(__file__).parent / "sliplog.db"
 PICKS_DB = Path(__file__).parent / "mlb.db"
-BASE = "https://statsapi.mlb.com/api/v1"
 WEBHOOK_URL = os.getenv("SPORTS_WEBHOOK_URL", "")
 
 
@@ -51,151 +49,6 @@ def get_open_bets(bet_id: int | None = None) -> list[dict]:
         result.append(slip)
     conn.close()
     return result
-
-
-def find_game_pk(matchup: str, game_date: str) -> int | None:
-    """Match free-text matchup to a game on the given date."""
-    words = [w.lower() for w in re.split(r"[\s@/]+", matchup) if len(w) > 2]
-    r = requests.get(f"{BASE}/schedule", params={"sportId": 1, "date": game_date}, timeout=10)
-    if r.status_code != 200:
-        return None
-    for d in r.json().get("dates", []):
-        for game in d.get("games", []):
-            teams = game["teams"]
-            names = (
-                teams["away"]["team"]["name"].lower() +
-                teams["home"]["team"]["name"].lower()
-            )
-            if sum(1 for w in words if w in names) >= 2:
-                return game["gamePk"]
-    return None
-
-
-def get_box_stats(game_pk: int) -> dict:
-    """Return {player_name: {batting: {...}, pitching: {...}}} for all players."""
-    r = requests.get(f"{BASE}/game/{game_pk}/boxscore", timeout=10)
-    if r.status_code != 200:
-        return {}
-    result = {}
-    for side in ("home", "away"):
-        for p in r.json().get("teams", {}).get(side, {}).get("players", {}).values():
-            name = p["person"]["fullName"]
-            result[name] = {
-                "batting": p.get("stats", {}).get("batting", {}),
-                "pitching": p.get("stats", {}).get("pitching", {}),
-            }
-    return result
-
-
-def get_game_status(game_pk: int) -> str:
-    r = requests.get(f"{BASE}/schedule", params={"sportId": 1, "gamePk": game_pk}, timeout=10)
-    if r.status_code != 200:
-        return "unknown"
-    for d in r.json().get("dates", []):
-        for g in d.get("games", []):
-            if g["gamePk"] == game_pk:
-                ls = g.get("linescore", {})
-                state = g["status"]["detailedState"]
-                inning = ls.get("currentInning", "")
-                inn_state = ls.get("inningState", "")
-                if state in ("Final", "Game Over"):
-                    return "FINAL"
-                if inning:
-                    return f"{inn_state} {inning}"
-                return state
-    return "unknown"
-
-
-def get_linescore(game_pk: int) -> dict:
-    r = requests.get(f"{BASE}/schedule", params={"sportId": 1, "gamePk": game_pk, "hydrate": "linescore"}, timeout=10)
-    if r.status_code != 200:
-        return {}
-    for d in r.json().get("dates", []):
-        for g in d.get("games", []):
-            if g["gamePk"] == game_pk:
-                teams = g["teams"]
-                ls = g.get("linescore", {})
-                away = teams["away"]["team"]["name"]
-                home = teams["home"]["team"]["name"]
-                away_r = teams["away"].get("score", "?")
-                home_r = teams["home"].get("score", "?")
-                return {"score": f"{away} {away_r}  {home} {home_r}", "linescore": ls}
-    return {}
-
-
-def extract_player_stats(bet_on: str, box: dict) -> list[str]:
-    """
-    Parse the bet_on string for player names and pull their relevant stats.
-    Returns list of formatted stat lines.
-    """
-    lines = []
-    # Split multi-pick slips by '+' or newline
-    picks = re.split(r"\s*\+\s*|\n", bet_on)
-
-    for pick in picks:
-        pick = pick.strip()
-        if not pick:
-            continue
-
-        # Try to match player name in box stats
-        matched_name = None
-        matched_stats = None
-        for name, stats in box.items():
-            # Check if any word of the player name appears in the pick string
-            last = name.split()[-1]
-            first = name.split()[0]
-            if last.lower() in pick.lower() or first.lower() in pick.lower():
-                matched_name = name
-                matched_stats = stats
-                break
-
-        if not matched_name:
-            lines.append(f"  {pick}  →  player not found in box score")
-            continue
-
-        bat = matched_stats["batting"]
-        pit = matched_stats["pitching"]
-
-        # Determine what stat to show based on pick text
-        pick_lower = pick.lower()
-        stat_lines = []
-
-        if "strikeout" in pick_lower or "ks" in pick_lower or " k " in pick_lower:
-            if pit.get("strikeOuts") is not None:
-                stat_lines.append(f"K={pit['strikeOuts']}")
-            if bat.get("strikeOuts") is not None:
-                stat_lines.append(f"Batter K={bat['strikeOuts']}")
-        if "earned run" in pick_lower or "era" in pick_lower:
-            stat_lines.append(f"ER={pit.get('earnedRuns','?')}  IP={pit.get('inningsPitched','?')}")
-        if "hits allowed" in pick_lower:
-            stat_lines.append(f"H allowed={pit.get('hits','?')}")
-        if "pitching out" in pick_lower:
-            outs = int(float(pit.get("inningsPitched", 0) or 0) * 3) if pit.get("inningsPitched") else "?"
-            stat_lines.append(f"Pitching Outs={outs}")
-        if "h+r+rbi" in pick_lower or "h + r + rbi" in pick_lower:
-            h = bat.get("hits", 0)
-            r = bat.get("runs", 0)
-            rbi = bat.get("rbi", 0)
-            stat_lines.append(f"H+R+RBI={h+r+rbi} ({h}H {r}R {rbi}RBI)")
-        if "hits" in pick_lower and "allowed" not in pick_lower and "h+r" not in pick_lower:
-            stat_lines.append(f"Hits={bat.get('hits','?')}")
-        if "total bases" in pick_lower:
-            stat_lines.append(f"TB={bat.get('totalBases','?')}")
-        if "home run" in pick_lower:
-            stat_lines.append(f"HR={bat.get('homeRuns','?')}")
-
-        if not stat_lines:
-            # Show summary
-            if pit.get("inningsPitched"):
-                stat_lines.append(f"IP={pit['inningsPitched']} ER={pit.get('earnedRuns','?')} K={pit.get('strikeOuts','?')}")
-            else:
-                stat_lines.append(f"AB={bat.get('atBats','?')} H={bat.get('hits','?')} K={bat.get('strikeOuts','?')}")
-
-        lines.append(f"  {pick}")
-        lines.append(f"    {matched_name}: {' | '.join(stat_lines)}")
-
-    return lines
-
 
 
 def _slip_players_str(bet: dict) -> str:
@@ -258,93 +111,6 @@ def build_ob1_content(bet: dict, result: str, profit: float | None) -> str:
     return "\n".join(lines)
 
 
-_STAT_ABBREVS = {
-    "ks": ("Strikeouts", "pitcher"),
-    "po": ("Pitching Outs", "pitcher"),
-    "er": ("Earned Runs", "pitcher"),
-    "h+r+rbi": ("Hits + Runs + RBIs", "batter"),
-    "tb": ("Total Bases", "batter"),
-    "hr": ("Home Runs", "batter"),
-}
-
-_PICK_RE = re.compile(
-    r"(?P<name>[A-Z][a-zA-Z\-']+(?:\s+[A-Z][a-zA-Z\-']+)*)\s+"
-    r"(?P<stat>[A-Za-z+]+(?:\+[A-Za-z]+)*)\s+"
-    r"(?P<line>\d+(?:\.\d+)?)\s+"
-    r"(?P<side>Higher|Lower)",
-    re.IGNORECASE,
-)
-
-
-def _get_actual_from_box(matched_name: str, stat_key: str, box: dict) -> float | None:
-    """Pull the numeric actual for a stat from the box score entry."""
-    stats = box.get(matched_name, {})
-    pit = stats.get("pitching", {})
-    bat = stats.get("batting", {})
-    if stat_key == "Strikeouts":
-        v = pit.get("strikeOuts")
-        return float(v) if v is not None else None
-    if stat_key == "Pitching Outs":
-        ip = pit.get("inningsPitched")
-        return round(float(ip) * 3, 0) if ip else None
-    if stat_key == "Earned Runs":
-        v = pit.get("earnedRuns")
-        return float(v) if v is not None else None
-    if stat_key == "Hits + Runs + RBIs":
-        h = bat.get("hits", 0) or 0
-        r = bat.get("runs", 0) or 0
-        rbi = bat.get("rbi", 0) or 0
-        return float(h + r + rbi)
-    if stat_key == "Total Bases":
-        v = bat.get("totalBases")
-        return float(v) if v is not None else None
-    if stat_key == "Home Runs":
-        v = bat.get("homeRuns")
-        return float(v) if v is not None else None
-    return None
-
-
-def auto_observe_picks(bet: dict, box: dict, result: str) -> None:
-    """Call pick_lessons.observe for each structured pick using box score data."""
-    if not bet["picks"]:
-        print("  [pick_lessons] no per-pick structure -- skipped")
-        return
-
-    for pick in bet["picks"]:
-        player = pick["player"]
-        stat_key = pick["stat"]
-        line = float(pick["line"])
-        side = pick["side"]
-        player_type = pick.get("player_type", "pitcher")
-        game = pick.get("game", "")
-
-        name_hint = player.split()[-1].lower()
-        matched_name = next((n for n in box if name_hint in n.lower()), None)
-        if not matched_name:
-            print(f"  [pick_lessons] no box match for {player} -- skipped")
-            continue
-
-        actual = _get_actual_from_box(matched_name, stat_key, box)
-        if actual is None:
-            print(f"  [pick_lessons] no actual for {matched_name} {stat_key} -- skipped")
-            continue
-
-        hit = (actual > line) if side == "Higher" else (actual < line)
-        _pl_observe(
-            player=matched_name,
-            player_type=player_type,
-            stat=stat_key,
-            line=line,
-            side=side,
-            actual=actual,
-            hit=hit,
-            game=game,
-            date_str=bet["date"],
-        )
-        print(f"  [pick_lessons] {matched_name} {stat_key} {line} {side} -> actual={actual}  {'HIT' if hit else 'MISS'}")
-
-
-RUBRIC_LOG = Path.home() / ".claude/skills/bet-score/mlb-rubric.md"
 
 
 def append_rubric_log(bet: dict, result: str, profit: float | None):
@@ -462,7 +228,7 @@ def capture_bet_lesson(bet: dict, result: str, profit: float | None) -> None:
             print("Lesson written to sports/insights.md")
 
 
-def settle_bet(bet_id: int, result: str):
+def settle_bet(bet_id: int, result: str, actual_payout: float | None = None):
     conn = sqlite3.connect(BETLOG_DB)
     conn.row_factory = sqlite3.Row
     slip = conn.execute("SELECT * FROM slips WHERE id=?", (bet_id,)).fetchone()
@@ -472,13 +238,13 @@ def settle_bet(bet_id: int, result: str):
         return
 
     entry = slip["entry"]
-    payout = slip["payout"]
+    payout = actual_payout if actual_payout is not None else slip["payout"]
     profit = round(payout - entry, 2) if result == "W" else round(-entry, 2)
     status = "win" if result == "W" else "loss"
 
     conn.execute(
-        "UPDATE slips SET status=?, profit=? WHERE id=?",
-        (status, profit, bet_id)
+        "UPDATE slips SET status=?, profit=?, payout=? WHERE id=?",
+        (status, profit, payout, bet_id)
     )
     conn.commit()
 
@@ -558,6 +324,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--id", type=int, help="Specific bet ID")
     parser.add_argument("--settle", choices=["W", "L"], help="Settle directly without prompting")
+    parser.add_argument("--payout", type=float, default=None, help="Actual payout received (overrides stored payout; use for flex/partial wins)")
     parser.add_argument("--post-discord", action="store_true", help="Post final-game summaries to Discord")
     args = parser.parse_args()
 
@@ -628,7 +395,7 @@ def main():
 
         if all_final or (not unique_games and args.settle):
             if args.settle:
-                settle_bet(bet["id"], args.settle)
+                settle_bet(bet["id"], args.settle, actual_payout=args.payout)
                 if all_boxes:
                     print("\nAuto-trigger: pick_lessons.observe per pick:")
                     auto_observe_picks(bet, all_boxes, args.settle)
