@@ -89,12 +89,11 @@ python watch.py "SF Giants @ Athletics" --date 2026-05-20
 
 What it does:
 - **Haiku** writes a 2-4 sentence field note on every meaningful event (run scored, pitching change, late inning, extras)
-- **Sonnet** reads all Haiku notes after innings 3, 6, 9, and each extra inning -- gives a rolling prop/trend betting read, pushes to Discord
 - **Sonnet final analysis + critical read** fire at game end -- both push to Discord
 
 Output lands at `scout_logs/YYYY-MM-DD_{away}_{home}.md`. The `game_scout_summary` table in mlb.db stores the final analysis and critical read for future reference.
 
-Cost: ~$2.86/game.
+Cost: ~$1/game.
 
 ---
 

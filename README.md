@@ -1,6 +1,6 @@
 # mlb-edge
 
-MLB player prop betting system for Underdog pick'em. Scrapes lines, caches stats, runs a 3-agent debate to find the highest-confidence picks each day. watch.py adds a live game scout layer -- three-agent analysis running from first pitch to final out.
+MLB player prop betting system for Underdog pick'em. Scrapes lines, caches stats, runs a 3-agent debate to find the highest-confidence picks each day. watch.py adds a live game scout layer -- Haiku per-event notes + Sonnet final analysis and critical read at game end (~$1/game).
 
 See `docs/FLOW.md` for the step-by-step game day runbook.
 
