@@ -240,3 +240,23 @@ CREATE TABLE IF NOT EXISTS pre_scan_scores (
     UNIQUE(date, game)
 );
 CREATE INDEX IF NOT EXISTS idx_pss_date ON pre_scan_scores(date);
+
+-- Live game scout log (mlb.db, managed by watch.py)
+-- One row per poll tick. scout_note populated only on meaningful events.
+-- event_type values: tick | run_scored | pitching_change | late_inning | extras | final
+CREATE TABLE IF NOT EXISTS game_scout_log (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_pk      INTEGER NOT NULL,
+    game         TEXT NOT NULL,
+    ts           TEXT NOT NULL,
+    inning       INTEGER,
+    half         TEXT,
+    away_score   INTEGER,
+    home_score   INTEGER,
+    pitcher_home TEXT,
+    pitcher_away TEXT,
+    event_type   TEXT,
+    raw_state    TEXT,
+    scout_note   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_game_scout_log_game_pk ON game_scout_log(game_pk);
