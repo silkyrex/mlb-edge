@@ -15,12 +15,15 @@ See `docs/FLOW.md` for the step-by-step game day runbook.
 
 noon PT   Discord lean signal (OVER / UNDER / AWAY / HOME)
 
-noon-1pm  /playwright-underdog        -- log into Underdog (2FA required)
-          /underdog-mlb "[game]"       -- scrape top 2-3 games only → mlb.db
-          python prep.py               -- cache stats/ESPN/news/team for all games
-          python prep.py --check       -- verify all surfaces are warm (all +)
-          python closer.py             -- 3-agent debate + live Statcast → picks
-          sliplog.py add --picks JSON  -- log the slip
+noon-1pm  /playwright-underdog              -- log into Underdog (2FA required)
+          python prescan.py                 -- rank today's games by edge score
+          /underdog-mlb "[game]"            -- scrape top 2-3 games → mlb.db
+          python prep.py                    -- cache stats/ESPN/news/team
+          python prep.py --check            -- verify all surfaces warm (all +)
+          python closer.py                  -- Scout+Skeptic+Closer debate → picks
+          python player.py batter "[name]"  -- GATE: validate every pick (last 10)
+          python player.py pitcher "[name]" -- never skip this step
+          sliplog.py add --picks JSON       -- log the slip
 
 ~10pm PT  sliplog.py result --id X --result win/loss --outcomes JSON
            -- settles per-pick, auto-triggers pick_lessons.observe per pick
@@ -49,9 +52,11 @@ python sliplog.py picks --slip-id N
 python sliplog.py summary                                    # includes bankroll math
 
 # Bankroll
-python sliplog.py deposit --amount 50 --notes "..."          # log deposit
-python sliplog.py withdrawal --amount 20 --notes "..."       # log withdrawal
+python sliplog.py deposit --amount 50 --notes "..."          # cash deposit or promo credit
+python sliplog.py withdrawal --amount 20 --notes "..."       # cash out or tournament entry
 python sliplog.py txns                                       # list all cash movements
+# Tournament entries: log as withdrawal. Log payout as deposit on settlement.
+# Rescue refunds and token bonuses: log as deposit (promo credit).
 
 # Research
 python dive.py --game "SF Giants @ Athletics"
@@ -66,11 +71,6 @@ python watch.py "NYM @ ATL"                 # watch today's game (auto-finds gam
 python watch.py "NYM @ ATL" --date 2026-05-20   # specific date
 python watch.py --game-pk 745582            # direct game_pk
 python watch.py "LAD @ SF" --no-discord     # suppress Discord pushes
-
-# Bankroll
-python sliplog.py deposit --amount 50 --notes "..."
-python sliplog.py withdrawal --amount 20 --notes "..."
-python sliplog.py txns
 
 # Rules and lessons
 python pick_lessons.py stats
@@ -116,4 +116,5 @@ launchctl load ~/Library/LaunchAgents/com.mlb-edge.morning-brief.plist
 - `docs/GLOSSARY.md` -- ERA, FIP, WAR, WHIP, xAVG, multiplier, and more
 - `docs/DATASOURCES.md` -- all APIs and data sources with endpoints
 - `docs/PICK_LESSONS.md` -- auto-generated rule tracker: schema, taxonomy, CLI
+- `sync_sb.py` -- auto-syncs second-brain/sports/context.md on every settle
 - `CLAUDE.md` -- architecture, DB schema, hard dev rules (Claude/dev reference)
