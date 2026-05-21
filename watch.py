@@ -694,6 +694,7 @@ def main() -> None:
     write_md_header(log_path, game_str, game_date, pregame_ctx)
 
     conn = sqlite3.connect(MLB_DB)
+    conn.row_factory = sqlite3.Row
     ensure_scout_log_table(conn)
     ensure_summary_table(conn)
 

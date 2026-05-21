@@ -1,6 +1,6 @@
 # mlb-edge
 
-MLB player prop betting system for Underdog pick'em. Scrapes lines, caches stats, runs a 3-agent debate to find the highest-confidence picks each day.
+MLB player prop betting system for Underdog pick'em. Scrapes lines, caches stats, runs a 3-agent debate to find the highest-confidence picks each day. watch.py adds a live game scout layer -- three-agent analysis running from first pitch to final out.
 
 See `docs/FLOW.md` for the step-by-step game day runbook.
 
@@ -59,6 +59,12 @@ python player.py matchup "Chapman" "Civale"
 python lines_query.py --list-games
 python lines_query.py --game "SF Giants @ Athletics" --type pitcher
 
+# Live game scout
+python watch.py "NYM @ ATL"                 # watch today's game (auto-finds game_pk)
+python watch.py "NYM @ ATL" --date 2026-05-20   # specific date
+python watch.py --game-pk 745582            # direct game_pk
+python watch.py "LAD @ SF" --no-discord     # suppress Discord pushes
+
 # Bankroll
 python sliplog.py deposit --amount 50 --notes "..."
 python sliplog.py withdrawal --amount 20 --notes "..."
@@ -68,6 +74,10 @@ python sliplog.py txns
 python pick_lessons.py stats
 python pick_lessons.py review
 python pick_lessons.py review --confirmed
+
+# Scout log DB queries
+sqlite3 ~/mlb-edge/mlb.db "SELECT ts, event_type, scout_note FROM game_scout_log WHERE game_pk=? ORDER BY id;"
+sqlite3 ~/mlb-edge/mlb.db "SELECT game, final_score, final_analysis FROM game_scout_summary;"
 ```
 
 ---
