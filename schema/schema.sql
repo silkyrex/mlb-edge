@@ -242,8 +242,9 @@ CREATE TABLE IF NOT EXISTS pre_scan_scores (
 CREATE INDEX IF NOT EXISTS idx_pss_date ON pre_scan_scores(date);
 
 -- Live game scout log (mlb.db, managed by watch.py)
--- One row per poll tick. scout_note populated only on meaningful events.
--- event_type values: tick | run_scored | pitching_change | late_inning | extras | final
+-- One row per poll tick or checkpoint. scout_note = Haiku observation (meaningful events).
+-- sonnet_note = Sonnet interpretation (3-inning checkpoints, event_type='sonnet_checkpoint').
+-- event_type values: tick | run_scored | pitching_change | late_inning | extras | final | sonnet_checkpoint
 CREATE TABLE IF NOT EXISTS game_scout_log (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     game_pk      INTEGER NOT NULL,
@@ -257,6 +258,21 @@ CREATE TABLE IF NOT EXISTS game_scout_log (
     pitcher_away TEXT,
     event_type   TEXT,
     raw_state    TEXT,
-    scout_note   TEXT
+    scout_note   TEXT,
+    sonnet_note  TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_game_scout_log_game_pk ON game_scout_log(game_pk);
+
+-- Per-game end-of-game synthesis (mlb.db, managed by watch.py)
+-- One row per watched game. Written when game status = Final.
+CREATE TABLE IF NOT EXISTS game_scout_summary (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_pk        INTEGER NOT NULL UNIQUE,
+    game           TEXT NOT NULL,
+    game_date      TEXT NOT NULL,
+    ts             TEXT NOT NULL,
+    final_score    TEXT,
+    final_analysis TEXT,
+    critical_read  TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_gss_game_pk ON game_scout_summary(game_pk);

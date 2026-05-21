@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-watch.py -- Live game scout: polls every 5 min, Claude Haiku on key events.
+watch.py -- Three-layer live MLB game scout.
 
-Watches one MLB game from first pitch to final out. Meaningful state changes
-(runs scored, pitching changes, late innings, extras, final) trigger a Claude
-Haiku analysis note. Every tick writes to mlb.db:game_scout_log and appends
-to ~/mlb-edge/scout_logs/YYYY-MM-DD_{away}_{home}.md.
+Layer 1  Haiku  : raw field observation on every meaningful event
+Layer 2  Sonnet : betting interpretation at 3-inning checkpoints (after inn 3, 6, 9, extras)
+Layer 3  Sonnet : final analysis + opinionated critical read at game end
+
+All output goes to mlb.db (game_scout_log + game_scout_summary) and
+~/mlb-edge/scout_logs/YYYY-MM-DD_{away}_{home}.md.
+Checkpoints + final sections push to Discord.
 
 Usage:
     python watch.py "NYM @ ATL"
@@ -37,6 +40,14 @@ MLB_DB = Path(__file__).parent / "mlb.db"
 SCOUT_LOGS = Path(__file__).parent / "scout_logs"
 POLL_INTERVAL = 300
 MODEL_HAIKU = "claude-haiku-4-5-20251001"
+MODEL_SONNET = "claude-sonnet-4-6"
+
+# Sonnet fires at the start of these innings (meaning the previous 3-inning block ended)
+SONNET_CHECKPOINTS = {4, 7, 10}
+
+# ---------------------------------------------------------------------------
+# Prompt templates
+# ---------------------------------------------------------------------------
 
 HAIKU_PROMPT = """You are a live MLB game analyst writing a brief scout note for a sports bettor.
 Keep it tight: 2-4 sentences. No filler. Reference numbers from the pre-game context when relevant.
@@ -61,31 +72,100 @@ INSTRUCTIONS BY TRIGGER TYPE:
 
 Write only the scout note. No headers, no labels."""
 
+SONNET_CHECKPOINT_PROMPT = """You are a sharp MLB betting analyst reviewing a game in progress.
+Read the complete scout log below and give your current betting read.
+
+PRE-GAME CONTEXT:
+{pregame_ctx}
+
+SCOUT LOG (Haiku field observations so far):
+{all_haiku_notes}
+
+CURRENT STATE:
+  Game: {game_str}
+  End of Inning: {checkpoint_inning} | Score: {away_score} - {home_score} (Away - Home)
+  Current pitchers -> Away: {pitcher_away} | Home: {pitcher_home}
+
+Write 4-6 sentences. Cover:
+- What trend is building from these notes?
+- Which pitcher props are still live vs dead at this point?
+- If you were live-betting right now, what is your read?
+- Be specific. Cite numbers from the notes or pre-game context.
+
+Write only the interpretation. No headers, no labels."""
+
+FINAL_ANALYSIS_PROMPT = """You are a professional MLB game analyst. The game is final.
+Read the complete scout log and write the definitive game summary.
+
+PRE-GAME CONTEXT:
+{pregame_ctx}
+
+COMPLETE SCOUT LOG:
+{all_notes}
+
+FINAL SCORE: {away_score}-{home_score} ({game_str})
+
+Write 6-8 sentences:
+- What was the dominant narrative of this game?
+- How did the starters perform vs their pre-game grades?
+- Which props would have hit or missed, and why?
+- What was the key turning point?
+- What does this game tell us for future bets on these teams or pitchers?
+
+Be specific. Reference pre-game grades and how reality compared.
+Write only the analysis. No headers, no labels."""
+
+CRITICAL_READ_PROMPT = """You are a harsh, opinionated betting analyst. Tear apart what happened.
+
+PRE-GAME CONTEXT (what was expected):
+{pregame_ctx}
+
+COMPLETE SCOUT LOG (what actually happened):
+{all_notes}
+
+FINAL SCORE: {away_score}-{home_score} ({game_str})
+
+Write 4-6 sentences. Be direct and opinionated:
+- What did the pre-game model get wrong?
+- Which props should have been avoided in hindsight?
+- Was the pre-game edge read correct or not?
+- What pattern should be remembered next time these teams or pitchers show up?
+
+No softening. No "could have gone either way." Pick a lane and commit.
+Write only the critical read. No headers, no labels."""
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Live MLB game scout -- polls every N seconds")
+    p = argparse.ArgumentParser(description="Three-layer live MLB game scout")
     p.add_argument("game", nargs="?", help='Game string e.g. "NYM @ ATL"')
-    p.add_argument("--game-pk", type=int, default=None, help="Direct MLB game_pk (skips schedule lookup)")
-    p.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
-    p.add_argument("--no-discord", action="store_true", help="Suppress Discord webhook pushes")
-    p.add_argument("--interval", type=int, default=POLL_INTERVAL, help="Poll interval in seconds (default 300)")
+    p.add_argument("--game-pk", type=int, default=None)
+    p.add_argument("--date", default=None, help="YYYY-MM-DD (default: today)")
+    p.add_argument("--no-discord", action="store_true")
+    p.add_argument("--interval", type=int, default=POLL_INTERVAL,
+                   help="Poll interval in seconds (default 300)")
     return p.parse_args()
 
 
+# ---------------------------------------------------------------------------
+# MLB Stats API helpers
+# ---------------------------------------------------------------------------
+
 def resolve_game_pk(game_str: str, game_date: str) -> int | None:
-    """Match free-text matchup to a game_pk on the given date. Adapted from settle.py."""
     words = [w.lower() for w in re.split(r"[\s@/]+", game_str) if len(w) > 2]
     try:
-        r = requests.get(f"{BASE}/schedule", params={"sportId": 1, "date": game_date}, timeout=10)
+        r = requests.get(f"{BASE}/schedule",
+                         params={"sportId": 1, "date": game_date}, timeout=10)
         if r.status_code != 200:
             return None
         for d in r.json().get("dates", []):
             for game in d.get("games", []):
                 teams = game["teams"]
-                names = (
-                    teams["away"]["team"]["name"].lower() +
-                    teams["home"]["team"]["name"].lower()
-                )
+                names = (teams["away"]["team"]["name"].lower() +
+                         teams["home"]["team"]["name"].lower())
                 if sum(1 for w in words if w in names) >= 2:
                     return game["gamePk"]
     except Exception as e:
@@ -94,9 +174,9 @@ def resolve_game_pk(game_str: str, game_date: str) -> int | None:
 
 
 def resolve_game_str_from_pk(game_pk: int, game_date: str) -> str:
-    """Reverse lookup: game_pk -> 'Away @ Home' display string."""
     try:
-        r = requests.get(f"{BASE}/schedule", params={"sportId": 1, "gamePk": game_pk}, timeout=10)
+        r = requests.get(f"{BASE}/schedule",
+                         params={"sportId": 1, "gamePk": game_pk}, timeout=10)
         if r.status_code == 200:
             for d in r.json().get("dates", []):
                 for g in d.get("games", []):
@@ -109,29 +189,22 @@ def resolve_game_str_from_pk(game_pk: int, game_date: str) -> str:
 
 
 def _get_game_abstract_state(game_pk: int) -> tuple[str, str]:
-    """Return (abstractGameState, detailedState) from schedule endpoint."""
     try:
-        r = requests.get(
-            f"{BASE}/schedule",
-            params={"sportId": 1, "gamePk": game_pk},
-            timeout=10,
-        )
+        r = requests.get(f"{BASE}/schedule",
+                         params={"sportId": 1, "gamePk": game_pk}, timeout=10)
         if r.status_code == 200:
             for d in r.json().get("dates", []):
                 for g in d.get("games", []):
                     if g["gamePk"] == game_pk:
                         status = g.get("status", {})
-                        return (
-                            status.get("abstractGameState", "Preview"),
-                            status.get("detailedState", ""),
-                        )
+                        return (status.get("abstractGameState", "Preview"),
+                                status.get("detailedState", ""))
     except Exception:
         pass
     return ("Preview", "")
 
 
 def _get_current_pitchers(game_pk: int) -> tuple[str, str]:
-    """Return (pitcher_away, pitcher_home) from boxscore. Empty string if unavailable."""
     pitcher_away = ""
     pitcher_home = ""
     try:
@@ -157,28 +230,19 @@ def _get_current_pitchers(game_pk: int) -> tuple[str, str]:
 
 
 def fetch_live_state(game_pk: int) -> dict | None:
-    """
-    Poll MLB Stats API linescore + schedule status.
-    Returns normalized state dict or None on failure.
-    """
     try:
         r = requests.get(f"{BASE}/game/{game_pk}/linescore", timeout=10)
         if r.status_code != 200:
             return None
         data = r.json()
-
         abstract_state, detailed_state = _get_game_abstract_state(game_pk)
-
         inning = data.get("currentInning", 0)
         half = "Top" if data.get("isTopInning", True) else "Bot"
         outs = data.get("outs", 0)
-
         teams = data.get("teams", {})
         away_score = teams.get("away", {}).get("runs", 0) or 0
         home_score = teams.get("home", {}).get("runs", 0) or 0
-
         pitcher_away, pitcher_home = _get_current_pitchers(game_pk)
-
         return {
             "abstract_state": abstract_state,
             "detailed_state": detailed_state,
@@ -196,56 +260,47 @@ def fetch_live_state(game_pk: int) -> dict | None:
         return None
 
 
+# ---------------------------------------------------------------------------
+# Event detection
+# ---------------------------------------------------------------------------
+
 def detect_events(current: dict, prev: dict | None, seen_innings: set) -> list[str]:
-    """Pure function. Returns list of meaningful event type strings."""
     if prev is None:
         return []
-
-    # Final check first -- short-circuit all other checks
     if (current["abstract_state"] == "Final" or
             current["detailed_state"] in ("Final", "Game Over")):
         return ["final"]
-
     events = []
-
-    # Run(s) scored
     if (current["away_score"] != prev["away_score"] or
             current["home_score"] != prev["home_score"]):
         events.append("run_scored")
-
-    # Pitching change (either team, only when pitcher names are non-empty)
     for side in ("away", "home"):
         key = f"pitcher_{side}"
         if current[key] and prev[key] and current[key] != prev[key]:
             if "pitching_change" not in events:
                 events.append("pitching_change")
-
-    # Late inning (7, 8, 9) -- first entry per inning
     if 7 <= current["inning"] <= 9 and current["inning"] not in seen_innings:
         events.append("late_inning")
-
-    # Extras (10+) -- first entry per inning
     if current["inning"] > 9 and current["inning"] not in seen_innings:
         events.append("extras")
-
     return events
 
 
 def prioritize_event(events: list[str]) -> str:
-    """Return highest-priority event type, or 'tick' if none."""
     for p in ("final", "run_scored", "pitching_change", "extras", "late_inning"):
         if p in events:
             return p
     return "tick"
 
 
+# ---------------------------------------------------------------------------
+# Pre-game context
+# ---------------------------------------------------------------------------
+
 def load_pregame_context(game_pk: int, game_date: str, game_str: str) -> str:
-    """Query mlb.db for prescan + pitcher stats. Graceful fallback on any error."""
     try:
         conn = sqlite3.connect(MLB_DB)
         conn.row_factory = sqlite3.Row
-
-        # Fuzzy game string match for pre_scan_scores
         words = [w.lower() for w in re.split(r"[\s@/]+", game_str) if len(w) > 2]
         game_pattern = "%" + "%".join(words[:2]) + "%"
         prescan = conn.execute(
@@ -253,7 +308,6 @@ def load_pregame_context(game_pk: int, game_date: str, game_str: str) -> str:
             "FROM pre_scan_scores WHERE date=? AND LOWER(game) LIKE ? LIMIT 1",
             (game_date, game_pattern),
         ).fetchone()
-
         pitcher_lines = []
         if prescan and prescan["components_json"]:
             try:
@@ -284,12 +338,12 @@ def load_pregame_context(game_pk: int, game_date: str, game_str: str) -> str:
                             f"L5 Ks: {l5}"
                         )
                     else:
-                        pitcher_lines.append(f"  {side}: {pname} | grade: {grade} | [stats not cached]")
+                        pitcher_lines.append(
+                            f"  {side}: {pname} | grade: {grade} | [stats not cached]"
+                        )
             except Exception:
                 pass
-
         conn.close()
-
         if prescan:
             lines = [
                 f"  Prescan score: {prescan['score']} | "
@@ -299,18 +353,45 @@ def load_pregame_context(game_pk: int, game_date: str, game_str: str) -> str:
             ]
             lines.extend(pitcher_lines)
             return "\n".join(lines)
-
     except Exception:
         pass
-
     return "[no pre-game context cached -- run prescan.py and cache_stats.py first]"
 
 
+# ---------------------------------------------------------------------------
+# Claude subprocess caller
+# ---------------------------------------------------------------------------
+
+def call_model(prompt: str, model: str, label: str, timeout: int = 90) -> str | None:
+    """Call a Claude model via subprocess. Returns None on failure -- never aborts the loop."""
+    claude_bin = shutil.which("claude")
+    if not claude_bin:
+        print(f"[watch] 'claude' not found in PATH -- skipping {label}", file=sys.stderr)
+        return None
+    try:
+        result = subprocess.run(
+            [claude_bin, "-p", prompt, "--model", model],
+            text=True,
+            capture_output=True,
+            timeout=timeout,
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+        if result.stderr:
+            print(f"[watch] {label} error: {result.stderr[:400]}", file=sys.stderr)
+    except subprocess.TimeoutExpired:
+        print(f"[watch] {label} timed out ({timeout}s) -- skipping", file=sys.stderr)
+    except Exception as e:
+        print(f"[watch] {label} subprocess error: {e}", file=sys.stderr)
+    return None
+
+
+# ---------------------------------------------------------------------------
+# Prompt builders
+# ---------------------------------------------------------------------------
+
 def build_haiku_prompt(
-    game_str: str,
-    current: dict,
-    events: list[str],
-    pregame_ctx: str,
+    game_str: str, current: dict, events: list[str], pregame_ctx: str
 ) -> str:
     return HAIKU_PROMPT.format(
         pregame_ctx=pregame_ctx,
@@ -326,29 +407,49 @@ def build_haiku_prompt(
     )
 
 
-def call_haiku(prompt: str) -> str | None:
-    """Call Claude Haiku via subprocess. Returns None on failure -- never aborts the loop."""
-    claude_bin = shutil.which("claude")
-    if not claude_bin:
-        print("[watch] 'claude' not found in PATH -- skipping analysis", file=sys.stderr)
-        return None
-    try:
-        result = subprocess.run(
-            [claude_bin, "-p", prompt, "--model", MODEL_HAIKU],
-            text=True,
-            capture_output=True,
-            timeout=60,
-        )
-        if result.returncode == 0:
-            return result.stdout.strip()
-        if result.stderr:
-            print(f"[watch] haiku error: {result.stderr[:400]}", file=sys.stderr)
-    except subprocess.TimeoutExpired:
-        print("[watch] haiku timed out (60s) -- skipping analysis", file=sys.stderr)
-    except Exception as e:
-        print(f"[watch] haiku subprocess error: {e}", file=sys.stderr)
-    return None
+def build_sonnet_checkpoint_prompt(
+    game_str: str, current: dict, pregame_ctx: str,
+    all_haiku_notes: str, checkpoint_inning: int
+) -> str:
+    return SONNET_CHECKPOINT_PROMPT.format(
+        pregame_ctx=pregame_ctx,
+        all_haiku_notes=all_haiku_notes or "[no Haiku notes yet]",
+        game_str=game_str,
+        checkpoint_inning=checkpoint_inning,
+        away_score=current["away_score"],
+        home_score=current["home_score"],
+        pitcher_away=current["pitcher_away"] or "unknown",
+        pitcher_home=current["pitcher_home"] or "unknown",
+    )
 
+
+def build_final_analysis_prompt(
+    game_str: str, current: dict, pregame_ctx: str, all_notes: str
+) -> str:
+    return FINAL_ANALYSIS_PROMPT.format(
+        pregame_ctx=pregame_ctx,
+        all_notes=all_notes or "[no notes recorded]",
+        game_str=game_str,
+        away_score=current["away_score"],
+        home_score=current["home_score"],
+    )
+
+
+def build_critical_read_prompt(
+    game_str: str, current: dict, pregame_ctx: str, all_notes: str
+) -> str:
+    return CRITICAL_READ_PROMPT.format(
+        pregame_ctx=pregame_ctx,
+        all_notes=all_notes or "[no notes recorded]",
+        game_str=game_str,
+        away_score=current["away_score"],
+        home_score=current["home_score"],
+    )
+
+
+# ---------------------------------------------------------------------------
+# DB helpers
+# ---------------------------------------------------------------------------
 
 def ensure_scout_log_table(conn: sqlite3.Connection) -> None:
     conn.executescript("""
@@ -365,12 +466,55 @@ def ensure_scout_log_table(conn: sqlite3.Connection) -> None:
             pitcher_away TEXT,
             event_type   TEXT,
             raw_state    TEXT,
-            scout_note   TEXT
+            scout_note   TEXT,
+            sonnet_note  TEXT
         );
         CREATE INDEX IF NOT EXISTS idx_game_scout_log_game_pk
             ON game_scout_log(game_pk);
     """)
+    # Migration: add sonnet_note to existing tables created before this version
+    try:
+        conn.execute("ALTER TABLE game_scout_log ADD COLUMN sonnet_note TEXT")
+    except sqlite3.OperationalError:
+        pass  # column already exists
     conn.commit()
+
+
+def ensure_summary_table(conn: sqlite3.Connection) -> None:
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS game_scout_summary (
+            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_pk        INTEGER NOT NULL UNIQUE,
+            game           TEXT NOT NULL,
+            game_date      TEXT NOT NULL,
+            ts             TEXT NOT NULL,
+            final_score    TEXT,
+            final_analysis TEXT,
+            critical_read  TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_gss_game_pk
+            ON game_scout_summary(game_pk);
+    """)
+    conn.commit()
+
+
+def get_all_scout_notes(conn: sqlite3.Connection, game_pk: int) -> str:
+    """Return all Haiku scout notes for this game as a formatted text block."""
+    rows = conn.execute(
+        "SELECT inning, half, away_score, home_score, event_type, scout_note "
+        "FROM game_scout_log "
+        "WHERE game_pk=? AND scout_note IS NOT NULL "
+        "ORDER BY id",
+        (game_pk,),
+    ).fetchall()
+    if not rows:
+        return ""
+    parts = []
+    for r in rows:
+        header = (f"[Inn {r['inning']} {r['half']} | "
+                  f"{r['away_score']}-{r['home_score']} | {r['event_type']}]")
+        parts.append(f"{header}\n{r['scout_note']}")
+    return "\n\n".join(parts)
 
 
 def write_db_row(
@@ -380,12 +524,13 @@ def write_db_row(
     current: dict,
     event_type: str,
     scout_note: str | None,
+    sonnet_note: str | None = None,
 ) -> None:
     conn.execute(
         """INSERT INTO game_scout_log
            (game_pk, game, ts, inning, half, away_score, home_score,
-            pitcher_home, pitcher_away, event_type, raw_state, scout_note)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            pitcher_home, pitcher_away, event_type, raw_state, scout_note, sonnet_note)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             game_pk,
             game_str,
@@ -399,11 +544,44 @@ def write_db_row(
             event_type,
             json.dumps(current["raw"]),
             scout_note,
+            sonnet_note,
         ),
     )
 
 
-def write_md_header(log_path: Path, game_str: str, game_date: str, pregame_ctx: str) -> None:
+def write_summary_db(
+    conn: sqlite3.Connection,
+    game_pk: int,
+    game_str: str,
+    game_date: str,
+    current: dict,
+    final_analysis: str | None,
+    critical_read: str | None,
+) -> None:
+    final_score = f"{current['away_score']}-{current['home_score']}"
+    conn.execute(
+        """INSERT OR REPLACE INTO game_scout_summary
+           (game_pk, game, game_date, ts, final_score, final_analysis, critical_read)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (
+            game_pk,
+            game_str,
+            game_date,
+            datetime.now().isoformat(timespec="seconds"),
+            final_score,
+            final_analysis,
+            critical_read,
+        ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Markdown writers
+# ---------------------------------------------------------------------------
+
+def write_md_header(
+    log_path: Path, game_str: str, game_date: str, pregame_ctx: str
+) -> None:
     with log_path.open("w") as f:
         f.write(f"# Scout Log: {game_str} -- {game_date}\n\n")
         f.write("## Pre-game Context\n")
@@ -431,8 +609,35 @@ def write_md_entry(
         f.write(score_line + "\n")
         f.write(pitcher_line + "\n")
         if scout_note:
-            f.write("\n" + scout_note + "\n")
+            f.write("\n**Scout (Haiku):** " + scout_note + "\n")
 
+
+def write_md_checkpoint(
+    log_path: Path, current: dict, checkpoint_inning: int, sonnet_note: str
+) -> None:
+    ts = datetime.now().strftime("%H:%M")
+    with log_path.open("a") as f:
+        f.write(f"\n---\n")
+        f.write(
+            f"### [{ts}] Checkpoint: End Inn {checkpoint_inning} | "
+            f"{current['away_score']} - {current['home_score']}\n\n"
+        )
+        f.write(f"**Sonnet Interpretation:**\n{sonnet_note}\n")
+
+
+def write_md_final_sections(
+    log_path: Path, final_analysis: str, critical_read: str
+) -> None:
+    with log_path.open("a") as f:
+        f.write("\n---\n\n## Final Analysis\n\n")
+        f.write(final_analysis + "\n")
+        f.write("\n---\n\n## Critical Read\n\n")
+        f.write(critical_read + "\n")
+
+
+# ---------------------------------------------------------------------------
+# Discord
+# ---------------------------------------------------------------------------
 
 def discord_push(webhook_url: str, message: str) -> None:
     if not webhook_url:
@@ -448,8 +653,11 @@ def discord_push(webhook_url: str, message: str) -> None:
         pass
 
 
+# ---------------------------------------------------------------------------
+# Utilities
+# ---------------------------------------------------------------------------
+
 def parse_team_names(game_str: str) -> tuple[str, str]:
-    """Extract last word of away/home team for use in log filename."""
     parts = re.split(r"\s*@\s*", game_str, maxsplit=1)
     if len(parts) == 2:
         away = re.sub(r"[^\w]", "_", parts[0].strip().split()[-1].lower())
@@ -457,6 +665,10 @@ def parse_team_names(game_str: str) -> tuple[str, str]:
         return away, home
     return "away", "home"
 
+
+# ---------------------------------------------------------------------------
+# Main loop
+# ---------------------------------------------------------------------------
 
 def main() -> None:
     args = parse_args()
@@ -483,14 +695,17 @@ def main() -> None:
 
     conn = sqlite3.connect(MLB_DB)
     ensure_scout_log_table(conn)
+    ensure_summary_table(conn)
 
     prev_state: dict | None = None
     seen_innings: set[int] = set()
+    sonnet_fired_after: set[int] = set()
     tick = 0
     interval = args.interval
 
     print(f"[watch] Watching: {game_str} (game_pk={game_pk}) on {game_date}")
     print(f"[watch] Log: {log_path}")
+    print(f"[watch] Haiku: per-event | Sonnet: checkpoints after inn 3/6/9/extras")
     print(f"[watch] Polling every {interval}s. Ctrl-C to abort.")
 
     while True:
@@ -502,29 +717,27 @@ def main() -> None:
             time.sleep(interval)
             continue
 
-        # Wait for first pitch
         if current["abstract_state"] == "Preview" and current["inning"] == 0:
             print(f"[watch] tick {tick}: waiting for first pitch ({current['detailed_state']})")
             time.sleep(interval)
             continue
 
-        # Detect events BEFORE updating seen_innings so late_inning/extras trigger on entry
+        # Detect events BEFORE updating seen_innings (late_inning/extras trigger on entry)
         events = detect_events(current, prev_state, seen_innings)
         event_type = prioritize_event(events)
 
-        # Update seen innings after detection
         if current["inning"] > 0:
             seen_innings.add(current["inning"])
 
+        # --- Layer 1: Haiku scout note (every meaningful event) ---
         scout_note = None
         if events:
             prompt = build_haiku_prompt(game_str, current, events, pregame_ctx)
             print(
-                f"[watch] tick {tick}: {event_type} -> calling Haiku...",
-                end=" ",
-                flush=True,
+                f"[watch] tick {tick}: {event_type} -> Haiku...",
+                end=" ", flush=True,
             )
-            scout_note = call_haiku(prompt)
+            scout_note = call_model(prompt, MODEL_HAIKU, "Haiku", 60)
             print("done." if scout_note else "failed (skipped).")
         else:
             print(
@@ -537,20 +750,83 @@ def main() -> None:
         write_md_entry(log_path, current, event_type, scout_note)
 
         if scout_note and events and webhook:
-            msg = (
+            discord_push(webhook,
                 f"**{current['half']} {current['inning']} | "
                 f"{game_str} {current['away_score']}-{current['home_score']}** "
-                f"[{event_type}]\n{scout_note}"
-            )
-            discord_push(webhook, msg)
+                f"[{event_type}]\n{scout_note}")
 
         prev_state = current
 
+        # --- Layer 2: Sonnet 3-inning checkpoint ---
+        sonnet_trigger = (
+            (current["inning"] in SONNET_CHECKPOINTS and
+             current["inning"] not in sonnet_fired_after) or
+            (current["inning"] > 9 and current["inning"] not in sonnet_fired_after)
+        )
+        if sonnet_trigger and event_type != "final":
+            sonnet_fired_after.add(current["inning"])
+            checkpoint_inning = current["inning"] - 1
+            all_haiku = get_all_scout_notes(conn, game_pk)
+            s_prompt = build_sonnet_checkpoint_prompt(
+                game_str, current, pregame_ctx, all_haiku, checkpoint_inning
+            )
+            print(
+                f"[watch] Sonnet checkpoint (after inn {checkpoint_inning})...",
+                end=" ", flush=True,
+            )
+            sonnet_note = call_model(s_prompt, MODEL_SONNET, "Sonnet-checkpoint", 120)
+            print("done." if sonnet_note else "failed.")
+            if sonnet_note:
+                write_db_row(conn, game_pk, game_str, current,
+                             "sonnet_checkpoint", None, sonnet_note)
+                conn.commit()
+                write_md_checkpoint(log_path, current, checkpoint_inning, sonnet_note)
+                if webhook:
+                    discord_push(webhook,
+                        f"**Checkpoint: After Inn {checkpoint_inning} | "
+                        f"{game_str} {current['away_score']}-{current['home_score']}**\n"
+                        f"{sonnet_note}")
+
+        # --- Game over ---
         if event_type == "final" or current["inning"] > 18:
             if current["inning"] > 18:
                 print("[watch] Safety stop: inning > 18.")
             else:
-                print(f"[watch] Game final. Log: {log_path}")
+                print(f"[watch] Game final. Running end-game analysis...")
+
+            all_notes = get_all_scout_notes(conn, game_pk)
+            final_score = f"{current['away_score']}-{current['home_score']}"
+
+            # Layer 3a: Final analysis
+            fa_prompt = build_final_analysis_prompt(game_str, current, pregame_ctx, all_notes)
+            print("[watch] Final analysis (Sonnet)...", end=" ", flush=True)
+            final_analysis = call_model(fa_prompt, MODEL_SONNET, "Sonnet-final", 120)
+            print("done." if final_analysis else "failed.")
+
+            # Layer 3b: Critical read
+            cr_prompt = build_critical_read_prompt(game_str, current, pregame_ctx, all_notes)
+            print("[watch] Critical read (Sonnet)...", end=" ", flush=True)
+            critical_read = call_model(cr_prompt, MODEL_SONNET, "Sonnet-critical", 120)
+            print("done." if critical_read else "failed.")
+
+            write_md_final_sections(
+                log_path,
+                final_analysis or "[analysis failed]",
+                critical_read or "[critical read failed]",
+            )
+            write_summary_db(conn, game_pk, game_str, game_date, current,
+                             final_analysis, critical_read)
+            conn.commit()
+
+            if webhook:
+                if final_analysis:
+                    discord_push(webhook,
+                        f"**Final Analysis: {game_str} {final_score}**\n{final_analysis}")
+                if critical_read:
+                    discord_push(webhook,
+                        f"**Critical Read: {game_str} {final_score}**\n{critical_read}")
+
+            print(f"[watch] Done. Log: {log_path}")
             conn.close()
             break
 
