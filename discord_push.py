@@ -119,15 +119,30 @@ def post(webhook_url: str, message: str):
         print(f"Failed -- HTTP {e.code}: {e.read().decode()}")
 
 
-if __name__ == "__main__":
-    load_env()
+def post_via_dm_or_legacy(message: str) -> None:
+    """Prefer discord-manager (rubric-enforced). Fall back to legacy SPORTS_WEBHOOK_URL
+    if discord_manager isn't installed -- mlb-edge stays dep-free."""
+    try:
+        from discord_manager import send as _dm_send  # type: ignore
+        _dm_send("mlb_matchup_daily", message)
+        print("Posted via discord-manager")
+        return
+    except ImportError:
+        pass
+    except Exception as exc:
+        print(f"discord-manager send failed: {exc} -- falling back to legacy webhook")
+
     webhook = os.environ.get("SPORTS_WEBHOOK_URL")
     if not webhook:
         print("SPORTS_WEBHOOK_URL not set -- check .env")
         sys.exit(1)
+    post(webhook, message)
 
+
+if __name__ == "__main__":
+    load_env()
     game_date = sys.argv[1] if len(sys.argv) > 1 else str(date.today())
     msg = build_message(game_date)
     print(msg)
     print()
-    post(webhook, msg)
+    post_via_dm_or_legacy(msg)
