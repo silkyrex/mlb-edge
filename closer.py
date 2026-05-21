@@ -855,10 +855,34 @@ def print_results(picks: list[dict], scout_output: str, skeptic_output: str) -> 
     print("=" * 60)
 
 
+def _check_prep(target_date: str, game_filter: str | None) -> bool:
+    """Gate: verify prep.py has run for today's games. Warns and returns False if cache is incomplete."""
+    result = subprocess.run(
+        [sys.executable, str(Path(__file__).parent / "prep.py"), "--check",
+         "--date", target_date]
+        + (["--game", game_filter] if game_filter else []),
+        capture_output=True, text=True, cwd=Path(__file__).parent,
+    )
+    output = result.stdout
+    missing = [line.strip() for line in output.splitlines() if "  -" in line]
+    if missing:
+        print("[closer] ⚠️  Cache incomplete — run prep.py first:", file=sys.stderr)
+        for m in missing:
+            print(f"  {m}", file=sys.stderr)
+        print("[closer] Run: python prep.py", file=sys.stderr)
+        print("[closer] Then re-run closer.py.", file=sys.stderr)
+        return False
+    return True
+
+
 def main() -> None:
     args = parse_args()
     target_date = args.date or date.today().isoformat()
     model_id = MODEL_IDS[args.model]
+
+    # Gate: require prep.py to have run before firing agents
+    if not args.dry_run and not _check_prep(target_date, args.game):
+        sys.exit(1)
 
     print(f"[closer] Building data brief for {target_date}...", flush=True)
     data_brief = build_data_brief(target_date, args.game)

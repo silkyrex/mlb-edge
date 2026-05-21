@@ -34,7 +34,7 @@ IL_ACTIVATED_RE = re.compile(r"activated .+ from the (\d+)-day injured list", re
 
 
 def get_conn() -> sqlite3.Connection:
-    conn = sqlite3.connect(PICKS_DB)
+    conn = sqlite3.connect(PICKS_DB, timeout=30)
     conn.row_factory = sqlite3.Row
     return conn
 

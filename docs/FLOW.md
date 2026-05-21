@@ -51,16 +51,21 @@ Enter the 6-digit phone code when prompted.
 ```
 ~70 seconds. Saves all prop lines to mlb.db.
 
-**Step 3 -- Cache all stats (one command)**
+**Step 3 -- Cache all stats (REQUIRED after every scrape)**
 ```bash
 python prep.py
 ```
-Runs `cache_stats` → `cache_espn` → `cache_news` + `cache_team` for every scraped game in parallel. ~30-60s.
+Runs `cache_stats` → `cache_espn` → `cache_news` + `cache_team` for every scraped game. ~60s.
 
-Check before running closer.py:
+**This step is mandatory.** Without it, `rank.py` has no lineup tiers, `mismatch.py` has incomplete signals,
+and `closer.py` will refuse to run (it checks prep status before firing agents).
+
+If any column shows `!` (failed), re-run — failures are usually DB lock retries that clear on second pass:
 ```bash
-python prep.py --check    # all columns must show + before proceeding
+python prep.py --check    # verify all columns show +
 ```
+
+Re-run until all `+`. closer.py also runs this check automatically and will block if anything is missing.
 
 **Step 4 -- Optional quick read**
 ```

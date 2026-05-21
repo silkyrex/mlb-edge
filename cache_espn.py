@@ -77,7 +77,7 @@ def match_name(player: str, espn_map: dict[str, dict]) -> dict | None:
 
 
 def augment_game(game_name: str, game_date: str):
-    conn = sqlite3.connect(PICKS_DB)
+    conn = sqlite3.connect(PICKS_DB, timeout=30)
     conn.row_factory = sqlite3.Row
 
     pitchers = conn.execute("""

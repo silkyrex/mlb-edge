@@ -272,16 +272,33 @@ def load_tiers(query_date: str, game_filter: str | None = None) -> dict:
         if r["player"] not in il_map:
             il_map[r["player"]] = dict(r)
 
-    # Team stats for lineup tier
-    teams_in_game = {r["team"] for r in lines_rows if r["team"] and r["player_type"] == "batter"}
+    # Team stats for lineup tier — query by game (not abbrev) since mlb_game_lines.team
+    # uses abbreviations (ATH, NYY) but team_game_stats.team_name uses full names.
+    game_placeholders = ",".join("?" * len(games))
     team_stats_rows = conn.execute(
-        """
-        SELECT * FROM team_game_stats
-        WHERE cache_date = ? AND team_name IN ({})
-        """.format(",".join("?" * len(teams_in_game))),
-        [query_date] + list(teams_in_game),
-    ).fetchall() if teams_in_game else []
+        f"SELECT * FROM team_game_stats WHERE cache_date = ? AND game IN ({game_placeholders})",
+        [query_date] + games,
+    ).fetchall() if games else []
     team_map = {r["team_name"]: dict(r) for r in team_stats_rows}
+
+    # Build abbrev->full_name map so batters (stored with abbreviations) resolve to lineup tiers.
+    # Match: team abbreviation is a substring of full name (ATH→Athletics, NYY→New York Yankees).
+    abbrev_to_fullname: dict[str, str] = {}
+    abbrevs = {r["team"] for r in lines_rows if r["team"] and r["player_type"] == "batter"}
+    for abbrev in abbrevs:
+        for full_name in team_map:
+            if abbrev.upper() in full_name.upper() or full_name.upper().startswith(abbrev.upper()):
+                abbrev_to_fullname[abbrev] = full_name
+                break
+        # Fallback: first token match (NYY → New York Yankees first letter N... won't work)
+        # Use longest common subsequence heuristic for hard cases (NYY, TOR, etc.)
+        if abbrev not in abbrev_to_fullname:
+            for full_name in team_map:
+                words = full_name.upper().split()
+                initials = "".join(w[0] for w in words)
+                if initials == abbrev.upper():
+                    abbrev_to_fullname[abbrev] = full_name
+                    break
 
     conn.close()
 
@@ -330,7 +347,8 @@ def load_tiers(query_date: str, game_filter: str | None = None) -> dict:
             t = tier_batter(s, pitcher_throws=None)  # handedness TBD
             t["game"] = game
             t["player"] = name
-            t["team"] = r["team"]
+            abbrev = r["team"]
+            t["team"] = abbrev_to_fullname.get(abbrev, abbrev)  # resolve to full name
             batters[name] = t
 
     # Lineup tiers from team_game_stats

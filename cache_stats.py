@@ -23,7 +23,7 @@ SEASON = str(date_cls.today().year)
 
 
 def get_conn() -> sqlite3.Connection:
-    conn = sqlite3.connect(PICKS_DB)
+    conn = sqlite3.connect(PICKS_DB, timeout=30)
     conn.row_factory = sqlite3.Row
     return conn
 
