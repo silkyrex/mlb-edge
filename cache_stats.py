@@ -33,8 +33,8 @@ def find_game_pk(game_name: str, game_date: str) -> int | None:
     if len(parts) != 2:
         return None
     away_kw, home_kw = parts
-    away_words = [w for w in away_kw.split() if len(w) > 2]
-    home_words = [w for w in home_kw.split() if len(w) > 2]
+    away_words = [w for w in away_kw.split() if len(w) >= 2]
+    home_words = [w for w in home_kw.split() if len(w) >= 2]
 
     r = requests.get(f"{BASE}/schedule", params={"sportId": 1, "date": game_date}, timeout=10)
     r.raise_for_status()
@@ -298,7 +298,7 @@ def resolve_player_id(player: str, name_to_id: dict[str, int]) -> int | None:
     return None
 
 
-def cache_game(game_name: str, game_date: str):
+def cache_game(game_name: str, game_date: str, game_pk_override: int | None = None):
     conn = get_conn()
 
     rows = conn.execute("""
@@ -315,7 +315,7 @@ def cache_game(game_name: str, game_date: str):
 
     print(f"Caching stats for {len(rows)} players -- {game_name} ({game_date})")
 
-    game_pk = find_game_pk(game_name, game_date)
+    game_pk = game_pk_override or find_game_pk(game_name, game_date)
     if not game_pk:
         print(f"ERROR: Could not find game_pk for '{game_name}' on {game_date}")
         conn.close()
@@ -424,12 +424,13 @@ def main():
     parser.add_argument("--game", required=True, help="Game name, e.g. 'SF Giants @ Athletics'")
     parser.add_argument("--date", default=str(date_cls.today()), help="YYYY-MM-DD (default: today)")
     parser.add_argument("--query", action="store_true", help="Show cached stats instead of fetching")
+    parser.add_argument("--game-pk", type=int, default=None, help="Override statsapi game_pk lookup")
     args = parser.parse_args()
 
     if args.query:
         query_cache(args.game, args.date)
     else:
-        cache_game(args.game, args.date)
+        cache_game(args.game, args.date, game_pk_override=args.game_pk)
 
 
 if __name__ == "__main__":
