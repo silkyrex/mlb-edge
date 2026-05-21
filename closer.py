@@ -43,6 +43,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--game", default=None, help="Filter to single game (substring match)")
     p.add_argument("--dry-run", action="store_true", help="Print data brief only, skip agents")
     p.add_argument("--model", default="sonnet", choices=list(MODEL_IDS), help="Closer (critic) model tier -- Scout and Skeptic always use haiku")
+    p.add_argument("--effort", default=None, choices=["low", "medium", "high", "xhigh", "max"], help="Effort level for Closer agent (passes --effort to claude CLI)")
     return p.parse_args()
 
 
@@ -296,7 +297,7 @@ def build_data_brief(target_date: str, game_filter: str | None) -> str:
     return "\n".join(sections)
 
 
-def run_agent(prompt: str, label: str, model_id: str) -> str:
+def run_agent(prompt: str, label: str, model_id: str, effort: str | None = None) -> str:
     claude_bin = shutil.which("claude")
     if not claude_bin:
         print(f"[closer] 'claude' not found in PATH -- cannot run {label}", file=sys.stderr)
@@ -305,8 +306,11 @@ def run_agent(prompt: str, label: str, model_id: str) -> str:
     for attempt in range(2):
         suffix = " (retry)" if attempt else ""
         print(f"[closer] Running {label}{suffix}...", end=" ", flush=True)
+        cmd = [claude_bin, "-p", prompt, "--model", model_id]
+        if effort:
+            cmd += ["--effort", effort]
         result = subprocess.run(
-            [claude_bin, "-p", prompt, "--model", model_id],
+            cmd,
             text=True,
             capture_output=True,
             timeout=300,
@@ -751,6 +755,7 @@ def run_closer(
     skeptic_output: str,
     savant_supplement: str,
     model_id: str,
+    effort: str | None = None,
 ) -> list[dict]:
     raw = run_agent(
         CLOSER_PROMPT.format(
@@ -761,6 +766,7 @@ def run_closer(
         ),
         "Closer",
         model_id,
+        effort=effort,
     )
 
     # Try direct parse
@@ -865,7 +871,7 @@ def main() -> None:
     skeptic = run_skeptic(data_brief, scout)
     candidates = extract_candidate_players(scout, target_date)
     savant = build_savant_supplement(candidates)
-    picks = run_closer(data_brief, scout, skeptic, savant, model_id)
+    picks = run_closer(data_brief, scout, skeptic, savant, model_id, effort=args.effort)
     print_results(picks, scout, skeptic)
 
 

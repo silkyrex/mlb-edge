@@ -237,6 +237,7 @@ CREATE TABLE IF NOT EXISTS pre_scan_scores (
     venue_score     REAL,
     certainty       REAL,
     components_json TEXT,
+    reason          TEXT,
     UNIQUE(date, game)
 );
 CREATE INDEX IF NOT EXISTS idx_pss_date ON pre_scan_scores(date);

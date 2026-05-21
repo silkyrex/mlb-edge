@@ -58,9 +58,16 @@ def ensure_table(conn):
             venue_score     REAL,
             certainty       REAL,
             components_json TEXT,
+            reason          TEXT,
             UNIQUE(date, game)
         );
     """)
+    # Migration: add reason column to existing tables
+    try:
+        conn.execute("ALTER TABLE pre_scan_scores ADD COLUMN reason TEXT")
+        conn.commit()
+    except Exception:
+        pass  # column already exists
 
 
 def fetch_schedule(target_date: str) -> list[dict]:
@@ -358,16 +365,49 @@ def score_game(game: dict, season: str, espn_map: dict[str, dict]) -> dict:
     }
 
 
+def _tier(grade: int) -> str:
+    if grade >= 9: return "ELITE"
+    if grade >= 7: return "GOOD"
+    if grade >= 5: return "MID"
+    if grade >= 2: return "FADE"
+    return "?"
+
+
+def generate_reason(row: dict) -> str:
+    """Build a plain-English reason string from prescan data. No new API calls."""
+    c = row["components"]
+    away_p = c.get("away_pitcher") or "TBD"
+    home_p = c.get("home_pitcher") or "TBD"
+    away_tier = _tier(c.get("away_grade", 4))
+    home_tier = _tier(c.get("home_grade", 4))
+
+    at_k = c.get("away_team_k_pct")
+    ht_k = c.get("home_team_k_pct")
+    k_gap_str = f"K-gap {abs(at_k - ht_k):.1f}%" if (at_k is not None and ht_k is not None) else "K-gap ?"
+
+    venue = c.get("venue", "")
+    if venue in PITCHER_FRIENDLY:
+        venue_str = "pitcher-friendly park"
+    elif venue in HITTER_FRIENDLY:
+        venue_str = "hitter-friendly park"
+    else:
+        venue_str = "neutral park"
+
+    rain = " | ⚠️ rain risk" if c.get("rainout_risk") else ""
+    return f"{away_p} ({away_tier}) vs {home_p} ({home_tier}) | {k_gap_str} | {venue_str}{rain}"
+
+
 def persist(target_date: str, results: list[dict]):
     conn = sqlite3.connect(MLB_DB)
     ensure_table(conn)
     for r in results:
         conn.execute("""
             INSERT OR REPLACE INTO pre_scan_scores
-            (date, game, score, pitcher_edge, k_gap, venue_score, certainty, components_json)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (date, game, score, pitcher_edge, k_gap, venue_score, certainty, components_json, reason)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (target_date, r["game"], r["score"], r["pitcher_edge"], r["k_gap"],
-              r["venue_score"], r["certainty"], json.dumps(r["components"])))
+              r["venue_score"], r["certainty"], json.dumps(r["components"]),
+              generate_reason(r)))
     conn.commit()
     conn.close()
 
@@ -450,7 +490,7 @@ def main():
     bt.add_argument("--since", default=None, help="YYYY-MM-DD start date")
 
     ap.add_argument("--date", default=date_cls.today().isoformat())
-    ap.add_argument("--top", type=int, default=3)
+    ap.add_argument("--top", type=int, default=5)
     args = ap.parse_args()
 
     if args.cmd == "backtest":

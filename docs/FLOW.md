@@ -8,7 +8,7 @@ See `docs/GLOSSARY.md` for term definitions. See `docs/DATASOURCES.md` for API d
 
 | Time (PT) | What | Where |
 |---|---|---|
-| 9am M-F | `morning_brief.py` -- pitcher grades, IL flags, all starter stats cached | Discord + mlb.db |
+| 9am M-F | `morning_brief.py` -- pitcher grades, IL flags, starter stats cached + top-5 prescan matchups with reasons | Discord + mlb.db |
 | nightly | `daily.sh` -- `cache_tomorrow.py` (night-before IL pre-cache) | mlb.db |
 
 Everything else is manual.
@@ -26,8 +26,11 @@ python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-16 --roster
 
 ## Morning (before noon)
 
+Top-5 matchups with reasons already in Discord from the 9am brief. Use them to decide which games to drill into.
+
 ```bash
-python dive.py --game "SF Giants @ Athletics"    # full pre-game picture
+python prescan.py                                 # re-run if you need a fresh ranking (top 5 default)
+python dive.py --game "SF Giants @ Athletics"     # full pre-game picture on a specific game
 python matchup.py                                 # early lean read before signal
 python lines_query.py --list-games               # check if lines are posted yet
 ```
@@ -99,6 +102,16 @@ Cost: ~$1/game.
 
 ## Picking a Slip
 
+**Historical hit rate check (required before presenting any pick):**
+```bash
+python player.py batter "Player Name"   # last 15 game log
+python player.py pitcher "Pitcher Name" # last 5 starts with H/A flag
+```
+- Score hit rate = games where result beats line / total games (last 10)
+- **Disqualify: hit rate < 30% on a 0.5 line** -- do not present without explicit flag
+- **Never cite home ERA for an away start** -- check H/A column first, then apply the matching split
+- Pitcher sample < 3 starts = flag as thin, filter to home or away subset
+
 Hard stops -- skip regardless of score:
 - Player is on the IL or returned from IL today
 - IL return within 7 days (rust, -10 score penalty)
@@ -108,6 +121,23 @@ Hard stops -- skip regardless of score:
 - Pitcher Ks Lower when L5 sample is from wrong role (relief sample, starting tonight)
 - Check `last15_h_r_rbi` against the line before fading any batter regardless of team grade
 - Check `x_avg` vs `season_avg` -- actual much higher than expected = regression risk
+
+**Doubles estimation (when player.py has no doubles column):**
+Use TB / H / HR to estimate: `doubles_estimate = TB - H - (HR * 3)` if result > 0 and H > 0.
+Caveat: a single hit with TB=3 and HR=0 is a triple, not a double — the formula overcounts.
+Safe rule: flag as estimate, only trust if 3+ games in last 10 show estimated doubles ≥ 1.
+
+**Full winning-slip process (run in order):**
+1. `prescan.py` — rank today's games
+2. `closer.py --game X` — Scout/Skeptic/Closer debate with live Statcast + umpire + lineup
+3. `player.py batter/pitcher` on every closer candidate — last 10 games, score vs line
+4. IL/scratch check — `mlb scratches` + query player_news table
+5. Rank by joint hit rate — best 2-pick Standard or 3-pick Flex
+6. Present one slip — wait for Raymond's approval
+
+**Browser slip state warning:**
+Navigating to a new page does NOT clear picks in Underdog. Always check `Your picks N` count
+before building. Remove stale picks explicitly by re-clicking their selected buttons.
 
 Slip construction rules:
 - Picks from 2+ different teams

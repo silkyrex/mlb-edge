@@ -56,8 +56,14 @@ GREEN >= 65. YELLOW 50-64. SKIP below 50 or IL-flagged.
 
 ---
 
-## Bet-Strategy Rules
+## Hard Stops (skip immediately — no override)
 
-- First-inning pitch count Higher on FADE pitchers is volatile -- only take when opposing lineup has documented high walk rates.
-- Check `last15_h_r_rbi` against the line before fading any batter regardless of team grade.
-- Check `x_avg` vs `season_avg` -- actual much higher than expected = regression risk.
+- Player on IL or returned from IL today
+- IL return within 7 days (rust penalty)
+- Both Higher and Lower show no multiplier on Underdog
+- Pitcher Ks Higher when line ≥ player's L5 median Ks
+- Pitcher Ks Lower when L5 sample is from wrong role (was relief, starting tonight)
+- 1st-inn pitch count Higher on a FADE pitcher — skip, period
+- Batter H+R+RBI Higher when line ≥ season average — **falsified** (1 hit vs 3 fails in pick_lessons)
+- `x_avg` well below `season_avg` — closer.py flags this; trust the flag
+- L15 H+R+RBI average below the line — don't fade the batter regardless of team grade

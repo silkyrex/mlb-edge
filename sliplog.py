@@ -30,6 +30,7 @@ from dotenv import load_dotenv
 from ob1 import ob1_push as _ob1_push
 from pick_lessons import observe as _pl_observe
 import notion_sync as _notion
+import sync_sb as _sync_sb
 
 load_dotenv(Path(__file__).parent / ".env")
 
@@ -300,6 +301,11 @@ def cmd_result(args):
          "players": players, "result": result, "profit": profit,
          "entry": slip["entry"], "payout": slip["payout"], "agent": "sliplog"},
     )
+
+    try:
+        _sync_sb.sync()
+    except Exception as e:
+        print(f"SB sync failed (non-fatal): {e}")
 
 
 def _lookup_outcome(outcomes: dict, player_name: str) -> float | None:

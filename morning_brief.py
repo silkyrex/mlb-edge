@@ -15,6 +15,7 @@ import json
 import os
 import re
 import sqlite3
+import subprocess
 import sys
 import requests
 from datetime import date as date_cls, timedelta
@@ -181,6 +182,43 @@ def utc_to_pt(utc_str: str) -> str:
     return f"{h12}:{m:02d}{ampm} PT"
 
 
+def _build_prescan_block(game_date: str, conn_path: Path) -> str:
+    """Return a formatted top-5 prescan block for Discord. DB-first; subprocess fallback."""
+    conn = sqlite3.connect(conn_path)
+    rows = conn.execute(
+        "SELECT game, score, reason FROM pre_scan_scores WHERE date=? ORDER BY score DESC LIMIT 5",
+        (game_date,)
+    ).fetchall()
+    conn.close()
+
+    if not rows:
+        # Prescan hasn't run yet for this date — run it now
+        try:
+            script = Path(__file__).parent / "prescan.py"
+            subprocess.run(
+                [sys.executable, str(script), "--date", game_date, "--top", "5"],
+                timeout=120, check=True, capture_output=True,
+            )
+        except Exception as e:
+            return f"\n_Prescan unavailable for {game_date}: {e}_"
+        conn = sqlite3.connect(conn_path)
+        rows = conn.execute(
+            "SELECT game, score, reason FROM pre_scan_scores WHERE date=? ORDER BY score DESC LIMIT 5",
+            (game_date,)
+        ).fetchall()
+        conn.close()
+
+    if not rows:
+        return ""
+
+    lines = [f"\n**⚾ Top {len(rows)} Matchups by Edge — {game_date}**"]
+    for i, (game, score, reason) in enumerate(rows, 1):
+        reason_str = reason or "—"
+        lines.append(f"  {i}. {game} ({score:.2f}) — {reason_str}")
+    lines.append("  _Scrape top 2-3 only via /underdog-mlb._")
+    return "\n".join(lines)
+
+
 def build_brief(game_date: str) -> str:
     games = get_schedule(game_date)
     if not games:
@@ -281,6 +319,12 @@ def build_brief(game_date: str) -> str:
         lines.append(f"\n_{len(pitchers_cached)} starters pre-cached in picks.db (ERA/FIP/WAR ready for /underdog-mlb-analyze)_")
 
     lines.append(f"\n_Lean signal arrives 12pm PT via Discord._")
+
+    # Prescan: top-5 matchups by edge score
+    prescan_block = _build_prescan_block(game_date, conn_path=PICKS_DB)
+    if prescan_block:
+        lines.append(prescan_block)
+
     brief_text = "\n".join(lines)
 
     # Capture starter grades to OB1

@@ -1,6 +1,6 @@
 # mlb-edge (dev reference)
 
-For the game day runbook see `docs/FLOW.md`. For project overview see `README.md`. For tier system, scoring rules, and pick direction see `docs/REFERENCE.md`.
+For the game day runbook see `docs/FLOW.md`. For project overview see `README.md`. For tier system, scoring rules, hard stops, and pick direction see `docs/REFERENCE.md`. For the decision guide (game selection, bankroll, lines source rule) see `docs/PLAYBOOK.md`.
 
 ---
 
@@ -73,7 +73,7 @@ noon PT Discord lean signal (or top-N from prescan)
 
 | File | Purpose |
 |---|---|
-| `prescan.py` | Pre-scrape game ranker. Pulls full slate + ESPN FIP + team stats, scores 4-factor rubric, writes `pre_scan_scores`. Run BEFORE Playwright opens to pick top-N games. `--date`, `--top`. |
+| `prescan.py` | Pre-scrape game ranker. Pulls full slate + ESPN FIP + team stats, scores 4-factor rubric, writes `pre_scan_scores` with `reason` string per game. Default top 5. Run BEFORE Playwright opens. `--date`, `--top`. Also called by `morning_brief.py` as subprocess fallback if today's rows are missing. |
 | `prep.py` | One-command cache runner. Finds today's scraped games, runs cache_stats → cache_espn (sequential) + cache_news + cache_team (parallel). `--check` for status-only. |
 | `closer.py` | 3-agent final round critique. Scout/Skeptic always haiku (executor); Closer uses `--model` (default sonnet, critic). Live Statcast + ump + lineup + days rest. `--dry-run`, `--game`, `--model haiku/opus`. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles. |
@@ -93,6 +93,7 @@ noon PT Discord lean signal (or top-N from prescan)
 | `mlb_api.py` | MLB Stats API helpers. `find_game_pk`, `get_box_stats`, `get_game_status`, `get_linescore`. Team abbreviations resolved at runtime from `/api/v1/teams` (handles relocations). Import from here, not settle.py. |
 | `box_stats.py` | Box score stat extraction + pick_lessons observation. `extract_player_stats`, `get_actual_from_box`, `auto_observe_picks`. |
 | `ob1.py` | Shared OB1 push helper. `from ob1 import ob1_push`. All scripts use this -- never the HTTP MCP path. |
+| `sync_sb.py` | Post-settle second-brain sync. Reads sliplog.db, rewrites the `## Underdog Fantasy` block in `~/second-brain/sports/context.md`. Auto-called by `sliplog.py result`. Also runnable standalone: `python sync_sb.py`. |
 
 ---
 

@@ -11,11 +11,12 @@ See `docs/FLOW.md` for the step-by-step game day runbook.
 ```
 9am PT    morning_brief.py auto-posts to Discord
            -- pitcher grades (ERA/FIP/WAR), IL flags, all starter stats cached
+           -- top 5 matchups by edge score (reason per game) appended to same post
 
 noon PT   Discord lean signal (OVER / UNDER / AWAY / HOME)
 
 noon-1pm  /playwright-underdog        -- log into Underdog (2FA required)
-          /underdog-mlb "[game]"       -- scrape all prop lines → mlb.db
+          /underdog-mlb "[game]"       -- scrape top 2-3 games only → mlb.db
           python prep.py               -- cache stats/ESPN/news/team for all games
           python prep.py --check       -- verify all surfaces are warm (all +)
           python closer.py             -- 3-agent debate + live Statcast → picks
@@ -23,6 +24,7 @@ noon-1pm  /playwright-underdog        -- log into Underdog (2FA required)
 
 ~10pm PT  sliplog.py result --id X --result win/loss --outcomes JSON
            -- settles per-pick, auto-triggers pick_lessons.observe per pick
+           -- auto-syncs ~/second-brain/sports/context.md (sync_sb.py)
 ```
 
 ---
@@ -109,7 +111,8 @@ launchctl load ~/Library/LaunchAgents/com.mlb-edge.morning-brief.plist
 ## Reference
 
 - `docs/FLOW.md` -- full game day runbook with hard stops
-- `docs/REFERENCE.md` -- tier system, scoring rules, pick direction table
+- `docs/PLAYBOOK.md` -- decision guide: lines source rule, game selection, bankroll gate
+- `docs/REFERENCE.md` -- tier system, scoring rules, pick direction table, hard stops
 - `docs/GLOSSARY.md` -- ERA, FIP, WAR, WHIP, xAVG, multiplier, and more
 - `docs/DATASOURCES.md` -- all APIs and data sources with endpoints
 - `docs/PICK_LESSONS.md` -- auto-generated rule tracker: schema, taxonomy, CLI
