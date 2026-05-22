@@ -24,20 +24,26 @@ python cache_news.py --game "SF Giants @ Athletics" --date 2026-05-16 --roster
 
 ---
 
-## Morning (before noon)
+## Morning / Pre-Lines Research (before scraping)
 
-Top-5 matchups with reasons already in Discord from the 9am brief. Use them to decide which games to drill into.
+Top-5 matchups with reasons already in Discord from the 9am brief. Pick one game and form an independent lean **before** seeing the market price — anchoring to the line kills edge detection.
 
 ```bash
 python prescan.py                                 # re-run if you need a fresh ranking (top 5 default)
-python dive.py --game "SF Giants @ Athletics"     # full pre-game picture on a specific game
-python matchup.py                                 # early lean read before signal
-python lines_query.py --list-games               # check if lines are posted yet
+python matchup.py                                 # team + pitcher tiers (ELITE/MID/FADE)
+python dive.py --game "SF Giants @ Athletics"     # full pre-game picture: pitcher splits, offense, regression flags
+python player.py pitcher "Pitcher Name"           # last 5 starts, H/A split, K rate -- run for BOTH starters
+```
+
+Form your lean here (OVER/UNDER, which side, which props look live). Then check lines. Disagreement with the market = potential edge. Agreement = no trade.
+
+```bash
+python lines_query.py --list-games               # verify lines are posted before logging in
 ```
 
 ---
 
-## After Lean Signal Drops (~noon PT)
+## After Lean Is Formed (~noon PT)
 
 **Step 1 -- Log into Underdog**
 ```
@@ -133,14 +139,18 @@ Caveat: a single hit with TB=3 and HR=0 is a triple, not a double — the formul
 Safe rule: flag as estimate, only trust if 3+ games in last 10 show estimated doubles ≥ 1.
 
 **Full winning-slip process (run in order — each step depends on the previous):**
-1. `prescan.py` — rank today's games (K-edge + mismatch bonus); top 2-3 to scrape
-2. `/underdog-mlb [game]` — scrape prop lines → mlb_game_lines
-3. `prep.py` — cache stats (REQUIRED; re-run until all +)
-4. `rank.py` — tier every pitcher/batter/lineup ELITE/MID/FADE
-5. `mismatch.py` — find ELITE vs FADE pairings → mismatch_candidates table
-6. `player.py batter/pitcher` on every mismatch candidate — CHEAP GATE (hit rate ≥ 30%, IL check, H/A split)
-7. `closer.py` — Scout/Skeptic/Closer debate on validated candidates; blocks if prep incomplete
-8. Present one slip — wait for Raymond's approval
+1. `prescan.py` — rank today's games; pick top 1-2 to work
+2. `matchup.py` — team + pitcher tiers before seeing any lines
+3. `dive.py --game` — full pre-game picture; form independent lean (OVER/UNDER, which props)
+4. `player.py pitcher` on both starters — H/A split, K rate, last 5 starts; lock in lean
+5. `lines_query.py --list-games` — confirm lines are posted
+6. `/underdog-mlb [game]` — scrape prop lines → mlb_game_lines
+7. `prep.py` — cache stats (REQUIRED; re-run until all +)
+8. `rank.py` — tier every pitcher/batter/lineup ELITE/MID/FADE
+9. `mismatch.py` — find ELITE vs FADE pairings → mismatch_candidates table
+10. `player.py batter` on every mismatch candidate — CHEAP GATE (hit rate ≥ 30%, IL check, H/A split)
+11. `closer.py` — Scout/Skeptic/Closer debate on validated candidates; blocks if prep incomplete
+12. Present one slip — wait for Raymond's approval
 
 **Why this order:** player.py (step 6) is free and instant; closer.py (step 7) costs $0.05–0.30 and 2-3 min.
 Filter cheap before spending compute. mismatch_candidates is the input to player.py — can't skip step 5.
