@@ -9,4 +9,4 @@ if [[ -f "$SCRIPT_DIR/.env" ]]; then
 fi
 
 PYTHON="${PYTHON_BIN:-$(which python3)}"
-exec $PYTHON "$SCRIPT_DIR/morning_brief.py" --post
+exec $PYTHON "$SCRIPT_DIR/mlb_brief.py" --post

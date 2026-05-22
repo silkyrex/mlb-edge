@@ -9,7 +9,7 @@ See `docs/FLOW.md` for the full game day runbook.
 ## Daily Flow
 
 ```
-9am PT    morning_brief.py auto-posts to Discord
+9am PT    mlb_brief.py auto-posts to Discord
            -- pitcher grades (ERA/FIP/WAR), IL flags, all starter stats cached
            -- top 5 matchups by edge score (includes mismatch bonus)
            -- edge_track.py: PRESS/HOLD/DROP per edge type

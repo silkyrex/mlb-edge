@@ -294,7 +294,174 @@ def build_data_brief(target_date: str, game_filter: str | None) -> str:
                 f"{r['rule_key']}: {r['hypothesis']}"
             )
 
+    # Mismatch candidates (pre-screened ELITE vs FADE pairings from mismatch.py)
+    mismatch_section = _build_mismatch_section(target_date, game_filter)
+    if mismatch_section:
+        sections.insert(1, mismatch_section)  # inject after header, before game breakdown
+
     return "\n".join(sections)
+
+
+def _sf(val, default=None):
+    """Safe float conversion."""
+    try:
+        return float(val) if val is not None else default
+    except (TypeError, ValueError):
+        return default
+
+
+def _compute_proxy_hit_rate(candidate: dict, stats: dict) -> tuple[str, str]:
+    """
+    Fast proxy hit rate from cached player_recent_stats (no API calls).
+    Returns (proxy_label, flag) where flag is ✅ HIGH / ⚠️ MEDIUM / ❌ LOW / ❓ NO_DATA.
+    """
+    import json as _json
+    stat = candidate.get("bet_category", "")
+    direction = candidate.get("bet_direction", "Higher")
+    tier_grades = {}
+    try:
+        tier_grades = _json.loads(candidate.get("tier_grades") or "{}")
+    except Exception:
+        pass
+
+    if candidate.get("player_type") == "batter":
+        line = None
+        # Find the line from tier_grades or mlb_game_lines (not available here — use avg proxy)
+        if "H+R+RBI" in stat or "Hits + Runs" in stat:
+            avg = _sf(stats.get("last15_h_r_rbi"))
+            if avg is None:
+                return "L15 avg: no data", "❓"
+            # Proxy: Underdog typically sets line at ~0.8-0.9 × season avg
+            # We compare avg to typical threshold lines (1.5, 2.5)
+            ratio = avg / 1.5  # assume line is 1.5 (most common H+R+RBI line)
+            if ratio >= 1.5:
+                return f"L15 {avg:.2f} avg (line ~1.5)", "✅ HIGH"
+            elif ratio >= 1.0:
+                return f"L15 {avg:.2f} avg (line ~1.5)", "⚠️ MEDIUM"
+            else:
+                return f"L15 {avg:.2f} avg (line ~1.5)", "❌ LOW"
+        elif stat == "Hits":
+            avg = _sf(stats.get("last15_hits"))
+            if avg is None:
+                return "L15 hits: no data", "❓"
+            if avg >= 1.3:
+                return f"L15 {avg:.2f} hits/g (line ~0.5)", "✅ HIGH"
+            elif avg >= 0.8:
+                return f"L15 {avg:.2f} hits/g (line ~0.5)", "⚠️ MEDIUM"
+            else:
+                return f"L15 {avg:.2f} hits/g (line ~0.5)", "❌ LOW"
+
+    elif candidate.get("player_type") == "pitcher":
+        if "Pitching Outs" in stat and direction == "Lower":
+            ip_raw = stats.get("last5_ip")
+            if not ip_raw:
+                return "L5 IP: no data", "❓"
+            try:
+                ips = _json.loads(ip_raw)
+                if not ips:
+                    return "L5 IP: empty", "❓"
+                avg_ip = sum(ips[-3:]) / len(ips[-3:])  # last 3
+                avg_po = avg_ip * 3
+                # Most PO lines are ~15-18 for starters; < avg_po means LOWER is risky
+                if avg_po < 15:
+                    return f"L3 avg {avg_ip:.1f} IP ({avg_po:.0f} PO)", "✅ HIGH"
+                elif avg_po < 18:
+                    return f"L3 avg {avg_ip:.1f} IP ({avg_po:.0f} PO) borderline", "⚠️ MEDIUM"
+                else:
+                    return f"L3 avg {avg_ip:.1f} IP ({avg_po:.0f} PO) — long outings", "❌ LOW"
+            except Exception:
+                return "L5 IP: parse error", "❓"
+        elif "Strikeout" in stat and direction == "Higher":
+            ks_raw = stats.get("last5_ks")
+            if not ks_raw:
+                return "L5 Ks: no data", "❓"
+            try:
+                ks = _json.loads(ks_raw)
+                avg_k = sum(ks) / len(ks) if ks else 0
+                return f"L5 avg {avg_k:.1f} Ks", "✅ HIGH" if avg_k >= 6 else "⚠️ MEDIUM" if avg_k >= 4 else "❌ LOW"
+            except Exception:
+                return "L5 Ks: parse error", "❓"
+
+    return "no proxy available", "❓"
+
+
+def _build_mismatch_section(target_date: str, game_filter: str | None) -> str:
+    """Load mismatch_candidates for today, compute proxy hit rates, return brief section."""
+    mlb = sqlite3.connect(MLB_DB)
+    mlb.row_factory = sqlite3.Row
+
+    q = "SELECT * FROM mismatch_candidates WHERE date=? ORDER BY rank, game, player"
+    params: list = [target_date]
+    if game_filter:
+        q = q.replace("WHERE date=?", "WHERE date=? AND LOWER(game) LIKE ?")
+        params.append(f"%{game_filter.lower()}%")
+
+    candidates = mlb.execute(q, params).fetchall()
+    if not candidates:
+        mlb.close()
+        return ""
+
+    # Load player stats for proxy calculation
+    players = list({r["player"] for r in candidates})
+    placeholders = ",".join("?" * len(players))
+    stats_rows = mlb.execute(
+        f"SELECT * FROM player_recent_stats WHERE player IN ({placeholders})"
+        f" AND cache_date = (SELECT MAX(cache_date) FROM player_recent_stats p2"
+        f" WHERE p2.player = player_recent_stats.player)",
+        players,
+    ).fetchall()
+    stats_map = {r["player"]: dict(r) for r in stats_rows}
+
+    # Load IL news
+    news_rows = mlb.execute(
+        f"SELECT player, status FROM player_news WHERE player IN ({placeholders})"
+        f" AND news_date >= date('now', '-7 days')",
+        players,
+    ).fetchall()
+    il_map = {r["player"]: r["status"] for r in news_rows}
+
+    mlb.close()
+
+    lines = [f"\n\n{'='*60}"]
+    lines.append("PRIORITY TARGETS — ELITE vs FADE MISMATCHES (pre-screened by mismatch.py)")
+    lines.append("Scout: analyze these FIRST before scanning the full slate.")
+    lines.append("Validation gate: run player.py on each to confirm hit rate ≥ 30%.")
+    lines.append("="*60)
+
+    current_rank = None
+    for c in candidates:
+        c = dict(c)
+        rank = c["rank"]
+        if rank != current_rank:
+            current_rank = rank
+            lines.append(f"\n  RANK {rank} — {c['edge_key']}")
+
+        # IL disqualify
+        il_status = il_map.get(c["player"], "")
+        il_flag = ""
+        if il_status and il_status.startswith("IL-") and "return" not in il_status:
+            il_flag = f"  ⛔ IL: {il_status}"
+
+        # Proxy hit rate
+        s = stats_map.get(c["player"], {})
+        proxy_label, proxy_flag = _compute_proxy_hit_rate(c, s)
+
+        lines.append(
+            f"  🎮 {c['game']}  |  {c['player']} ({c['player_type']})"
+        )
+        lines.append(
+            f"     Bet: {c['bet_category']} {c['bet_direction'].upper()}"
+            f"  |  Proxy: {proxy_label} {proxy_flag}{il_flag}"
+        )
+        lines.append(f"     EdgeKey: {c['edge_key']}")
+
+    lines.append(f"\n  ⚠️  Hard stops (enforce even if Scout picks it):")
+    lines.append(f"     • Proxy ❌ LOW or ❓ NO_DATA → require player.py validation first")
+    lines.append(f"     • IL flag → disqualify")
+    lines.append(f"     • Hit rate < 30% on actual game log → disqualify")
+    lines.append(f"     • Home ERA cited for away start → use correct split")
+
+    return "\n".join(lines)
 
 
 def run_agent(prompt: str, label: str, model_id: str, effort: str | None = None) -> str:
@@ -341,6 +508,13 @@ Here is today's complete slate with all available stats:
 
 TASK: Find the 6-8 highest-confidence prop picks across today's slate.
 
+PRIORITY: If the brief contains a "PRIORITY TARGETS" section, analyze those candidates FIRST.
+They are pre-screened ELITE vs FADE tier mismatches. For each priority target, verify:
+- Multiplier >= 1.00x on the recommended side
+- No IL flag
+- Proxy hit rate is ✅ HIGH or ⚠️ MEDIUM (if ❌ LOW, note it but do not include without strong other signal)
+- H/A split matches the game context (home vs away)
+
 For each pick, provide a numbered entry with:
 - Player | Stat | Line | Side (Higher/Lower) | Game
 - Bull thesis (2-3 sentences): cite specific numbers -- L5 trend vs the line, FIP vs ERA, K9, splits, confirmed rules.
@@ -350,6 +524,7 @@ Prioritize:
 - FIP supports ERA (not a regression candidate)
 - Multiplier >= 1.00x on your side (market not strongly opposed)
 - No IL flags
+- ELITE batter vs FADE pitcher mismatches (highest confirmed edge)
 
 Do NOT output JSON yet. Write as a numbered plain-text list."""
 

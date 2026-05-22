@@ -7,7 +7,7 @@ For the game day runbook see `docs/FLOW.md`. For project overview see `README.md
 ## Architecture
 
 ```
-9am PT  morning_brief.py (launchd) -- pitchers + IL → Discord + mlb.db
+9am PT  mlb_brief.py (launchd) -- pitchers + IL → Discord + mlb.db
 
 session start  prescan.py -- rank today's full slate before any scrape
   └── pulls MLB Stats API schedule + ESPN FIP, scores 4-factor rubric
@@ -39,7 +39,7 @@ noon PT Discord lean signal (or top-N from prescan)
 
 | Time (PT) | Script | Trigger | Output |
 |---|---|---|---|
-| 9am M-F | `morning_brief.py --post` | launchd | Discord brief + mlb.db pitcher cache |
+| 9am M-F | `mlb_brief.py --post` | launchd | Discord brief + mlb.db pitcher cache |
 | nightly | `daily.sh` → `cache_tomorrow.py` | launchd/cron | mlb.db player_news (night-before IL) |
 
 ---
@@ -73,7 +73,7 @@ noon PT Discord lean signal (or top-N from prescan)
 
 | File | Purpose |
 |---|---|
-| `prescan.py` | Pre-scrape game ranker. Pulls full slate + ESPN FIP + team stats, scores 4-factor rubric, writes `pre_scan_scores` with `reason` string per game. Default top 5. Run BEFORE Playwright opens. `--date`, `--top`. Also called by `morning_brief.py` as subprocess fallback if today's rows are missing. |
+| `prescan.py` | Pre-scrape game ranker. Pulls full slate + ESPN FIP + team stats, scores 4-factor rubric, writes `pre_scan_scores` with `reason` string per game. Default top 5. Run BEFORE Playwright opens. `--date`, `--top`. Also called by `mlb_brief.py` as subprocess fallback if today's rows are missing. |
 | `prep.py` | One-command cache runner. Finds today's scraped games, runs cache_stats → cache_espn (sequential) + cache_news + cache_team (parallel). `--check` for status-only. |
 | `closer.py` | 3-agent final round critique. Scout/Skeptic always haiku (executor); Closer uses `--model` (default sonnet, critic). Live Statcast + ump + lineup + days rest. `--dry-run`, `--game`, `--model haiku/opus`. |
 | `dive.py` | Full pre-game report: pitchers, batter splits, regression flags, prop angles. |
@@ -84,7 +84,7 @@ noon PT Discord lean signal (or top-N from prescan)
 | `cache_tomorrow.py` | Night-before IL pre-cache for all tomorrow's games. Called by daily.sh. |
 | `sliplog.py` | Slip log + bankroll. `add --picks JSON` (with reason), `result --outcomes JSON` (auto-triggers pick_lessons), `add-picks` retrofit, `list --detailed`, `picks`, `summary` (includes bankroll), `deposit --amount`, `withdrawal --amount`, `txns`. OB1 + Notion on add + result. |
 | `pick_lessons.py` | Auto-generated rule tracker. `observe`, `list`, `stats`, `review`, `falsify`, `resurrect`, `edit`. Graduates watching → confirmed at 3 occurrences. Pushes OB1 + insights.md on promotion. |
-| `morning_brief.py` | 9am pitcher grades + IL flags → Discord. Caches all starter stats in mlb.db. |
+| `mlb_brief.py` | 9am pitcher grades + IL flags → Discord. Caches all starter stats in mlb.db. |
 | `matchup.py` | Team + pitcher tier rankings. Early lean read. |
 | `player.py` | Per-pitcher start log / per-batter game log + splits / head-to-head. |
 | `lines_query.py` | Query mlb_game_lines by game, stat, player. |

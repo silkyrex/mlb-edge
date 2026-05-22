@@ -1,13 +1,14 @@
 """
-morning_brief.py -- daily 9am pre-game brief
+mlb_brief.py -- daily 9am MLB brief
 
-Pulls tomorrow's MLB schedule, grades probable starters, flags IL returns,
-and posts a summary to Discord (or prints to terminal).
+Pulls today's MLB schedule, grades probable starters, flags IL returns,
+ranks top matchups by edge score (K-edge + mismatch bonus), outputs
+edge_track PRESS/HOLD/DROP, and posts a summary to Discord.
 
 Usage:
-    python morning_brief.py               # print to terminal
-    python morning_brief.py --post        # post to Discord
-    python morning_brief.py --date 2026-05-16  # specific date
+    python mlb_brief.py                # print to terminal
+    python mlb_brief.py --post         # post to Discord
+    python mlb_brief.py --date 2026-05-16  # specific date
 """
 
 import argparse

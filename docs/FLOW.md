@@ -8,7 +8,7 @@ See `docs/GLOSSARY.md` for term definitions. See `docs/DATASOURCES.md` for API d
 
 | Time (PT) | What | Where |
 |---|---|---|
-| 9am M-F | `morning_brief.py` -- pitcher grades, IL flags, starter stats cached + top-5 prescan matchups with reasons | Discord + mlb.db |
+| 9am M-F | `mlb_brief.py` -- pitcher grades, IL flags, starter stats cached + top-5 prescan matchups with reasons | Discord + mlb.db |
 | nightly | `daily.sh` -- `cache_tomorrow.py` (night-before IL pre-cache) | mlb.db |
 
 Everything else is manual.
@@ -132,13 +132,18 @@ Use TB / H / HR to estimate: `doubles_estimate = TB - H - (HR * 3)` if result > 
 Caveat: a single hit with TB=3 and HR=0 is a triple, not a double — the formula overcounts.
 Safe rule: flag as estimate, only trust if 3+ games in last 10 show estimated doubles ≥ 1.
 
-**Full winning-slip process (run in order):**
-1. `prescan.py` — rank today's games
-2. `closer.py --game X` — Scout/Skeptic/Closer debate with live Statcast + umpire + lineup
-3. `player.py batter/pitcher` on every closer candidate — last 10 games, score vs line
-4. IL/scratch check — `mlb scratches` + query player_news table
-5. Rank by joint hit rate — best 2-pick Standard or 3-pick Flex
-6. Present one slip — wait for Raymond's approval
+**Full winning-slip process (run in order — each step depends on the previous):**
+1. `prescan.py` — rank today's games (K-edge + mismatch bonus); top 2-3 to scrape
+2. `/underdog-mlb [game]` — scrape prop lines → mlb_game_lines
+3. `prep.py` — cache stats (REQUIRED; re-run until all +)
+4. `rank.py` — tier every pitcher/batter/lineup ELITE/MID/FADE
+5. `mismatch.py` — find ELITE vs FADE pairings → mismatch_candidates table
+6. `player.py batter/pitcher` on every mismatch candidate — CHEAP GATE (hit rate ≥ 30%, IL check, H/A split)
+7. `closer.py` — Scout/Skeptic/Closer debate on validated candidates; blocks if prep incomplete
+8. Present one slip — wait for Raymond's approval
+
+**Why this order:** player.py (step 6) is free and instant; closer.py (step 7) costs $0.05–0.30 and 2-3 min.
+Filter cheap before spending compute. mismatch_candidates is the input to player.py — can't skip step 5.
 
 **Browser slip state warning:**
 Navigating to a new page does NOT clear picks in Underdog. Always check `Your picks N` count
