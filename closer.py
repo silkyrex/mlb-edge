@@ -1039,7 +1039,7 @@ def _check_prep(target_date: str, game_filter: str | None) -> bool:
         capture_output=True, text=True, cwd=Path(__file__).parent,
     )
     output = result.stdout
-    missing = [line.strip() for line in output.splitlines() if "  -" in line]
+    missing = [line.strip() for line in output.splitlines() if "  -" in line and "= missing" not in line]
     if missing:
         print("[closer] ⚠️  Cache incomplete — run prep.py first:", file=sys.stderr)
         for m in missing:
