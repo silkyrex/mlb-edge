@@ -584,16 +584,10 @@ def write_md_final_sections(
 # Discord
 # ---------------------------------------------------------------------------
 
-def discord_push(webhook_url: str, message: str) -> None:
-    if not webhook_url:
-        return
+def discord_push(message: str) -> None:
     try:
-        requests.post(
-            webhook_url,
-            json={"content": message},
-            headers={"User-Agent": "mlb-edge/1.0"},
-            timeout=10,
-        )
+        from discord_manager import send as _dm_send
+        _dm_send("mlb_edge_alert", message)
     except Exception:
         pass
 
@@ -617,7 +611,7 @@ def parse_team_names(game_str: str) -> tuple[str, str]:
 
 def main() -> None:
     args = parse_args()
-    webhook = os.getenv("SPORTS_WEBHOOK_URL", "") if not args.no_discord else ""
+    discord_enabled = not args.no_discord
     game_date = args.date or date_cls.today().isoformat()
 
     if args.game_pk:
@@ -694,8 +688,8 @@ def main() -> None:
         conn.commit()
         write_md_entry(log_path, current, event_type, scout_note)
 
-        if scout_note and events and webhook:
-            discord_push(webhook,
+        if scout_note and events and discord_enabled:
+            discord_push(
                 f"**{current['half']} {current['inning']} | "
                 f"{game_str} {current['away_score']}-{current['home_score']}** "
                 f"[{event_type}]\n{scout_note}")
@@ -733,12 +727,12 @@ def main() -> None:
                              final_analysis, critical_read)
             conn.commit()
 
-            if webhook:
+            if discord_enabled:
                 if final_analysis:
-                    discord_push(webhook,
+                    discord_push(
                         f"**Final Analysis: {game_str} {final_score}**\n{final_analysis}")
                 if critical_read:
-                    discord_push(webhook,
+                    discord_push(
                         f"**Critical Read: {game_str} {final_score}**\n{critical_read}")
 
             print(f"[watch] Done. Log: {log_path}")

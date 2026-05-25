@@ -277,10 +277,11 @@ def settle_bet(bet_id: int, result: str, actual_payout: float | None = None):
 
 
 def post_discord(message: str):
-    if not WEBHOOK_URL:
-        return
-    requests.post(WEBHOOK_URL, json={"content": message},
-                  headers={"User-Agent": "mlb-edge/1.0"}, timeout=10)
+    try:
+        from discord_manager import send as _dm_send
+        _dm_send("mlb_edge_alert", message)
+    except Exception as e:
+        print(f"Discord post failed: {e}")
 
 
 def build_bet_summary(bet: dict) -> tuple[str, str]:

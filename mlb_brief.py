@@ -382,23 +382,18 @@ def build_brief(game_date: str) -> str:
 
 
 def post_to_discord(message: str):
-    if not WEBHOOK_URL:
-        print("No SPORTS_WEBHOOK_URL set -- printing only.")
-        return
-    r = requests.post(WEBHOOK_URL, json={"content": message},
-                      headers={"User-Agent": "mlb-edge/1.0"}, timeout=10)
-    if r.status_code in (200, 204):
+    try:
+        from discord_manager import send as _dm_send
+        _dm_send("mlb_edge_alert", message)
         print("Posted to Discord.")
-    else:
-        print(f"Discord post failed: {r.status_code} {r.text}")
+    except Exception as e:
+        print(f"Discord post failed: {e}")
 
 
 def _post_qa_status(message: str) -> None:
-    if not QA_WEBHOOK:
-        return
     try:
-        requests.post(QA_WEBHOOK, json={"content": message},
-                      headers={"User-Agent": "mlb-edge/1.0"}, timeout=10)
+        from discord_manager import send as _dm_send
+        _dm_send("qa_gate_status", message)
     except Exception as e:
         print(f"QA webhook post failed: {e}")
 
